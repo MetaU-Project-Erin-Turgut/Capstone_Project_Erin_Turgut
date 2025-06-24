@@ -1,5 +1,7 @@
-#Client folder
+#Root directory
+.DS_Store
 
+#Client folder
 # Logs
 client/logs
 client/*.log
