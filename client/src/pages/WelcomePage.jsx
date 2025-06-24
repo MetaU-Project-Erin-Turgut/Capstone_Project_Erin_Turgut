@@ -1,6 +1,7 @@
 import Header from "../components/Header";
 import "../styles/WelcomePage.css"
 
+//This is the page that loads on start up - welcoming user to the app
 const WelcomePage = () => {
 
     return (
