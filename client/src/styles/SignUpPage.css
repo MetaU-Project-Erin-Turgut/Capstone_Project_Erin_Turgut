@@ -1,0 +1,27 @@
+.page-div {
+    display: flex;
+    flex-direction: row;
+    justify-content: space-around;
+    align-items: center;
+    height: 100vh;
+}
+
+.title-side {
+    text-align: center;
+}
+
+.input-side input {
+    padding: 10px;
+    width: 400px;
+    margin: 10px 0px;
+}
+
+.title-side h1 {
+    font-size: 100px;
+    margin: 5px;
+}
+
+input::placeholder {
+    color: black;
+    opacity: 1;
+}
