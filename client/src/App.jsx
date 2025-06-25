@@ -1,4 +1,6 @@
+import { useEffect } from 'react';
 import { HashRouter, Routes, Route } from 'react-router-dom';
+import { useUser } from "./contexts/UserContext";
 import WelcomePage from "./pages/WelcomePage";
 import SignUpPage from "./pages/SignUpPage";
 import LoginPage from "./pages/LoginPage";
@@ -7,6 +9,21 @@ import ProfilePage from "./pages/ProfilePage";
 import './App.css'
 
 function App() {
+
+  const { setUser } = useUser();
+
+  // useEffect(() => {
+  //   //check if session exists when the app starts
+  //   fetch("http://localhost:3000/me", { credentials: "include" })
+  //     .then((response) => response.json())
+  //     .then((data) => {
+  //       if (data.id) {
+  //         setUser(data); // Set the user in context
+  //       }
+  //     });
+  // }, [setUser]); //need this dependency?
+
+
   return (
     <HashRouter>
       <Routes>

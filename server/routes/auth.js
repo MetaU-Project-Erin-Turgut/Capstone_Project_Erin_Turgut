@@ -56,14 +56,19 @@ router.post('/signup', async (req, res) => {
                 password: hashedPassword,
                 events: {
                     create: [
-                        { event: { create: { title: 'bowling', description: 'descBowling', zip_code: '75034' } } },
-                        { event: { create: { title: 'tennis', description: 'descTennis', zip_code: '75034' } } },
+                        { event: { create: { title: `${username}_bowling`, description: 'descBowling', zip_code: '75034' } } },
+                        { event: { create: { title: `${username}_tennis`, description: 'descTennis', zip_code: '75034' } } },
                     ],
                 },
             }
         })
 
-        res.status(201).json({ message: "Signup successful!" })
+        // Store user ID and username in the session, allowing them to remain authenticated as they navigate the website
+        req.session.userId = newUser.id
+        req.session.username = newUser.username
+        res.status(201).json({ message: "Sign up successful!", id: newUser.id, username: newUser.username }) 
+
+
     } catch (error) {
         console.error(error)
         res.status(500).json({ error: "Something went wrong during signup" })
@@ -96,7 +101,6 @@ router.post('/login', loginLimiter, async (req, res) => {
             }
             if (result) {
                 //Successful login:
-                //res.status(201).json({ message: "Login successful!" })
 
                 // Store user ID and username in the session, allowing them to remain authenticated as they navigate the website
                 req.session.userId = user.id
