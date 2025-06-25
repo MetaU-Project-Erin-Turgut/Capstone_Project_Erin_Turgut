@@ -1,0 +1,21 @@
+.card {
+    /* border: solid rgb(133, 131, 131) 5px; */
+    box-shadow: 0px 10px 10px rgb(114, 112, 112);  
+    max-height: 400px;
+}
+/*Reordered*/
+.card-header {
+    display: flex;
+    flex-direction: column;
+}
+
+.card-header .title {
+    font-size: 30px;
+    margin: 2px;
+}
+
+
+.card-header .status-icon{
+    font-size: 40px;
+    align-self: end;
+}
