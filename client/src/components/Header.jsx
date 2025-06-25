@@ -1,4 +1,5 @@
 import { useNavigate } from  "react-router";
+import { welcomeRoute, signUpRoute, loginRoute } from "../utils/NavigationConsts";
 import "../styles/Header.css"
 const Header = () => {
 
@@ -7,14 +8,14 @@ const Header = () => {
     return (
         <header className="banner">
             <h1 className="title-text" onClick={() => {
-                navigate('/');
+                navigate(welcomeRoute);
             }}>Pivot</h1>
             <div className="welcome-buttons">
                 <button onClick={() => {
-                    navigate('/signup');
+                    navigate(signUpRoute);
                 }}>Sign Up</button>
                 <button onClick={() => {
-                    navigate('/login');
+                    navigate(loginRoute);
                 }}>Login</button> 
             </div>
         </header>

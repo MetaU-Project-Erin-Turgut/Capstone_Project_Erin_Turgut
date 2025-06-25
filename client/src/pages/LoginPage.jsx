@@ -2,7 +2,9 @@ import { useState } from 'react';
 import { useNavigate } from  "react-router";
 import { useUser } from "../contexts/UserContext";
 import Header from "../components/Header";
+import { mainPageRoute } from '../utils/NavigationConsts';
 import "../styles/SignUpPage.css"
+
 
 const LoginPage = () => {
     const { setUser } = useUser();
@@ -38,7 +40,7 @@ const LoginPage = () => {
 
             if (response.ok) {
                 setUser(data); // Store user session in context
-                navigate('/main');
+                navigate(mainPageRoute);
             } else {
                 console.error(data.error);
             }

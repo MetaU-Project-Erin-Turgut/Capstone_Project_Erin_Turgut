@@ -22,9 +22,9 @@ app.use(session({
   cookie: { path: '/', httpOnly: true, secure: false, maxAge: 1000 * 60 * 60 } //1 hour session
 }))
 
-
-app.use(authRoutes)
-app.use(eventRoutes)
+//routes are defined in these files
+app.use(authRoutes) //sign up, login, logout, and check for active session
+app.use(eventRoutes) //operations relating to user's event data
 
 app.listen(PORT, () => {
   console.log(`Server is running on http://localhost:${PORT}`)

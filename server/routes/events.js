@@ -12,7 +12,7 @@ const isAuthenticated = (req, res, next) => {
     next()
 }
 
-//get user's events
+//get user's events - possibly change url in future to be more specific?
 router.get('/user/events/', isAuthenticated, async (req, res) => {
     try {
         const userData = await prisma.user.findMany({

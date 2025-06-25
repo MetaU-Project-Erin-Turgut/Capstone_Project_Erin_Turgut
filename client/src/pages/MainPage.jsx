@@ -26,7 +26,6 @@ const MainPage = () => {
             const data = await response.json();
 
             if (response.ok) {
-                console.log(data[0].events);
                 setEvents(data[0].events);
             } else {
                 console.error(data.error);
@@ -43,6 +42,7 @@ const MainPage = () => {
                 setSelectedTab(tabName);
             }}/>
             {/* Populate events or groups depending what tab was clicked on the side */}
+            {/* As you add more tabs, change to switch statement! */}
             {selectedTab == Tab.EVENTS? 
                 <EventsList eventsArr={events}/> : <GroupsList />
             }
