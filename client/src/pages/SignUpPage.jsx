@@ -10,7 +10,7 @@ const SignUpPage = () => {
             <Header />
             <div className="page-div">
                 <div className="title-side">
-                    <h1 className="caprasimo-regular">Sign Up</h1>
+                    <h1 className="title-text">Sign Up</h1>
                 </div>
 
                 <div className="input-side">

@@ -4,7 +4,7 @@
     height: 100vh;
 }
 
-.sidebar div {
+.sidebar .side-tab {
     text-align: center;
     padding: 50px;
     width: 120px;

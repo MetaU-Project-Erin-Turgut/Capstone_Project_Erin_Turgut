@@ -6,7 +6,7 @@ const Header = () => {
 
     return (
         <header className="banner">
-            <h1 className="caprasimo-regular" onClick={() => {
+            <h1 className="title-text" onClick={() => {
                 navigate('/');
             }}>Pivot</h1>
             <div className="welcome-buttons">

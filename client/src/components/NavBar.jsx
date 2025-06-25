@@ -8,7 +8,7 @@ const NavBar = () => {
 
     return (
         <nav className="navigation">
-            <h1 className="caprasimo-regular" onClick={() => {
+            <h1 className="title-text" onClick={() => {
                 navigate('/main');
             }}>Pivot</h1>
             <FaUserCircle size={50} onClick={() => {

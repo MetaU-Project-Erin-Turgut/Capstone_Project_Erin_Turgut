@@ -9,7 +9,7 @@ const WelcomePage = () => {
             <Header />
             <div className="welcome-div">
                 <div className="welcome-title">
-                    <h1 className="caprasimo-regular">Pivot</h1>
+                    <h1 className="title-text">Pivot</h1>
                     <h2>A social app that gets rid of the hardest part: 
                         <br></br>the first step.
                     </h2>

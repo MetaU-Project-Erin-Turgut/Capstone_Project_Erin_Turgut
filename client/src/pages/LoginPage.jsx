@@ -11,7 +11,7 @@ const LoginPage = () => {
             <Header />
             <div className="page-div">
                 <div className="title-side">
-                    <h1 className="caprasimo-regular">Login</h1>
+                    <h1 className="title-text">Login</h1>
                 </div>
 
                 <div className="input-side">

@@ -3,9 +3,11 @@ import { LiaUserTimesSolid } from "react-icons/lia";//icon for "rejected event"
 import { LiaUserCheckSolid } from "react-icons/lia";//icon for "accepted event"
 import { LiaUserClockSolid } from "react-icons/lia";//icon for "pending response"
 
+
 const Event = () => {
     return (
-        <div className="card">
+        <div className="card" onClick={() => {
+        }}>
             <section className="card-header">
                 {/* the below icon will be chnaged based on event status */}
                 <LiaUserClockSolid className="status-icon"/>

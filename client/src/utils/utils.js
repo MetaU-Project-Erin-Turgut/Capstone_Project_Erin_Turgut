@@ -1,7 +1,7 @@
 //enums for tabs
 const Tab = Object.freeze({
-    EVENTS: "events",
-    GROUPS: "groups"
+    EVENTS: "Events",
+    GROUPS: "Groups"
 });
 
 export { Tab };

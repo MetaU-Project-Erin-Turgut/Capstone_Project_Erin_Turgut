@@ -23,6 +23,7 @@ const MainPage = () => {
             {selectedTab == Tab.EVENTS? 
                 <EventsList /> : <GroupsList />
             }
+            
         </div>
     )
 }
