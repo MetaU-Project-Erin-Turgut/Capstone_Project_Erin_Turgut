@@ -90,14 +90,14 @@ router.post('/login', loginLimiter, async (req, res) => {
         })
 
         if (!user) {
-            return res.status(401).json({ error: "Invalid email or password" })
+            return res.status(401).json({ error: "Invalid email" })
         }
 
         //if user was found, compare entered password to hashed password in database
 
         bcrypt.compare(password, user.password, (err, result) => {
             if (err) {
-                return res.status(500).json({ error: "Error validating email or password, come back later." })
+                return res.status(500).json({ error: "Error validating password, come back later." })
             }
             if (result) {
                 //Successful login:

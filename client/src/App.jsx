@@ -1,6 +1,4 @@
-import { useEffect } from 'react';
 import { HashRouter, Routes, Route } from 'react-router-dom';
-import { useUser } from "./contexts/UserContext";
 import WithAuth from './components/WithAuth';
 import WelcomePage from "./pages/WelcomePage";
 import SignUpPage from "./pages/SignUpPage";

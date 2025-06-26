@@ -1,24 +1,54 @@
+import { useState } from 'react';
+import { LiaUserTimesSolid as RejectedIcon} from "react-icons/lia";//icon for "rejected event"
+import { LiaUserCheckSolid as AcceptedIcon} from "react-icons/lia";//icon for "accepted event"
+import { LiaUserClockSolid as PendingIcon} from "react-icons/lia";//icon for "pending response"
+import EventDetailsModal from './EventDetailsModal';
+import { Status } from "../utils/utils";
 import "../styles/Card.css";
-import { LiaUserTimesSolid } from "react-icons/lia";//icon for "rejected event"
-import { LiaUserCheckSolid } from "react-icons/lia";//icon for "accepted event"
-import { LiaUserClockSolid } from "react-icons/lia";//icon for "pending response"
 
 
-const Event = ( {event_id, status, eventData}) => {
+const Event = ( {eventData}) => {
+
+    const [statusState, setStatusState] = useState(eventData.status); //change to event object? 
+    const [isEventDetailsModalVisible, setIsEventDetailsModalVisible] = useState(false);
+
+    const { title, description, zip_code, address  } = eventData.event; //due to nature of prisma relational queries, event table data is in nested event property
+
+    const renderStatus = () => {
+        switch(statusState) {
+            case Status.ACCEPTED: 
+                return <AcceptedIcon className="status-icon"/>
+            case Status.PENDING: 
+                return <PendingIcon className="status-icon"/>
+            case Status.REJECTED:
+                return <RejectedIcon className="status-icon"/>
+        }
+    }
+
+    const openModal = () => {
+        setIsEventDetailsModalVisible(true)
+    }
+    const closeModal = () => {
+        setIsEventDetailsModalVisible(false);
+    }
+
+    const updateStatus = (newStatus) => {
+        setStatusState(newStatus);
+    }
     
-    const { title, description, zip_code, address  } = eventData.event; //due to nature of prisma relational queries, event table data is in nested event propert
+    
     return (
-        <div className="card" onClick={() => {
-        }}>
+        <>
+        <div className="card" onClick={openModal}>
             <section className="card-header">
-                {/* the below icon will be chnaged based on event status */}
-                <LiaUserClockSolid className="status-icon"/>
+                {renderStatus()}
                 <h4 className="title">{title}</h4>
             </section>
-            {/* <img src="https://picsum.photos/200/200" /> */}
             <p>{description}</p>
             <p>{zip_code}</p>
         </div>
+        {isEventDetailsModalVisible && <EventDetailsModal closeModal={closeModal} eventData={eventData} currStatus={statusState} updateStatus={updateStatus}/>}
+        </>
     )
 }
 

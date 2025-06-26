@@ -6,7 +6,7 @@ import "../styles/NavBar.css";
 
 const NavBar = () => {
 
-    const { user, setUser } = useUser(); 
+    const { setUser } = useUser(); 
 
     const navigate = useNavigate();
 
