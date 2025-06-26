@@ -1,0 +1,56 @@
+// This is your Prisma schema file,
+// learn more about it in the docs: https://pris.ly/d/prisma-schema
+
+// Looking for ways to speed up your queries, or scale easily with your serverless or edge functions?
+// Try Prisma Accelerate: https://pris.ly/cli/accelerate-init
+
+generator client {
+  provider = "prisma-client-js"
+  output   = "../generated/prisma"
+}
+
+datasource db {
+  provider = "postgresql"
+  url      = env("DATABASE_URL")
+}
+
+model User {
+  id       Int    @id @default(autoincrement())
+  username String @unique
+  email    String @unique
+  password String
+  events   Event_User[]
+}
+
+model User_Profile {
+  id          Int    @id @default(autoincrement())
+  first_name  String
+  last_name   String
+  address     String?
+  zip_code    String @db.VarChar(5)
+}
+
+model Event {
+  id          Int    @id @default(autoincrement())
+  title String
+  description String
+  address  String?
+  zip_code String @db.VarChar(5)
+  attendees Event_User[]
+}
+
+model Event_User {
+  user User @relation(fields: [user_id], references: [id])
+  user_id Int
+  event Event @relation(fields: [event_id], references: [id])
+  event_id Int
+  status Status @default(PENDING)
+
+  @@id([user_id, event_id])
+}
+
+enum Status {
+  PENDING
+  ACCEPTED
+  REJECTED
+}
