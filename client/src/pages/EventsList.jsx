@@ -3,7 +3,7 @@ import Event from "../components/Event";
 import FilterOptions from "../components/FilterOptions";
 import "../styles/CardListContainer.css"
 
-const EventsList = ({ eventsArr, filterEvents }) => {
+const EventsList = ({ eventsArr, filterEvents, refetchData }) => {
 
     return (
         <>
@@ -15,6 +15,7 @@ const EventsList = ({ eventsArr, filterEvents }) => {
                     return <Event 
                         key={event.event_id}
                         eventData={event}
+                        refetchData={refetchData}
                     />
                 })}
             </Suspense>

@@ -7,7 +7,7 @@ import { Status } from "../utils/utils";
 import "../styles/Card.css";
 
 
-const Event = ( {eventData}) => {
+const Event = ( {eventData, refetchData}) => {
 
     const [statusState, setStatusState] = useState(eventData.status); //change to event object? 
     const [isEventDetailsModalVisible, setIsEventDetailsModalVisible] = useState(false);
@@ -34,6 +34,8 @@ const Event = ( {eventData}) => {
 
     const updateStatus = (newStatus) => {
         setStatusState(newStatus);
+        refetchData(); //Note: need to refetch data in Main Page so that filtering will work with updated events
+                        //This doesn't feel like the best solution - would this be a case for useContext? Or is there a better option?
     }
     
     

@@ -54,7 +54,7 @@ const MainPage = () => {
             {/* Populate events or groups depending what tab was clicked on the side */}
             {/* As you add more tabs, change to switch statement! */}
             {selectedTab == Tab.EVENTS? 
-                <EventsList eventsArr={events} filterEvents={filterEvents}/> : <GroupsList />
+                <EventsList eventsArr={events} filterEvents={filterEvents} refetchData={() => {fetchEvents()}}/> : <GroupsList />
             }
             
         </div>
