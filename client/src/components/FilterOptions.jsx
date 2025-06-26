@@ -7,9 +7,11 @@ const FilterOptions = ( {filterEvents}) => {
     }
 
     return <div className="filter-form">
-        <button value={Status.PENDING} onClick={handleFilterClick}>{Status.PENDING}</button>
-        <button value={Status.ACCEPTED} onClick={handleFilterClick}>{Status.ACCEPTED}</button>
-        <button value={Status.REJECTED} onClick={handleFilterClick}>{Status.REJECTED}</button>
+        {
+            Object.values(Status).map((status, index) => (
+                <button key={index} value={status} onClick={handleFilterClick}>{status}</button>
+            ))
+        }
     </div>
 }
 
