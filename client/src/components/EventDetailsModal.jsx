@@ -1,11 +1,10 @@
 import { useState } from 'react';
 import { Status } from "../utils/utils";
-import { useUser } from "../contexts/UserContext";
 import "../styles/Modal.css";
 
 const EventDetailsModal = ( {onModalClose, eventData, initialStatus, onStatusChange}) => {
 
-    const [statusState, setStatusState] = useState(initialStatus); //change to event object? 
+    const [statusState, setStatusState] = useState(initialStatus); 
 
     const { id, address, description, title, zip_code } = eventData; //needs to be done this way due to nature of database query many-to-many
 

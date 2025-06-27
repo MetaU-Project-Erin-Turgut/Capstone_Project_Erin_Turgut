@@ -10,8 +10,7 @@ import "../styles/SignUpPage.css"
 const SignUpPage = () => {
     const { setUser } = useUser();
 
-    //set these to null instead??
-    //move these to a separate component??
+    //set these to null instead?
     const [formData, setFormData] = useState({address: "", username: "", password: "",  email: ""});
 
     const navigate = useNavigate();
