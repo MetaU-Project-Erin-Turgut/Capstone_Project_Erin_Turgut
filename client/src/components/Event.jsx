@@ -9,7 +9,6 @@ import "../styles/Card.css";
 
 const Event = ( {eventData, refetchData}) => {
 
-    // const [statusState, setStatusState] = useState(eventData.status); //change to event object? 
     const [isEventDetailsModalVisible, setIsEventDetailsModalVisible] = useState(false);
 
     const { title, description, zip_code, address  } = eventData.event; //due to nature of prisma relational queries, event table data is in nested event property

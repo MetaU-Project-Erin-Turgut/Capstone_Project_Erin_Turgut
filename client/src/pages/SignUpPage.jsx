@@ -12,7 +12,7 @@ const SignUpPage = () => {
 
     //set these to null instead??
     //move these to a separate component??
-    const [formData, setFormData] = useState({ username: "", password: "",  email: ""});
+    const [formData, setFormData] = useState({address: "", username: "", password: "",  email: ""});
 
     const navigate = useNavigate();
 
@@ -68,6 +68,13 @@ const SignUpPage = () => {
                         <input placeholder="Last Name"></input><br />
 
                         {/* Handle just these for now  - use enums for 'name'??*/}
+                        <input 
+                            placeholder="Address"
+                            type="text"
+                            name="address"
+                            value={formData.address}
+                            onChange={handleInputChange}
+                        ></input><br />
                         <input 
                             placeholder="Email"
                             type="text"
