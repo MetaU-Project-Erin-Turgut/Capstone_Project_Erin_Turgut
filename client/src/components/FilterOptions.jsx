@@ -1,9 +1,9 @@
 import { Status } from "../utils/utils";
 
-const FilterOptions = ( {filterEvents}) => {
+const FilterOptions = ( {onFilterChange}) => {
 
     const handleFilterClick = (event) => {
-        filterEvents(event.target.value)
+        onFilterChange(event.target.value)
     }
 
     return <div className="filter-form">

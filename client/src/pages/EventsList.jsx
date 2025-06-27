@@ -3,12 +3,12 @@ import Event from "../components/Event";
 import FilterOptions from "../components/FilterOptions";
 import "../styles/CardListContainer.css"
 
-const EventsList = ({ eventsArr, filterEvents, refetchData }) => {
+const EventsList = ({ eventsArr, onFilterChange, refetchData }) => {
 
     return (
         <>
         <h2>Events</h2>
-        <FilterOptions filterEvents={filterEvents}/>
+        <FilterOptions onFilterChange={onFilterChange}/>
         <div className="card-container">
             <Suspense fallback={<p>Loading...</p>}>
                 {eventsArr.map((event) => {

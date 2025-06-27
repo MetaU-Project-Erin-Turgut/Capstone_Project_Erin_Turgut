@@ -9,13 +9,13 @@ import "../styles/Card.css";
 
 const Event = ( {eventData, refetchData}) => {
 
-    const [statusState, setStatusState] = useState(eventData.status); //change to event object? 
+    // const [statusState, setStatusState] = useState(eventData.status); //change to event object? 
     const [isEventDetailsModalVisible, setIsEventDetailsModalVisible] = useState(false);
 
     const { title, description, zip_code, address  } = eventData.event; //due to nature of prisma relational queries, event table data is in nested event property
 
     const renderStatus = () => {
-        switch(statusState) {
+        switch(eventData.status) {
             case Status.ACCEPTED: 
                 return <AcceptedIcon className="status-icon"/>
             case Status.PENDING: 
@@ -31,13 +31,6 @@ const Event = ( {eventData, refetchData}) => {
     const closeModal = () => {
         setIsEventDetailsModalVisible(false);
     }
-
-    const updateStatus = (newStatus) => {
-        setStatusState(newStatus);
-        refetchData(); //Note: need to refetch data in Main Page so that filtering will work with updated events
-                        //This doesn't feel like the best solution - would this be a case for useContext? Or is there a better option?
-    }
-    
     
     return (
         <>
@@ -49,7 +42,7 @@ const Event = ( {eventData, refetchData}) => {
             <p>{description}</p>
             <p>{zip_code}</p>
         </div>
-        {isEventDetailsModalVisible && <EventDetailsModal closeModal={closeModal} eventData={eventData} currStatus={statusState} updateStatus={updateStatus}/>}
+        {isEventDetailsModalVisible && <EventDetailsModal onModalClose={closeModal} eventData={eventData.event} initialStatus={eventData.status} onStatusChange={() => {refetchData()}}/>}
         </>
     )
 }
