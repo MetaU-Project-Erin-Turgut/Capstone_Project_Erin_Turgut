@@ -1,4 +1,3 @@
-
 import "../styles/CardListContainer.css"
 
 const GroupsList = () => {

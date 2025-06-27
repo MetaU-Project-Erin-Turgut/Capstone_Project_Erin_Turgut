@@ -4,11 +4,13 @@ import "../styles/SideBar.css"
 const SideBar = ({ handleTabSelect }) => {
 
     return <nav className="sidebar"> 
-        {Object.values(Tab).map(currentTab => (
-          <div className="side-tab" onClick={() => {handleTabSelect(currentTab)}}>
-              <h3 className="title-text">{currentTab}</h3>
-          </div>
-        ))}
+        {
+            Object.values(Tab).map((currentTab, index) => (
+                <div key={index} className="side-tab" onClick={() => {handleTabSelect(currentTab)}}>
+                    <h3 className="title-text">{currentTab}</h3>
+                </div>
+            ))
+        }
     </nav>
 }
 

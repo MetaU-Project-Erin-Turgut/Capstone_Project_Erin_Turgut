@@ -1,0 +1,49 @@
+.modal-overlay {
+    display: block;
+    position: fixed;
+    top: 0;
+    left: 0;
+    width:100vw;
+    height:100vh;
+    background: rgba(0, 0, 0, 0.6);
+    z-index: 2;
+    
+}
+
+.modal-popup {
+    display: block;
+    z-index: 2;
+    min-width: 60%;
+    max-height: 80%;
+    margin-bottom: 20px;
+    margin-top: 50px;
+    overflow-y: scroll;
+    overflow-x: hidden;
+    scrollbar-width: none;
+    /*Below is to center the modal relative to the browser window*/
+    position: fixed;
+    left: 50%;
+    top: 40%;
+    transform: translate(-40%, -50%);    
+}
+
+.modal-popup * {
+    opacity: 1;
+    padding: 6px;
+}
+
+.modal-content {
+    background-color: white;
+    max-width: 70%;
+    border-style: outset;
+    border-width: 7px;
+    overflow: scroll;
+    box-shadow: 10px 10px 10px rgb(114, 112, 112);
+}
+
+.modal-content .close-btn {
+    position: fixed;
+    left: 67%;
+    top: 5%;    
+    z-index: 3; 
+}

@@ -1,4 +1,4 @@
-import { useState, useEffect } from 'react';
+import { useState, useEffect, useRef } from 'react';
 import NavBar from "../components/NavBar";
 import SideBar from "../components/SideBar";
 import EventsList from './EventsList';
@@ -7,6 +7,8 @@ import { Tab } from "../utils/utils";
 import "../styles/MainPage.css";
 
 const MainPage = () => {
+
+    const defaultEvents = useRef([]);
 
     const [selectedTab, setSelectedTab] = useState(Tab.EVENTS);
     const [events, setEvents] = useState([]);
@@ -26,13 +28,21 @@ const MainPage = () => {
             const data = await response.json();
 
             if (response.ok) {
-                setEvents(data[0].events);
+                setEvents(data.events);
+                defaultEvents.current = data.events;
             } else {
                 console.error(data.error);
             }
         } catch (error) {
             console.error("Network error:", error);
         }
+    }
+
+    const filterEvents = (filter) => {
+        const newEvents = defaultEvents.current.filter(event => 
+            event.status === filter
+        );
+        setEvents(newEvents);
     }
 
     return (
@@ -44,7 +54,7 @@ const MainPage = () => {
             {/* Populate events or groups depending what tab was clicked on the side */}
             {/* As you add more tabs, change to switch statement! */}
             {selectedTab == Tab.EVENTS? 
-                <EventsList eventsArr={events}/> : <GroupsList />
+                <EventsList eventsArr={events} onFilterChange={filterEvents} refetchData={() => {fetchEvents()}}/> : <GroupsList />
             }
             
         </div>

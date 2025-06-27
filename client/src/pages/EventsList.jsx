@@ -1,24 +1,24 @@
-// import { useUser } from "../contexts/UserContext";
+import { Suspense } from 'react';
 import Event from "../components/Event";
+import FilterOptions from "../components/FilterOptions";
 import "../styles/CardListContainer.css"
 
-const EventsList = ({ eventsArr }) => {
-
-    // const { user } = useUser();
+const EventsList = ({ eventsArr, onFilterChange, refetchData }) => {
 
     return (
         <>
-        {/* <h2>{user}</h2> */}
         <h2>Events</h2>
+        <FilterOptions onFilterChange={onFilterChange}/>
         <div className="card-container">
-            {eventsArr?.map((event) => {
-                return <Event 
-                    key={event.event_id}
-                    event_id={event.event_id}
-                    status={event.status}
-                    eventData={event}
-                />
-            })}
+            <Suspense fallback={<p>Loading...</p>}>
+                {eventsArr.map((event) => {
+                    return <Event 
+                        key={event.event_id}
+                        eventData={event}
+                        refetchData={refetchData}
+                    />
+                })}
+            </Suspense>
         </div>
         </>
     )
