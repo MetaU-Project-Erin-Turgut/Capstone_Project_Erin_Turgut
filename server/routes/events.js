@@ -36,19 +36,17 @@ router.get('/user/events/', isAuthenticated, async (req, res) => {
 //update user's status for an event
 router.patch('/user/events/:event_id', async (req, res) => {
     const event_id = parseInt(req.params.event_id);
-    const {updatedStatus} = req.body; //wasn't sure if user_id should be a path parameter because it may be sensitive information
+    const {updatedStatus} = req.body; 
 
     try {
-        const event_user = await prisma.event_User.findUnique({
+        const isEvent_user = await prisma.event_User.count({
             where: {
-                user_id_event_id: {
-                    user_id: req.session.userId,
-                    event_id: event_id
-                }
+                user_id: req.session.userId,
+                event_id: event_id
             }
         });
 
-        if (!event_user) {
+        if (isEvent_user === 0 ) {
             res.status(404).send('This user - event relationship does not exist');
         }
 

@@ -38,9 +38,9 @@ const MainPage = () => {
         }
     }
 
-    const filterEvents = (filter) => {
+    const filterEventsByStatus = (status) => {
         const newEvents = defaultEvents.current.filter(event => 
-            event.status === filter
+            event.status === status
         );
         setEvents(newEvents);
     }
@@ -54,7 +54,7 @@ const MainPage = () => {
             {/* Populate events or groups depending what tab was clicked on the side */}
             {/* As you add more tabs, change to switch statement! */}
             {selectedTab == Tab.EVENTS? 
-                <EventsList eventsArr={events} onFilterChange={filterEvents} refetchData={() => {fetchEvents()}}/> : <GroupsList />
+                <EventsList eventsArr={events} onFilterChange={filterEventsByStatus} refetchData={() => {fetchEvents()}}/> : <GroupsList />
             }
             
         </div>

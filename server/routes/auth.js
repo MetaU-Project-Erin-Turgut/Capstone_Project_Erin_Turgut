@@ -16,7 +16,7 @@ const saltRounds = 10;
 
 //Signup route
 router.post('/signup', async (req, res) => {
-    const { username, email, password } = req.body;
+    const { address, username, email, password } = req.body;
 
     try {
         if (!username || !email || !password) {
@@ -51,13 +51,14 @@ router.post('/signup', async (req, res) => {
         // Create a new user in the database
         const newUser = await prisma.user.create({
             data: {
+                address,
                 username,
                 email,
                 password: hashedPassword,
                 events: {
                     create: [
-                        { event: { create: { title: `${username}_bowling`, description: 'descBowling', zip_code: '75034' } } },
-                        { event: { create: { title: `${username}_tennis`, description: 'descTennis', zip_code: '75034' } } },
+                        { event: { create: { title: `${username}_bowling`, description: 'descBowling', address: 'event avenue', zip_code: '75034' } } },
+                        { event: { create: { title: `${username}_tennis`, description: 'descTennis', address: 'event avenue', zip_code: '75034' } } },
                     ],
                 },
             }

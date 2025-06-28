@@ -1,22 +1,25 @@
 import { useState } from 'react';
 import { Status } from "../utils/utils";
-import { useUser } from "../contexts/UserContext";
 import "../styles/Modal.css";
 
 const EventDetailsModal = ( {onModalClose, eventData, initialStatus, onStatusChange}) => {
 
-    const [statusState, setStatusState] = useState(initialStatus); //change to event object? 
+    const [statusState, setStatusState] = useState(initialStatus); 
 
     const { id, address, description, title, zip_code } = eventData; //needs to be done this way due to nature of database query many-to-many
 
-    const handleStatusUpdate = async (event) => {
+    const handleDropdownChange = (event) => {
+        setStatusState(event.target.value);
+    }
+
+    const handleStatusUpdate = async () => {
         //put request to change status of event
         try {
             const response = await fetch(`http://localhost:3000/user/events/${id}`, { //path param is event id
                 method: "PATCH",
                 headers: { "Content-Type": "application/json" },
                 body: JSON.stringify({
-                    "updatedStatus": event.target.value
+                    "updatedStatus": statusState
                 }),
                 credentials: "include",
             });
@@ -24,8 +27,8 @@ const EventDetailsModal = ( {onModalClose, eventData, initialStatus, onStatusCha
             const data = await response.json();
 
             if (response.ok) {
-                setStatusState(event.target.value);
-                onStatusChange(event.target.value);
+                await onStatusChange(statusState);
+                onModalClose();
             } else {
                 console.error(data.error);
             }
@@ -45,12 +48,13 @@ const EventDetailsModal = ( {onModalClose, eventData, initialStatus, onStatusCha
                     <p>{address}</p>
                     <p>{zip_code}</p>
                     <div className="select-form">
-                        <select name="update-sattus" defaultValue={statusState} onChange={handleStatusUpdate}>
+                        <select name="update-sattus" defaultValue={statusState} onChange={handleDropdownChange}>
                             <option disabled value="">Choose status</option>
                             <option value={Status.PENDING}>{Status.PENDING}</option>
                             <option value={Status.ACCEPTED}>{Status.ACCEPTED}</option>
                             <option value={Status.REJECTED}>{Status.REJECTED}</option>
                         </select>
+                        <button onClick={handleStatusUpdate}>Submit Changes</button>
                     </div>
 
                 </div>
