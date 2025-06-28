@@ -7,6 +7,7 @@ const PORT = 3000;
 
 const eventRoutes = require('./routes/events')
 const authRoutes = require('./routes/auth')
+const interestRoutes = require('./routes/interests')
 
 app.use(cors({
   origin: 'http://localhost:5173', 
@@ -25,6 +26,7 @@ app.use(session({
 //routes are defined in these files
 app.use(authRoutes) //sign up, login, logout, and check for active session
 app.use(eventRoutes) //operations relating to user's event data
+app.use(interestRoutes) //operations relating to getting and selecting interests
 
 app.listen(PORT, () => {
   console.log(`Server is running on http://localhost:${PORT}`)

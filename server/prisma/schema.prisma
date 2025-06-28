@@ -23,6 +23,8 @@ model User {
   user_profile User_Profile?
   events   Event_User[]
   groups   Group_User[]
+  interest   Interest?   @relation(fields: [interest_id], references: [id])
+  interest_id     Int?    
 }
 
 model User_Profile {
@@ -51,6 +53,9 @@ model Group {
   is_full     Boolean @default(false)
   members     Group_User[]
   events      Group_Event[]
+  core_interest Interest @relation(fields: [interest_id], references: [id])
+  interest_id Int
+  central_location String
 }
 
 model Event_User {
@@ -88,6 +93,9 @@ model Interest {
   parent_id   Int?
   parent      Interest? @relation("InterestsSubInterests", fields: [parent_id], references: [id])
   children    Interest[] @relation("InterestsSubInterests")
+
+  groups Group[]
+  users User[] //this field won't be used but prisma requires it to establish the one-to-many relationship 
 }
 
 
