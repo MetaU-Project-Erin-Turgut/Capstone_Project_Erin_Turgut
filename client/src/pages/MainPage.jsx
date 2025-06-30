@@ -4,6 +4,7 @@ import SideBar from "../components/SideBar";
 import EventsList from './EventsList';
 import GroupsList from './GroupsList';
 import { Tab } from "../utils/utils";
+import { apifetchEvents }from '../utils/APIUtils';
 import "../styles/MainPage.css";
 
 const MainPage = () => {
@@ -19,22 +20,12 @@ const MainPage = () => {
 
     const fetchEvents = async () => {
         try {
-            const response = await fetch("http://localhost:3000/user/events/", {
-                method: "GET",
-                headers: { "Content-Type": "application/json" },
-                credentials: "include",
-            });
-
-            const data = await response.json();
-
-            if (response.ok) {
-                setEvents(data.events);
-                defaultEvents.current = data.events;
-            } else {
-                console.error(data.error);
-            }
+            const apiResultData = await apifetchEvents();
+            setEvents(apiResultData.events);
+            defaultEvents.current = apiResultData.events;
         } catch (error) {
-            console.error("Network error:", error);
+            console.log("Status ", error.status);
+            console.log("Error: ", error.message);
         }
     }
 

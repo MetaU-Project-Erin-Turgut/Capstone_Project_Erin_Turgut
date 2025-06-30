@@ -4,6 +4,7 @@ import { useUser } from "../contexts/UserContext";
 import Header from "../components/Header";
 import { mainPageRoute } from '../utils/NavigationConsts';
 import { DEFAULT_FORM_VALUE } from "../utils/utils";
+import { apihandleLogin } from '../utils/APIUtils';
 import "../styles/SignUpPage.css"
 
 
@@ -30,23 +31,12 @@ const LoginPage = () => {
 
     const loginUser = async () => {
         try {
-            const response = await fetch("http://localhost:3000/login", {
-                method: "POST",
-                headers: { "Content-Type": "application/json" },
-                body: JSON.stringify(formData),
-                credentials: "include",
-            });
-
-            const data = await response.json();
-
-            if (response.ok) {
-                setUser(data); // Store user session in context
-                navigate(mainPageRoute);
-            } else {
-                console.error(data.error);
-            }
+            const apiResultData = await apihandleLogin(formData);
+            setUser(apiResultData); // Store user session in context
+            navigate(mainPageRoute);
         } catch (error) {
-            console.error("Network error:", error);
+            console.log("Status ", error.status);
+            console.log("Error: ", error.message);
         }
     }
 

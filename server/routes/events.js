@@ -47,7 +47,7 @@ router.patch('/user/events/:event_id', async (req, res) => {
         });
 
         if (isEvent_user === 0 ) {
-            res.status(404).send('This user - event relationship does not exist');
+            res.status(404).json({error: 'This user - event relationship does not exist'});
         }
 
         const updatedEvent = await prisma.event_User.update({

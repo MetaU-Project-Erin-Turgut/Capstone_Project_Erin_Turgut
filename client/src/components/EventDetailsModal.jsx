@@ -1,5 +1,7 @@
 import { useState } from 'react';
 import { Status } from "../utils/utils";
+import { apiupdateEventStatus } from '../utils/APIUtils';
+
 import "../styles/Modal.css";
 
 const EventDetailsModal = ( {onModalClose, eventData, initialStatus, onStatusChange}) => {
@@ -15,27 +17,13 @@ const EventDetailsModal = ( {onModalClose, eventData, initialStatus, onStatusCha
     const handleStatusUpdate = async () => {
         //put request to change status of event
         try {
-            const response = await fetch(`http://localhost:3000/user/events/${id}`, { //path param is event id
-                method: "PATCH",
-                headers: { "Content-Type": "application/json" },
-                body: JSON.stringify({
-                    "updatedStatus": statusState
-                }),
-                credentials: "include",
-            });
-
-            const data = await response.json();
-
-            if (response.ok) {
-                await onStatusChange(statusState);
-                onModalClose();
-            } else {
-                console.error(data.error);
-            }
+            const apiResultData = await apiupdateEventStatus(id, statusState);
+            onStatusChange(apiResultData.status);
+            onModalClose();
         } catch (error) {
-            console.error("Network error:", error);
+            console.log("Status ", error.status);
+            console.log("Error: ", error.message);
         }
-
     }
 
     return (
