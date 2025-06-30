@@ -11,4 +11,14 @@ const Status = Object.freeze({
     REJECTED: "REJECTED"
 });
 
-export { Tab, Status };
+//const form value defaults used in login and sign up
+const DEFAULT_FORM_VALUE = {
+    first_name: "",
+    last_name: "",
+    address: "",
+    username: "",
+    password: "",
+    email: ""
+}
+
+export { Tab, Status, DEFAULT_FORM_VALUE };

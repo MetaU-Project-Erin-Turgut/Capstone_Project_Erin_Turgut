@@ -20,13 +20,6 @@ compatible.
 
 */
 
-
-
-
-
-
-
-
 ///---------------------------------ORIGINAL LAYOUT----------------------------------///
 
 //Step 1: Filter only incomplete groups

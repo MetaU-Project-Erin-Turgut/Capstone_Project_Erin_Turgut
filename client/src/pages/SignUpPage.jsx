@@ -3,6 +3,7 @@ import { useNavigate } from  "react-router";
 import { useUser } from "../contexts/UserContext";
 import Header from "../components/Header";
 import { mainPageRoute } from "../utils/NavigationConsts";
+import { DEFAULT_FORM_VALUE } from "../utils/utils";
 import "../styles/SignUpPage.css"
 
 
@@ -10,8 +11,7 @@ import "../styles/SignUpPage.css"
 const SignUpPage = () => {
     const { setUser } = useUser();
 
-    //set these to null instead?
-    const [formData, setFormData] = useState({address: "", username: "", password: "",  email: ""});
+    const [formData, setFormData] = useState({address: DEFAULT_FORM_VALUE.address, username: DEFAULT_FORM_VALUE.username, password: DEFAULT_FORM_VALUE.password,  email: DEFAULT_FORM_VALUE.email});
 
     const navigate = useNavigate();
 

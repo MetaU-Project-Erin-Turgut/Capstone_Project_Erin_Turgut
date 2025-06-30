@@ -6,7 +6,7 @@ const EventDetailsModal = ( {onModalClose, eventData, initialStatus, onStatusCha
 
     const [statusState, setStatusState] = useState(initialStatus); 
 
-    const { id, address, description, title, zip_code } = eventData; //needs to be done this way due to nature of database query many-to-many
+    const { id, address, description, title, zip_code } = eventData;
 
     const handleDropdownChange = (event) => {
         setStatusState(event.target.value);

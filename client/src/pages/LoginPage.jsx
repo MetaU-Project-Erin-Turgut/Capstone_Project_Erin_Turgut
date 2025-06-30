@@ -3,13 +3,14 @@ import { useNavigate } from  "react-router";
 import { useUser } from "../contexts/UserContext";
 import Header from "../components/Header";
 import { mainPageRoute } from '../utils/NavigationConsts';
+import { DEFAULT_FORM_VALUE } from "../utils/utils";
 import "../styles/SignUpPage.css"
 
 
 const LoginPage = () => {
     const { setUser } = useUser();
 
-    const [formData, setFormData] = useState({ email: "", password: ""});
+    const [formData, setFormData] = useState({ email: DEFAULT_FORM_VALUE.email, password: DEFAULT_FORM_VALUE.password});
     
     const navigate = useNavigate();
 
