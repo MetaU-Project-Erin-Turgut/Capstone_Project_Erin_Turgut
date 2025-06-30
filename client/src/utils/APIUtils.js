@@ -1,4 +1,3 @@
-
     const apiupdateEventStatus = async (id, statusState) => {
         const response = await fetch(`http://localhost:3000/user/events/${id}`, { //path param is event id
             method: "PATCH",

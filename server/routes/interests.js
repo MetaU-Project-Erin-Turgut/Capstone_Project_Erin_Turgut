@@ -4,8 +4,6 @@ const router = express.Router()
 const { PrismaClient } = require('../generated/prisma');
 const prisma = new PrismaClient()
 
-const { findGroups } = require('../systems/GroupFindAlgo');
-
 // Middleware to check if user is logged in before being able to perform any crud operations
 const isAuthenticated = (req, res, next) => {
     if (!req.session.userId) {
