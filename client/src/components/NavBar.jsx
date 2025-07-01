@@ -2,6 +2,7 @@ import { useNavigate } from  "react-router";
 import { FaUserCircle } from "react-icons/fa";
 import { useUser } from "../contexts/UserContext";
 import { mainPageRoute, profileRoute } from "../utils/NavigationConsts";
+import APIUtils from "../utils/APIUtils";
 import "../styles/NavBar.css";
 
 const NavBar = () => {
@@ -12,22 +13,12 @@ const NavBar = () => {
 
     const handleLogout = async () => {
         try {
-            const response = await fetch("http://localhost:3000/logout", {
-                method: "POST",
-                headers: { "Content-Type": "application/json" },
-                credentials: "include",
-            });
-
-            const data = await response.json();
-
-            if (response.ok) {
-                setUser(null); // remove session from react context
-                navigate(mainPageRoute);
-            } else {
-                console.error(data.error);
-            }
+            await APIUtils.handleLogout();
+            setUser(null); // remove session from react context
+            navigate(mainPageRoute);
         } catch (error) {
-            console.error("Network error:", error);
+            console.log("Status ", error.status);
+            console.log("Error: ", error.message);
         }
     }
 

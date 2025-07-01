@@ -13,17 +13,17 @@ const WithAuth = (WrappedComponent) => {
         useEffect(() => {
             if (!user) {
                 fetch("http://localhost:3000/me", { credentials: "include" })
-                    .then((response) => response.json())
-                    .then((data) => {
-                        if (data.id) { // Ensure the response contains the user id
-                            setUser(data); // Set the user in context
-                        } else {
-                            navigate(welcomeRoute);
-                        }
-                    })
-                    .catch(() => {
+                .then((response) => response.json())
+                .then((data) => {
+                    if (data.id) { // Ensure the response contains the user id
+                        setUser(data); // Set the user in context
+                    } else {
                         navigate(welcomeRoute);
-                    });
+                    }
+                })
+                .catch(() => {
+                    navigate(welcomeRoute);
+                });
             }
         }, [user, setUser, navigate]);
 

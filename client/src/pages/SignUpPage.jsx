@@ -3,6 +3,8 @@ import { useNavigate } from  "react-router";
 import { useUser } from "../contexts/UserContext";
 import Header from "../components/Header";
 import { mainPageRoute } from "../utils/NavigationConsts";
+import { DEFAULT_FORM_VALUE } from "../utils/utils";
+import APIUtils from "../utils/APIUtils";
 import "../styles/SignUpPage.css"
 
 
@@ -10,8 +12,7 @@ import "../styles/SignUpPage.css"
 const SignUpPage = () => {
     const { setUser } = useUser();
 
-    //set these to null instead?
-    const [formData, setFormData] = useState({address: "", username: "", password: "",  email: ""});
+    const [formData, setFormData] = useState({address: DEFAULT_FORM_VALUE.address, username: DEFAULT_FORM_VALUE.username, password: DEFAULT_FORM_VALUE.password,  email: DEFAULT_FORM_VALUE.email});
 
     const navigate = useNavigate();
 
@@ -31,23 +32,12 @@ const SignUpPage = () => {
 
     const signUpUser = async () => {
         try {
-            const response = await fetch("http://localhost:3000/signup", {
-                method: "POST",
-                headers: { "Content-Type": "application/json" },
-                body: JSON.stringify(formData),
-                credentials: "include",
-            });
-
-            const data = await response.json();
-
-            if (response.ok) {
-                setUser(data); // Store user session in context
-                navigate(mainPageRoute);
-            } else {
-                console.error(data.error);
-            }
+            const apiResultData = await APIUtils.handleSignUp(formData);
+            setUser(apiResultData); // Store user session in context
+            navigate(mainPageRoute);
         } catch (error) {
-            console.error("Network error:", error);
+            console.log("Status ", error.status);
+            console.log("Error: ", error.message);
         }
     }
 

@@ -20,11 +20,17 @@ model User {
   email    String @unique
   address  String
   password String
+  user_profile User_Profile?
   events   Event_User[]
+  groups   Group_User[]
+  interest   Interest?   @relation(fields: [interest_id], references: [id])
+  interest_id     Int?    
 }
 
 model User_Profile {
   id          Int    @id @default(autoincrement())
+  user        User   @relation(fields: [user_id], references: [id])
+  user_id     Int    @unique
   first_name  String
   last_name   String
   zip_code    String @db.VarChar(5)
@@ -32,22 +38,66 @@ model User_Profile {
 
 model Event {
   id          Int    @id @default(autoincrement())
-  title String
+  title       String
   description String
-  address  String
-  zip_code String @db.VarChar(5)
-  attendees Event_User[]
+  address     String
+  zip_code    String @db.VarChar(5)
+  attendees   Event_User[]
+  groups      Group_Event[]
+}
+
+model Group {
+  id          Int    @id @default(autoincrement())
+  title       String
+  description String
+  is_full     Boolean @default(false)
+  members     Group_User[]
+  events      Group_Event[]
+  core_interest Interest @relation(fields: [interest_id], references: [id])
+  interest_id Int
+  central_location String
 }
 
 model Event_User {
-  user User @relation(fields: [user_id], references: [id])
-  user_id Int
-  event Event @relation(fields: [event_id], references: [id])
-  event_id Int
-  status Status @default(PENDING)
+  user        User @relation(fields: [user_id], references: [id])
+  user_id     Int
+  event       Event @relation(fields: [event_id], references: [id])
+  event_id    Int
+  status      Status @default(PENDING)
 
   @@id([user_id, event_id])
 }
+
+model Group_User {
+  user        User @relation(fields: [user_id], references: [id])
+  user_id     Int
+  group       Group @relation(fields: [group_id], references: [id])
+  group_id    Int
+  status      Status @default(PENDING)
+
+  @@id([user_id, group_id])
+}
+
+model Group_Event {
+  group       Group @relation(fields: [group_id], references: [id])
+  group_id    Int
+  event       Event @relation(fields: [event_id], references: [id])
+  event_id    Int
+
+  @@id([group_id, event_id])
+}
+
+model Interest {
+  id          Int    @id @default(autoincrement())
+  title       String
+  parent_id   Int?
+  parent      Interest? @relation("InterestsSubInterests", fields: [parent_id], references: [id])
+  children    Interest[] @relation("InterestsSubInterests")
+
+  groups Group[]
+  users User[] //this field won't be used but prisma requires it to establish the one-to-many relationship 
+}
+
 
 enum Status {
   PENDING
