@@ -1,4 +1,6 @@
-    const apiupdateEventStatus = async (id, statusState) => {
+export default class APIUtils {
+
+    static updateEventStatus = async (id, statusState) => {
         const response = await fetch(`http://localhost:3000/user/events/${id}`, { //path param is event id
             method: "PATCH",
             headers: { "Content-Type": "application/json" },
@@ -18,7 +20,7 @@
    
     }
 
-    const apihandleLogout = async () => {
+    static handleLogout = async () => {
         const response = await fetch("http://localhost:3000/logout", {
             method: "POST",
             headers: { "Content-Type": "application/json" },
@@ -34,7 +36,7 @@
         }
     }
 
-    const apihandleLogin = async (formData) => {
+    static handleLogin = async (formData) => {
         const response = await fetch("http://localhost:3000/login", {
             method: "POST",
             headers: { "Content-Type": "application/json" },
@@ -52,7 +54,7 @@
 
     }
 
-    const apihandleSignUp = async (formData) => {
+    static handleSignUp = async (formData) => {
         const response = await fetch("http://localhost:3000/signup", {
             method: "POST",
             headers: { "Content-Type": "application/json" },
@@ -70,7 +72,7 @@
 
     }
 
-    const apifetchEvents = async () => {
+    static fetchEvents = async () => {
         const response = await fetch("http://localhost:3000/user/events/", {
             method: "GET",
             headers: { "Content-Type": "application/json" },
@@ -86,7 +88,4 @@
         }
 
     }
-
-
-
-export { apiupdateEventStatus, apihandleLogout, apihandleLogin, apihandleSignUp, apifetchEvents};
+}

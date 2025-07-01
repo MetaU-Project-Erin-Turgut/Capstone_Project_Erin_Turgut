@@ -4,7 +4,7 @@ import SideBar from "../components/SideBar";
 import EventsList from './EventsList';
 import GroupsList from './GroupsList';
 import { Tab } from "../utils/utils";
-import { apifetchEvents }from '../utils/APIUtils';
+import APIUtils from '../utils/APIUtils';
 import "../styles/MainPage.css";
 
 const MainPage = () => {
@@ -20,7 +20,7 @@ const MainPage = () => {
 
     const fetchEvents = async () => {
         try {
-            const apiResultData = await apifetchEvents();
+            const apiResultData = await APIUtils.fetchEvents();
             setEvents(apiResultData.events);
             defaultEvents.current = apiResultData.events;
         } catch (error) {

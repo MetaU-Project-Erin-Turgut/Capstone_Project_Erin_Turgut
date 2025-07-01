@@ -2,7 +2,7 @@ import { useNavigate } from  "react-router";
 import { FaUserCircle } from "react-icons/fa";
 import { useUser } from "../contexts/UserContext";
 import { mainPageRoute, profileRoute } from "../utils/NavigationConsts";
-import { apihandleLogout } from "../utils/APIUtils";
+import APIUtils from "../utils/APIUtils";
 import "../styles/NavBar.css";
 
 const NavBar = () => {
@@ -13,7 +13,7 @@ const NavBar = () => {
 
     const handleLogout = async () => {
         try {
-            await apihandleLogout();
+            await APIUtils.handleLogout();
             setUser(null); // remove session from react context
             navigate(mainPageRoute);
         } catch (error) {

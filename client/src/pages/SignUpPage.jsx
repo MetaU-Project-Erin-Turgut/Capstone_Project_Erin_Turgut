@@ -4,7 +4,7 @@ import { useUser } from "../contexts/UserContext";
 import Header from "../components/Header";
 import { mainPageRoute } from "../utils/NavigationConsts";
 import { DEFAULT_FORM_VALUE } from "../utils/utils";
-import { apihandleSignUp } from "../utils/APIUtils";
+import APIUtils from "../utils/APIUtils";
 import "../styles/SignUpPage.css"
 
 
@@ -32,7 +32,7 @@ const SignUpPage = () => {
 
     const signUpUser = async () => {
         try {
-            const apiResultData = await apihandleSignUp(formData);
+            const apiResultData = await APIUtils.handleSignUp(formData);
             setUser(apiResultData); // Store user session in context
             navigate(mainPageRoute);
         } catch (error) {

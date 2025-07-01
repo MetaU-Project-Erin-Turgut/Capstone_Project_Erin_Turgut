@@ -1,6 +1,6 @@
 import { useState } from 'react';
 import { Status } from "../utils/utils";
-import { apiupdateEventStatus } from '../utils/APIUtils';
+import APIUtils from '../utils/APIUtils';
 
 import "../styles/Modal.css";
 
@@ -17,7 +17,7 @@ const EventDetailsModal = ( {onModalClose, eventData, initialStatus, onStatusCha
     const handleStatusUpdate = async () => {
         //put request to change status of event
         try {
-            const apiResultData = await apiupdateEventStatus(id, statusState);
+            const apiResultData = await APIUtils.updateEventStatus(id, statusState);
             onStatusChange(apiResultData.status);
             onModalClose();
         } catch (error) {
