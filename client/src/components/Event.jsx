@@ -7,7 +7,7 @@ import { Status } from "../utils/utils";
 import "../styles/Card.css";
 
 
-const Event = ( {eventData, refetchData}) => {
+const Event = ( {eventData, updateEvent}) => {
 
     const [isEventDetailsModalVisible, setIsEventDetailsModalVisible] = useState(false);
 
@@ -41,7 +41,7 @@ const Event = ( {eventData, refetchData}) => {
             <p>{description}</p>
             <p>{zip_code}</p>
         </div>
-        {isEventDetailsModalVisible && <EventDetailsModal onModalClose={closeModal} eventData={eventData.event} initialStatus={eventData.status} onStatusChange={() => {refetchData()}}/>}
+        {isEventDetailsModalVisible && <EventDetailsModal onModalClose={closeModal} eventData={eventData} onStatusChange={(newEventObj) => {updateEvent(newEventObj)}}/>}
         </>
     )
 }

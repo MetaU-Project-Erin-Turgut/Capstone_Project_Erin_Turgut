@@ -6,6 +6,7 @@ const Tab = Object.freeze({
 
 //enums for user's status for an event or group
 const Status = Object.freeze({
+    NONE: "NONE", //used for when no filter is applied
     PENDING: "PENDING",
     ACCEPTED: "ACCEPTED",
     REJECTED: "REJECTED"
