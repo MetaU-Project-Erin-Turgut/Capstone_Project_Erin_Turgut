@@ -74,7 +74,7 @@ router.post('/interests/:interestId', isAuthenticated, async (req, res) => {
         })
 
         //Call first step of GroupFindAlgo - should make this a separate call from frontend later
-        findGroups(updatedUser.interest);
+        findGroups(updatedUser);
 
         res.status(200).json(updatedUser);
 
