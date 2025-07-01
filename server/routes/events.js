@@ -4,13 +4,7 @@ const router = express.Router()
 const { PrismaClient } = require('../generated/prisma');
 const prisma = new PrismaClient()
 
-// Middleware to check if user is logged in before being able to perform any crud operations
-const isAuthenticated = (req, res, next) => {
-    if (!req.session.userId) {
-        return res.status(401).json({ error: "You must be logged in to perform this action." })
-    }
-    next()
-}
+const { isAuthenticated } = require('../middleware/CheckAutheticated')
 
 //get user's events - possibly change url in future to be more specific?
 router.get('/user/events/', isAuthenticated, async (req, res) => {
