@@ -1,3 +1,4 @@
+
 export default class APIUtils {
 
     static updateEventStatus = async (id, statusState) => {

@@ -98,7 +98,6 @@ model Interest {
   users User[] //this field won't be used but prisma requires it to establish the one-to-many relationship 
 }
 
-
 enum Status {
   PENDING
   ACCEPTED

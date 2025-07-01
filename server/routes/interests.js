@@ -5,6 +5,7 @@ const { PrismaClient } = require('../generated/prisma');
 const prisma = new PrismaClient()
 
 const { isAuthenticated } = require('../middleware/CheckAutheticated')
+const { findGroups } = require('../systems/GroupFindAlgo');
 
 //get all first level interests
 router.get('/interests', isAuthenticated, async (req, res) => {
@@ -73,6 +74,7 @@ router.post('/interests/:interestId', isAuthenticated, async (req, res) => {
         })
 
         //Call first step of GroupFindAlgo - should make this a separate call from frontend later
+        findGroups(updatedUser.interest);
 
         res.status(200).json(updatedUser);
 

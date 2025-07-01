@@ -1,44 +1,82 @@
-///-------------------NEW APPROACH (see below for original layout)--------------------///
-/*
-1. Start in interest tree at user's interest
-2. At that interest field, filter by incomplete groups AND groups within area. Then I should have the most 
-compatible groups for the user. Store these and mark them as 100% compatibility
-3. Continue going up the tree and at each parent interest repeat step 2.
-4. Depending on height of branch, mark these marked groups by their level/percentage of compatibility
-5. Notify user of group invitations and have them show up in their groups tab
+const { PrismaClient } = require('../generated/prisma');
+const prisma = new PrismaClient()
 
-NOTE: Maybe stop going up the tree once you have a certain amount of groups selected for the user.
+const KDBush = require('kdbush');
+const geokdbush = require('geokdbush');
 
-User behvior addition: 
--Once you have narrowed down the groups within an interest node, further sort them by closest overall event type
-interest to the user. This data is determined by events users have accpeted and rejected. Events are classified into
-smaller categories ("Active", "Entertainment", "Food/Drink", "Nightlife") and when users join a group, the group's overall liked events may change. 
-    -This could also create interesting opportunty for search criteria for the second technical challenge
-NOTE: Need to decide if this data pertaining to user and to an event is visible. Or groups are just order by most
-compatible.
+const MAX_GROUPS_TO_RECOMMEND = 5;
 
+const findGroups = async (interest) => {
 
-*/
+    let currInterest = interest
+    let groups = []; //this will hold all the groups that will be recommended to the user in order of most compatible to least compatible
+    let tempGroups = [];
+    while (groups.length <= MAX_GROUPS_TO_RECOMMEND) {
+        //Step 1: given user’s selected interest, start there in the interest tree and filter groups that have the same core interest 
+        // (also filter by only incomplete groups here). 
+        tempGroups = await getAllGroupsByInterestId(currInterest.id); //filters down to only incomplete groups with certain interest
 
-///---------------------------------ORIGINAL LAYOUT----------------------------------///
+        //Step 2: given the groups that were already filtered down from the last step, now only include groups within a specified radius of the user
+        filterGroupsByLocation();
 
-//Step 1: Filter only incomplete groups
-    //edge case: if none, create new one
+        //Step 3: We now have available groups with the same interest as the user and are in their area. Now sort these groups by 
+        // averaged event type preference that aligns with the user.
 
 
-//Step 2: Filter groups within specified radius
-    //Need efficient way to narrow down all groups by ones within a radius - NPM Package?
-    //edge case: if none, create new one
+        groups = [...groups, ...tempGroups]; //add newly found groups to whole list
+
+        if (currInterest.parent_id === null) {
+            //if we have reached the root of the interest tree, break out of loop
+            break;
+        }
+        currInterest = await getParentInterestObj(currInterest.parent_id) //Keep going uo the interest tree to search for more groups
+        tempGroups = [];
+    }
 
 
-//Step 3: Sort remaining groups by closest core interest to user's interest
-    //have level field for interest?
-    //go through each group and calculate distance from user's interest
+    console.log("Your groups!", groups);
+    //Edge case: what if you have gone all the way up and no groups were found??
+    return groups; 
+}
 
 
-//Step 4: Invite user to top 3 groups
+const getAllGroupsByInterestId = async (interestId) => {
+
+    const groups = await prisma.group.findMany( {
+        where: {
+            interest_id: interestId,
+            is_full: false
+        }
+    });
 
 
-//Step 5: When user accepts group, need to adjust the group's central location and core interest
-    //Need to find the median point between the group's central location and user's location. - NPM Package?
-    //Need to adjust group's core interest up or down the interest tree
+    return groups;
+}
+
+
+const getParentInterestObj = async (parentId) => {
+    const interest = await prisma.interest.findUnique( {
+        where: {
+            id: parentId,
+        }
+    });
+    return interest;
+}
+
+const filterGroupsByLocation = () => {
+    //returns groups within radius
+    const points = [{lon: -122.1500, lat: 37.4855}, {lon: -122.1470, lat: 37.4830}, {lon: -122.1495, lat: 37.4860}, {lon: 139.6917, lat: 35.6895}];
+    const index = new KDBush.default(points.length);
+    for (const {lon, lat} of points) index.add(lon, lat);
+    index.finish();
+
+    const nearestIds = geokdbush.around(index, -122.1483, 37.4848, Infinity, 1);
+
+    const nearest = nearestIds.map(id => points[id]);
+
+    console.log("Coordinates near Meta Headquearters:")
+    console.log(nearest);
+}
+
+module.exports = { findGroups };
+
