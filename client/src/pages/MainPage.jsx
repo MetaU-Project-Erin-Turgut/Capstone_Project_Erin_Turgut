@@ -28,12 +28,14 @@ const MainPage = () => {
     return (
         <div id="main-page">
             <NavBar />
-            <SideBar handleTabSelect={(tabName) => {
-                setSelectedTab(tabName);
-            }}/>
-            {/* Populate events or groups depending what tab was clicked on the side */}
-            {/* As you add more tabs, change to switch statement! */}
-            {newDisplay()}
+            <div className="main-content">
+                <SideBar handleTabSelect={(tabName) => {
+                    setSelectedTab(tabName);
+                }}/>
+                {/* Populate events or groups depending what tab was clicked on the side */}
+                {/* As you add more tabs, change to switch statement! */}
+                {newDisplay()}
+            </div>
             
         </div>
     )
