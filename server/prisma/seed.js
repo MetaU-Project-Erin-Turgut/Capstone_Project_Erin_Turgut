@@ -14,12 +14,12 @@ const interests = [
     {id: 9, title: 'ACDC',  parent_id: 8},
 ];
 const groups = [
-    {id: 0, title: 'Group Karaoke', description: 'Karaoke Group in Menlo Park', is_full: false, interest_id: 4, central_location: 'fake coordinates'},
-    {id: 1, title: 'Group ACDC', description: 'ACDC Group in Menlo Park', is_full: false, interest_id: 9, central_location: 'fake coordinates'},
-    {id: 2, title: 'Group ACDC better', description: 'Karaoke Group in Menlo Park', is_full: true, interest_id: 9, central_location: 'fake coordinates'},
-    {id: 3, title: 'Group Hard Rock', description: 'Hard Rock Group in Menlo Park', is_full: false, interest_id: 8, central_location: 'fake coordinates'},
-    {id: 4, title: 'Group Rock', description: 'Rock Group in Menlo Park', is_full: true, interest_id: 6, central_location: 'fake coordinates'},
-    {id: 5, title: 'Group Music', description: 'Music Group in Menlo Park', is_full: false, interest_id: 0, central_location: 'fake coordinates'},
+    {id: 0, title: 'Group Karaoke', description: 'Karaoke Group in Menlo Park', is_full: false, interest_id: 4, latitude: 37.4855, longitude: -122.1500},
+    {id: 1, title: 'Group ACDC', description: 'ACDC Group in Tokyo', is_full: false, interest_id: 9, latitude: 35.6895, longitude: 139.6917},
+    {id: 2, title: 'Group ACDC better', description: 'Karaoke Group in Menlo Park', is_full: true, interest_id: 9, latitude: 37.4855, longitude: -122.1500},
+    {id: 3, title: 'Group Hard Rock', description: 'Hard Rock Group in Menlo Park', is_full: false, interest_id: 8, latitude: 37.4855, longitude: -122.1500},
+    {id: 4, title: 'Group Rock', description: 'Rock Group in Menlo Park', is_full: true, interest_id: 6, latitude: 37.4855, longitude: -122.1500},
+    {id: 5, title: 'Group Music', description: 'Music Group in Menlo Park', is_full: false, interest_id: 0, latitude: 37.4855, longitude: -122.1500},
 ]
 async function main() {
     console.log(`Start seeding ...`)
@@ -42,6 +42,8 @@ async function main() {
                 description: group.description,
                 is_full: group.is_full,
                 central_location: group.central_location,
+                latitude: group.latitude,
+                longitude: group.longitude,
                 core_interest: {
                     connect: { id: group.interest_id }
                 }

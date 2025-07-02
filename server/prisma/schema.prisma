@@ -19,12 +19,14 @@ model User {
   username String @unique
   email    String @unique
   address  String
+  latitude Decimal @db.Decimal(8, 5)
+  longitude Decimal @db.Decimal(8, 5)
   password String
   user_profile User_Profile?
   events   Event_User[]
   groups   Group_User[]
   interest   Interest?   @relation(fields: [interest_id], references: [id])
-  interest_id     Int?    
+  interest_id     Int?  
 }
 
 model User_Profile {
@@ -41,6 +43,8 @@ model Event {
   title       String
   description String
   address     String
+  latitude Decimal @db.Decimal(8, 5)
+  longitude Decimal @db.Decimal(8, 5)
   zip_code    String @db.VarChar(5)
   attendees   Event_User[]
   groups      Group_Event[]
@@ -55,7 +59,8 @@ model Group {
   events      Group_Event[]
   core_interest Interest @relation(fields: [interest_id], references: [id])
   interest_id Int
-  central_location String
+  latitude Decimal @db.Decimal(8, 5)
+  longitude Decimal @db.Decimal(8, 5)
 }
 
 model Event_User {
@@ -97,6 +102,7 @@ model Interest {
   groups Group[]
   users User[] //this field won't be used but prisma requires it to establish the one-to-many relationship 
 }
+
 
 
 enum Status {

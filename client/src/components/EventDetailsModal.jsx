@@ -4,11 +4,11 @@ import APIUtils from '../utils/APIUtils';
 
 import "../styles/Modal.css";
 
-const EventDetailsModal = ( {onModalClose, eventData, initialStatus, onStatusChange}) => {
+const EventDetailsModal = ( {onModalClose, eventData, onStatusChange}) => {
+    
+    const [statusState, setStatusState] = useState(eventData.status); 
 
-    const [statusState, setStatusState] = useState(initialStatus); 
-
-    const { id, address, description, title, zip_code } = eventData;
+    const { id, address, description, title, zip_code } = eventData.event;
 
     const handleDropdownChange = (event) => {
         setStatusState(event.target.value);
@@ -18,7 +18,7 @@ const EventDetailsModal = ( {onModalClose, eventData, initialStatus, onStatusCha
         //put request to change status of event
         try {
             const apiResultData = await APIUtils.updateEventStatus(id, statusState);
-            onStatusChange(apiResultData.status);
+            onStatusChange({...eventData, status: apiResultData.status});
             onModalClose();
         } catch (error) {
             console.log("Status ", error.status);

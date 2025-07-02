@@ -1,6 +1,6 @@
 const express = require('express')
 const bcrypt = require('bcrypt')
-const { PrismaClient } = require('../generated/prisma');
+const { PrismaClient, Prisma } = require('../generated/prisma');
 
 const prisma = new PrismaClient()
 const router = express.Router()
@@ -49,16 +49,19 @@ router.post('/signup', async (req, res) => {
         const hashedPassword = await bcrypt.hash(password, saltRounds)
 
         // Create a new user in the database
+        //for mock data, have all users start out with location at meta's headquarters
         const newUser = await prisma.user.create({
             data: {
                 address,
                 username,
+                latitude: 37.4855,
+                longitude: -122.1500,
                 email,
                 password: hashedPassword,
                 events: {
                     create: [
-                        { event: { create: { title: `${username}_bowling`, description: 'descBowling', address: 'event avenue', zip_code: '75034' } } },
-                        { event: { create: { title: `${username}_tennis`, description: 'descTennis', address: 'event avenue', zip_code: '75034' } } },
+                        { event: { create: { title: `${username}_bowling`, description: 'descBowling', address: 'event avenue', zip_code: '75034', latitude: 37.4855, longitude: -122.1500 } } },
+                        { event: { create: { title: `${username}_tennis`, description: 'descTennis', address: 'event avenue', zip_code: '75034', latitude: 37.4855, longitude: -122.1500  } } },
                     ],
                 },
             }
