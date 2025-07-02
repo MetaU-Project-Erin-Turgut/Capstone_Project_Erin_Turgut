@@ -1,9 +1,3 @@
-// This is your Prisma schema file,
-// learn more about it in the docs: https://pris.ly/d/prisma-schema
-
-// Looking for ways to speed up your queries, or scale easily with your serverless or edge functions?
-// Try Prisma Accelerate: https://pris.ly/cli/accelerate-init
-
 generator client {
   provider = "prisma-client-js"
   output   = "../generated/prisma"
@@ -15,95 +9,96 @@ datasource db {
 }
 
 model User {
-  id       Int    @id @default(autoincrement())
-  username String @unique
-  email    String @unique
-  address  String
-  latitude Decimal @db.Decimal(8, 5)
-  longitude Decimal @db.Decimal(8, 5)
-  password String
+  id           Int           @id @default(autoincrement())
+  username     String        @unique
+  email        String        @unique
+  password     String
+  address      String
+  interest_id  Int?
+  latitude     Decimal       @db.Decimal(8, 5)
+  longitude    Decimal       @db.Decimal(8, 5)
+  events       Event_User[]
+  groups       Group_User[]
+  interest     Interest?     @relation(fields: [interest_id], references: [id])
   user_profile User_Profile?
-  events   Event_User[]
-  groups   Group_User[]
-  interest   Interest?   @relation(fields: [interest_id], references: [id])
-  interest_id     Int?  
 }
 
 model User_Profile {
-  id          Int    @id @default(autoincrement())
-  user        User   @relation(fields: [user_id], references: [id])
-  user_id     Int    @unique
-  first_name  String
-  last_name   String
-  zip_code    String @db.VarChar(5)
+  id         Int    @id @default(autoincrement())
+  first_name String
+  last_name  String
+  zip_code   String @db.VarChar(5)
+  user_id    Int    @unique
+  user       User   @relation(fields: [user_id], references: [id])
 }
 
 model Event {
-  id          Int    @id @default(autoincrement())
+  id          Int           @id @default(autoincrement())
   title       String
   description String
   address     String
-  latitude Decimal @db.Decimal(8, 5)
-  longitude Decimal @db.Decimal(8, 5)
-  zip_code    String @db.VarChar(5)
+  zip_code    String        @db.VarChar(5)
+  latitude    Decimal       @db.Decimal(8, 5)
+  longitude   Decimal       @db.Decimal(8, 5)
   attendees   Event_User[]
   groups      Group_Event[]
 }
 
 model Group {
-  id          Int    @id @default(autoincrement())
+  id          Int           @id @default(autoincrement())
   title       String
   description String
-  is_full     Boolean @default(false)
-  members     Group_User[]
+  is_full     Boolean       @default(false)
   events      Group_Event[]
-  core_interest Interest @relation(fields: [interest_id], references: [id])
-  interest_id Int
-  latitude Decimal @db.Decimal(8, 5)
-  longitude Decimal @db.Decimal(8, 5)
+  members     Group_User[]
 }
 
 model Event_User {
-  user        User @relation(fields: [user_id], references: [id])
-  user_id     Int
-  event       Event @relation(fields: [event_id], references: [id])
-  event_id    Int
-  status      Status @default(PENDING)
+  user_id  Int
+  event_id Int
+  status   Status @default(PENDING)
+  event    Event  @relation(fields: [event_id], references: [id])
+  user     User   @relation(fields: [user_id], references: [id])
 
   @@id([user_id, event_id])
 }
 
 model Group_User {
-  user        User @relation(fields: [user_id], references: [id])
-  user_id     Int
-  group       Group @relation(fields: [group_id], references: [id])
-  group_id    Int
-  status      Status @default(PENDING)
+  user_id  Int
+  group_id Int
+  status   Status @default(PENDING)
+  group    Group  @relation(fields: [group_id], references: [id])
+  user     User   @relation(fields: [user_id], references: [id])
 
   @@id([user_id, group_id])
 }
 
 model Group_Event {
-  group       Group @relation(fields: [group_id], references: [id])
-  group_id    Int
-  event       Event @relation(fields: [event_id], references: [id])
-  event_id    Int
+  group_id Int
+  event_id Int
+  event    Event @relation(fields: [event_id], references: [id])
+  group    Group @relation(fields: [group_id], references: [id])
 
   @@id([group_id, event_id])
 }
 
 model Interest {
-  id          Int    @id @default(autoincrement())
-  title       String
-  parent_id   Int?
-  parent      Interest? @relation("InterestsSubInterests", fields: [parent_id], references: [id])
-  children    Interest[] @relation("InterestsSubInterests")
-
-  groups Group[]
-  users User[] //this field won't be used but prisma requires it to establish the one-to-many relationship 
+  id        Int        @id @default(autoincrement())
+  title     String
+  parent_id Int?
+  parent    Interest?  @relation("InterestsSubInterests", fields: [parent_id], references: [id])
+  children  Interest[] @relation("InterestsSubInterests")
+  users     User[]
 }
 
-
+/// This table contains check constraints and requires additional setup for migrations. Visit https://pris.ly/d/check-constraints for more info.
+model spatial_ref_sys {
+  srid      Int     @id
+  auth_name String? @db.VarChar(256)
+  auth_srid Int?
+  srtext    String? @db.VarChar(2048)
+  proj4text String? @db.VarChar(2048)
+}
 
 enum Status {
   PENDING
