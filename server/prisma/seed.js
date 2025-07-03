@@ -14,12 +14,12 @@ const interests = [
     {id: 9, title: 'ACDC',  parent_id: 8},
 ];
 const groups = [
-    {id: 0, title: 'Group Karaoke', description: 'Karaoke Group in Menlo Park', is_full: false, interest_id: 4, latitude: 37.4855, longitude: -122.1500},
-    {id: 1, title: 'Group ACDC', description: 'ACDC Group in Tokyo', is_full: false, interest_id: 9, latitude: 35.6895, longitude: 139.6917},
-    {id: 2, title: 'Group ACDC better', description: 'Karaoke Group in Menlo Park', is_full: true, interest_id: 9, latitude: 37.4855, longitude: -122.1500},
-    {id: 3, title: 'Group Hard Rock', description: 'Hard Rock Group in Menlo Park', is_full: false, interest_id: 8, latitude: 37.4855, longitude: -122.1500},
-    {id: 4, title: 'Group Rock', description: 'Rock Group in Menlo Park', is_full: true, interest_id: 6, latitude: 37.4855, longitude: -122.1500},
-    {id: 5, title: 'Group Music', description: 'Music Group in Menlo Park', is_full: false, interest_id: 0, latitude: 37.4855, longitude: -122.1500},
+    {title: 'Group Karaoke MPK', description: 'Karaoke Group in Menlo Park', is_full: false, interest_id: 4, latitude: 37.4855, longitude: -122.1500},
+    {title: 'Group ACDC Tokyo', description: 'ACDC Group in Tokyo', is_full: false, interest_id: 9, latitude: 35.6895, longitude: 139.6917},
+    {title: 'Group ACDC better MPK', description: 'Karaoke Group in Menlo Park', is_full: true, interest_id: 9, latitude: 37.4855, longitude: -122.1500},
+    {title: 'Group Hard Rock MPK', description: 'Hard Rock Group in Menlo Park', is_full: false, interest_id: 8, latitude: 37.4855, longitude: -122.1500},
+    {title: 'Group Rock MPK', description: 'Rock Group in Menlo Park', is_full: true, interest_id: 6, latitude: 37.4855, longitude: -122.1500},
+    {title: 'Group Music MPK', description: 'Music Group in Menlo Park', is_full: false, interest_id: 0, latitude: 37.4855, longitude: -122.1500},
 ]
 async function main() {
     console.log(`Start seeding ...`)
@@ -36,21 +36,9 @@ async function main() {
     }
     
     for (const group of groups) {
-        const groupRecord = await prisma.group.create({
-            data: {
-                title: group.title,
-                description: group.description,
-                is_full: group.is_full,
-                central_location: group.central_location,
-                latitude: group.latitude,
-                longitude: group.longitude,
-                core_interest: {
-                    connect: { id: group.interest_id }
-                }
-            }
+        const groupRecord = await prisma.$queryRaw`INSERT INTO "Group" (title, description, is_full, coord) VALUES(${group.title}, ${group.description}, ${group.is_full}, ST_SetSRID(ST_MakePoint(${group.longitude}, ${group.latitude}), 4326)::geography)`;
 
-        })
-        console.log(`Created group: ${groupRecord.title}`)
+        console.log(`Created group: ${group.title}`)
     }
 
 

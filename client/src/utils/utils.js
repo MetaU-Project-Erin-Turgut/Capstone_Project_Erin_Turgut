@@ -1,7 +1,8 @@
 //enums for tabs
 const Tab = Object.freeze({
     EVENTS: "Events",
-    GROUPS: "Groups"
+    GROUPS: "Groups",
+    INTERESTS: "Interests"
 });
 
 //enums for user's status for an event or group
