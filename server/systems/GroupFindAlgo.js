@@ -14,8 +14,7 @@ const filterGroupsByLocation = async (userLatitude, userLongitude) => {
 
     const groupRecord = await prisma.$queryRaw`SELECT id, title, ST_AsText(coord) FROM "Group" WHERE ST_DWithin(coord, ST_SetSRID(ST_MakePoint(${userLongitude}, ${userLatitude}), 4326)::geography, ${LOCATION_SEARCH_RADIUS}) AND is_full= FALSE`;
     
-    console.log("Groups near User:")
-    console.log(groupRecord);
+    
 }
 
 module.exports = { findGroups };
