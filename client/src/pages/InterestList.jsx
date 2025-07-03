@@ -5,10 +5,9 @@ import "../styles/InterestList.css";
 
 const InterestList = () => {
 
-    //array with level by array index and all interests at that level value as the value at that index
+    //2D array with level by array index and all interests at that level value as an array at that index
     const [interestsByLevel, setInterestsByLevel] = useState([]); 
 
-    //fetch roots
     useEffect(() => {
         fetchRootInterests();
     }, []);
@@ -17,7 +16,7 @@ const InterestList = () => {
             try {
                 const apiResultData = await APIUtils.fetchRootInterests();
                 const newArr = []; 
-                newArr[0] = apiResultData;
+                newArr[0] = apiResultData; //make first level interests (stored in first index of array) hold all returned root interests
                 setInterestsByLevel(newArr);
             } catch (error) {
                 console.log("Status ", error.status);
@@ -28,7 +27,7 @@ const InterestList = () => {
     const addNewColumn = async (interestId, clickedInterestLevel) => {
         try {
             const apiResultData = await APIUtils.fetchImmediateChildren(interestId);
-            if (apiResultData.length !== 0) { //meaning no children i.e have reached leaf in the tree
+            if (apiResultData.length !== 0) { //have reached leaf in the tree therefore dont render more
                 const newArr = [];
                 for (let i = 0; i < clickedInterestLevel; i++) {
                     newArr[i] = interestsByLevel[i];
