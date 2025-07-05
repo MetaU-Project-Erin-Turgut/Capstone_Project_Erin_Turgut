@@ -44,7 +44,7 @@ router.get('/interests/:interestId', isAuthenticated, async (req, res) => {
             res.status(404).send('This interest does not exist');
         }
 
-        res.status(200).json(interest);
+        res.status(200).json(interest.children); //only send back children
         
 
 

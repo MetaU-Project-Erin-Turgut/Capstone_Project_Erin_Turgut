@@ -86,6 +86,7 @@ model Interest {
   id        Int        @id @default(autoincrement())
   title     String
   parent_id Int?
+  level     Int
   parent    Interest?  @relation("InterestsSubInterests", fields: [parent_id], references: [id])
   children  Interest[] @relation("InterestsSubInterests")
   users     User[]
