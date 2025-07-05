@@ -16,9 +16,8 @@ model User {
   address      String
   events       Event_User[]
   groups       Group_User[]
-  interests    User_Interest[]
   user_profile User_Profile?
-  
+  interests    Interest[]
 }
 
 model User_Profile {
@@ -49,7 +48,7 @@ model Group {
   is_full     Boolean       @default(false)
   events      Group_Event[]
   members     Group_User[]
-  interests   Group_Interest[]
+  interests   Interest[]
 }
 
 model Interest {
@@ -61,8 +60,8 @@ model Interest {
   parent    Interest?  @relation("InterestsSubInterests", fields: [parent_id], references: [id])
   children  Interest[] @relation("InterestsSubInterests")
 
-  users    User_Interest[]
-  groups   Group_Interest[]
+  users    User[]
+  groups   Group[]
 }
 
 model Event_User {
@@ -83,24 +82,6 @@ model Group_User {
   user     User   @relation(fields: [user_id], references: [id])
 
   @@id([user_id, group_id])
-}
-
-model User_Interest {
-  user_id  Int
-  interest_id Int
-  interest    Interest  @relation(fields: [interest_id], references: [id])
-  user        User   @relation(fields: [user_id], references: [id])
-
-  @@id([user_id, interest_id])
-}
-
-model Group_Interest {
-  group_id  Int
-  interest_id Int
-  interest    Interest  @relation(fields: [interest_id], references: [id])
-  group       Group   @relation(fields: [group_id], references: [id])
-
-  @@id([group_id, interest_id])
 }
 
 model Group_Event {

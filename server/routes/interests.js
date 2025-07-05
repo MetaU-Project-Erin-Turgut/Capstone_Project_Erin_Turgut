@@ -4,6 +4,7 @@ const router = express.Router()
 const { PrismaClient } = require('../generated/prisma');
 const prisma = new PrismaClient()
 
+
 const { isAuthenticated } = require('../middleware/CheckAutheticated')
 const { findGroups } = require('../systems/GroupFindAlgo');
 
@@ -54,9 +55,9 @@ router.get('/interests/:interestId', isAuthenticated, async (req, res) => {
     }
 })
 
-//choose an interest
-router.post('/interests/:interestId', isAuthenticated, async (req, res) => {
-    const interestId = parseInt(req.params.interestId);
+//update user interests
+router.post('/interests', isAuthenticated, async (req, res) => {
+    const { chosenInterests } = req.body;
 
     try {
         const updatedUser = await prisma.user.update({
@@ -64,12 +65,12 @@ router.post('/interests/:interestId', isAuthenticated, async (req, res) => {
                 id: req.session.userId,
             },
             data: {
-                interest_id: interestId
+                interests: {
+                    set: chosenInterests,
+                },
             },
             include: {
-                interest: {
-                    include: {parent: true}
-                }
+                interests: true
             }
         })
 
@@ -79,8 +80,8 @@ router.post('/interests/:interestId', isAuthenticated, async (req, res) => {
         res.status(200).json(updatedUser);
 
     } catch (error) {
-        console.error("Error choosing this interest:", error)
-        res.status(500).json({ error: "Could not choose this interest." });
+        console.error("Error in updating interests:", error)
+        res.status(500).json({ error: "Could not update interests." });
     }
 })
 
