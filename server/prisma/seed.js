@@ -2,16 +2,16 @@ const { PrismaClient } = require('../generated/prisma');
 const prisma = new PrismaClient()
 
 const interests = [
-    {id: 0, title: 'Music', parent_id: null, level: 1},
-    {id: 1, title: 'Sports',  parent_id: null, level: 1},
-    {id: 2, title: 'Cooking',  parent_id: null, level: 1},
-    {id: 3, title: 'Singing',  parent_id: 0, level: 2},
-    {id: 4, title: 'Karaoke',  parent_id: 3, level: 3},
-    {id: 5, title: 'Basketball',  parent_id: 1, level: 2},
-    {id: 6, title: 'Rock',  parent_id: 0, level: 2},
-    {id: 7, title: 'Indie Rock',  parent_id: 6, level: 3},
-    {id: 8, title: 'Hard Rock',  parent_id: 6, level: 3},
-    {id: 9, title: 'ACDC',  parent_id: 8, level: 4},
+    {id: 0, title: 'Music', parent_id: null, level: 1, path: "0"},
+    {id: 1, title: 'Sports',  parent_id: null, level: 1, path: "1"},
+    {id: 2, title: 'Cooking',  parent_id: null, level: 1, path: "2"},
+    {id: 3, title: 'Singing',  parent_id: 0, level: 2, path: "0.3"},
+    {id: 4, title: 'Karaoke',  parent_id: 3, level: 3, path: "0.3.4"},
+    {id: 5, title: 'Basketball',  parent_id: 1, level: 2, path: "1.5"},
+    {id: 6, title: 'Rock',  parent_id: 0, level: 2, path: "0.6"},
+    {id: 7, title: 'Indie Rock',  parent_id: 6, level: 3, path: "0.6.7"},
+    {id: 8, title: 'Hard Rock',  parent_id: 6, level: 3, path: "0.6.8"},
+    {id: 9, title: 'ACDC',  parent_id: 8, level: 4, path: "0.6.8.9"},
 ];
 const groups = [
     {title: 'Group Karaoke MPK', description: 'Karaoke Group in Menlo Park', is_full: false, interest_id: 4, latitude: 37.4855, longitude: -122.1500},
@@ -27,7 +27,7 @@ async function main() {
     // Clear the tables first
     await prisma.interest.deleteMany()
     await prisma.group.deleteMany()
-    
+
     for (const interest of interests) {
         const interestRecord = await prisma.interest.create({
             data: interest
