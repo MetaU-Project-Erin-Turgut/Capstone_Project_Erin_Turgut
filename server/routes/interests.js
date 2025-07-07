@@ -6,7 +6,6 @@ const prisma = new PrismaClient()
 
 
 const { isAuthenticated } = require('../middleware/CheckAutheticated')
-const { findGroups } = require('../systems/GroupFindAlgo');
 
 //get all first level interests
 router.get('/interests', isAuthenticated, async (req, res) => {
@@ -60,6 +59,7 @@ router.post('/interests', isAuthenticated, async (req, res) => {
     const { chosenInterests } = req.body;
 
     try {
+        //may want to make this a raw query to be able to get coordinates here too.
         const updatedUser = await prisma.user.update({
             where: {
                 id: req.session.userId,
@@ -74,9 +74,6 @@ router.post('/interests', isAuthenticated, async (req, res) => {
             }
         })
 
-        //Call first step of GroupFindAlgo - should make this a separate call from frontend later
-        findGroups(updatedUser);
-
         res.status(200).json(updatedUser);
 
     } catch (error) {
@@ -84,5 +81,6 @@ router.post('/interests', isAuthenticated, async (req, res) => {
         res.status(500).json({ error: "Could not update interests." });
     }
 })
+
 
 module.exports = router

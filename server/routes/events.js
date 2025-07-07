@@ -6,7 +6,7 @@ const prisma = new PrismaClient()
 
 const { isAuthenticated } = require('../middleware/CheckAutheticated')
 
-//get user's events - possibly change url in future to be more specific?
+//get user's events 
 router.get('/user/events/', isAuthenticated, async (req, res) => {
     try {
         const userData = await prisma.user.findUnique({
@@ -28,19 +28,21 @@ router.get('/user/events/', isAuthenticated, async (req, res) => {
 })
 
 //update user's status for an event
-router.patch('/user/events/:event_id', async (req, res) => {
+router.patch('/user/events/:event_id', isAuthenticated, async (req, res) => {
     const event_id = parseInt(req.params.event_id);
     const {updatedStatus} = req.body; 
 
     try {
-        const isEvent_user = await prisma.event_User.count({
-            where: {
-                user_id: req.session.userId,
-                event_id: event_id
-            }
+        const event_user = await prisma.event_User.findUnique({
+                where: {
+                    user_id_event_id: {
+                        user_id: req.session.userId,
+                        event_id: event_id
+                    }
+                }
         });
 
-        if (isEvent_user === 0 ) {
+        if (!event_user) {
             res.status(404).json({error: 'This user - event relationship does not exist'});
         }
 
