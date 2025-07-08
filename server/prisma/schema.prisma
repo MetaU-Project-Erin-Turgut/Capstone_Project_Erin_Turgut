@@ -14,13 +14,10 @@ model User {
   email        String        @unique
   password     String
   address      String
-  interest_id  Int?
-  latitude     Decimal       @db.Decimal(8, 5)
-  longitude    Decimal       @db.Decimal(8, 5)
   events       Event_User[]
   groups       Group_User[]
-  interest     Interest?     @relation(fields: [interest_id], references: [id])
   user_profile User_Profile?
+  interests    Interest[]
 }
 
 model User_Profile {
@@ -36,10 +33,9 @@ model Event {
   id          Int           @id @default(autoincrement())
   title       String
   description String
-  address     String
-  zip_code    String        @db.VarChar(5)
-  latitude    Decimal       @db.Decimal(8, 5)
-  longitude   Decimal       @db.Decimal(8, 5)
+  dateTime    DateTime
+  interest_id Int?
+  interest    Interest?     @relation(fields: [interest_id], references: [id])
   attendees   Event_User[]
   groups      Group_Event[]
 }
@@ -51,6 +47,21 @@ model Group {
   is_full     Boolean       @default(false)
   events      Group_Event[]
   members     Group_User[]
+  interests   Group_Interest[]
+}
+
+model Interest {
+  id        Int        @id @default(autoincrement())
+  title     String
+  parent_id Int?
+  level     Int
+  path      String
+  parent    Interest?  @relation("InterestsSubInterests", fields: [parent_id], references: [id])
+  children  Interest[] @relation("InterestsSubInterests")
+
+  users    User[]
+  groups   Group_Interest[]
+  events   Event[]
 }
 
 model Event_User {
@@ -82,14 +93,13 @@ model Group_Event {
   @@id([group_id, event_id])
 }
 
-model Interest {
-  id        Int        @id @default(autoincrement())
-  title     String
-  parent_id Int?
-  level     Int
-  parent    Interest?  @relation("InterestsSubInterests", fields: [parent_id], references: [id])
-  children  Interest[] @relation("InterestsSubInterests")
-  users     User[]
+model Group_Interest {
+  group_id    Int
+  interest_id Int
+  interest    Interest @relation(fields: [interest_id], references: [id])
+  group       Group @relation(fields: [group_id], references: [id])
+
+  @@id([group_id, interest_id])
 }
 
 /// This table contains check constraints and requires additional setup for migrations. Visit https://pris.ly/d/check-constraints for more info.

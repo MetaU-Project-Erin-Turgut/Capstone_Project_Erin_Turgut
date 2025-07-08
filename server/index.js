@@ -6,6 +6,7 @@ const app = express();
 const PORT = 3000;
 
 const eventRoutes = require('./routes/events')
+const groupRoutes = require('./routes/groups')
 const authRoutes = require('./routes/auth')
 const interestRoutes = require('./routes/interests')
 
@@ -26,6 +27,7 @@ app.use(session({
 //routes are defined in these files
 app.use(authRoutes) //sign up, login, logout, and check for active session
 app.use(eventRoutes) //operations relating to user's event data
+app.use(groupRoutes) //operations relating to user's group data
 app.use(interestRoutes) //operations relating to getting and selecting interests
 
 app.listen(PORT, () => {
