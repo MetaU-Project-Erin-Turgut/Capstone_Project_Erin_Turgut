@@ -2,10 +2,11 @@ const express = require('express')
 const router = express.Router()
 
 const { PrismaClient } = require('../generated/prisma');
-const prisma = new PrismaClient()
+const prisma = new PrismaClient();
 
 const { isAuthenticated } = require('../middleware/CheckAutheticated')
 const { findGroups } = require('../systems/GroupFindAlgo');
+const { updateGroupCentralLocation, updateGroupInterests } = require('../systems/GroupUpdateMethods')
 
 //get user's groups 
 router.get('/user/groups/', isAuthenticated, async (req, res) => {
@@ -104,5 +105,75 @@ router.get('/user/newGroups/', isAuthenticated, async (req, res) => {
     }
 })
 
+//accept group - first, the endpoint above will be called, then this endpoint will be called
+//update user's status for a group
+router.put('/user/groups/:groupId/accept', isAuthenticated, async (req, res) => {
+   const groupId = parseInt(req.params.groupId);
+
+
+   try {
+        //Need to merge below database calls?
+       const group_user = await prisma.group_User.findUnique({
+           where: {
+               user_id_group_id: {
+                   group_id: groupId,
+                   user_id: req.session.userId
+               }
+           },
+           include: {
+               group: { include: {interests: {select: {interest: true}}}},
+               user: true
+           }
+       });
+       const userCoord = await prisma.$queryRaw`
+        SELECT ST_X(coord::geometry), ST_Y(coord::geometry)
+        FROM "User" 
+        WHERE id = ${req.session.userId}`;
+       const groupCoord = await prisma.$queryRaw`
+        SELECT ST_X(coord::geometry), ST_Y(coord::geometry)
+        FROM "Group" 
+        WHERE id = ${groupId}`;
+
+
+
+       if (!group_user) {
+           res.status(404).json({error: 'This user - group relationship does not exist'});
+       }
+
+
+       //IMPLEMENTED LATER:
+       //NOTE: is it better to instead make it so that when group becomes full it is removed from all users’ lists where it is pending?
+       if (group_user.group.is_full) {
+           //notify user
+           //remove from their list
+       }
+
+
+       //now that user accepted this group, we need to update the group's interest list and central location
+       const newGroupCoords = updateGroupCentralLocation(groupCoord[0], userCoord[0]);
+       const newGroupInterests = await updateGroupInterests(group_user.group.interests, group_user.user.interests);
+
+
+       const updatedGroup = await prisma.group_User.update({
+           where: {
+               user_id_group_id: {
+                   group_id: groupId,
+                   user_id: req.session.userId
+               }
+           },
+           data: {
+               status: 'ACCEPTED' //NEED TO USE ENUM HERE
+           }
+       })
+
+
+       res.status(200).json(updatedGroup);
+
+
+   } catch (error) {
+       console.error("Error updating group:", error)
+       res.status(500).json({ error: "Could not update your response to this group." });
+   }
+})
 
 module.exports = router
