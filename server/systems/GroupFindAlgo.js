@@ -49,7 +49,6 @@ const getCandidateGroups =  async (allGroupsNearby, allUserInterests) => {
     const interestIds = allUserInterests.map((interest) => {
         return interest.id;
     })
-    
     //get group candidates, filtered by ones nearby and ones that include at least one of the user's extended interests
     let groupCandidates =  await prisma.group.findMany({
         where: {

@@ -7,6 +7,9 @@ const prisma = new PrismaClient();
 const { isAuthenticated } = require('../middleware/CheckAutheticated')
 const { findGroups } = require('../systems/GroupFindAlgo');
 const { updateGroupCentralLocation, updateGroupInterests } = require('../systems/GroupUpdateMethods')
+const { Status, filterMembersByStatus } = require('../systems/Utils');
+
+const FULL_GROUP_SIZE = 6;
 
 //get user's groups 
 router.get('/user/groups/', isAuthenticated, async (req, res) => {
@@ -67,9 +70,13 @@ router.patch('/user/groups/:groupId', isAuthenticated, async (req, res) => {
 
 //get new group suggestions - will be called immediately after user updates their interests
 router.get('/user/newGroups/', isAuthenticated, async (req, res) => {
-    const updatedUser = req.body;
+    
 
     try {
+        const updatedUser = await prisma.user.findUnique({
+                where: {id: req.session.userId},
+                select: {id: true, interests: true}
+        });;
         //Call GroupFindAlgo, will return all suggested groups sorted by compatibility
         const suggestedGroups = await findGroups(updatedUser); //NOTE: the interests attribute part of the returned objects won't be entirely accurate - not needed for now though
         
@@ -91,7 +98,7 @@ router.get('/user/newGroups/', isAuthenticated, async (req, res) => {
                     data: {
                         group: {connect: {id: group.id} },
                         user: {connect: {id: req.session.userId} },
-                        status: 'PENDING' //NEED TO USE ENUM HERE
+                        status: Status.PENDING 
                     }
                 })
             }
@@ -146,6 +153,7 @@ router.put('/user/groups/:groupId/accept', isAuthenticated, async (req, res) => 
        if (group_user.group.is_full) {
            //notify user
            //remove from their list
+           const pendingMembers = filterMembersByStatus(group_user.group.members, Status.PENDING);
        }
 
 
@@ -153,11 +161,13 @@ router.put('/user/groups/:groupId/accept', isAuthenticated, async (req, res) => 
        const newGroupCoords = updateGroupCentralLocation(groupCoord[0], userCoord[0]);
        const newGroupInterests = await updateGroupInterests(group_user.group.interests, group_user.user.interests);
 
-//TO DO:
-       //INCLUDE MEMBERS TO CHECK IF IS FULL NEEDS TO BE CHANGED
+       const acceptedMembers = filterMembersByStatus(group_user.group.members, Status.ACCEPTED);
+       let newIsFullStatus = false;
+       if (acceptedMembers.length + 1 === FULL_GROUP_SIZE) {
+            newIsFullStatus = true;
+       }
        
-//TO DO:
-       //update group in database (update members, check if full, update coordinates, update interests list-CHECK)
+       //update group in database (update if is now full, update coordinates, update interests list)
        const updatedGroup = await prisma.group.update({
             where: {id: groupId},
             data: {
@@ -166,9 +176,15 @@ router.put('/user/groups/:groupId/accept', isAuthenticated, async (req, res) => 
                     create: newGroupInterests.map((interest) => {
                         return { interest: { connect: {id: interest} } }
                     })
-                 }
+                 },
+                 is_full: newIsFullStatus
              },
        })
+
+       await prisma.$queryRaw`
+       UPDATE "Group" 
+       SET "coord" = (ST_SetSRID(ST_MakePoint(${newGroupCoords.longitude}, ${newGroupCoords.latitude}), 4326)::geography)
+       WHERE id=${groupId}`;
 
 
        //update status of group_user relationship
@@ -180,8 +196,7 @@ router.put('/user/groups/:groupId/accept', isAuthenticated, async (req, res) => 
                }
            },
            data: {
-//TO DO:
-               status: 'ACCEPTED' //NEED TO USE ENUM HERE
+               status: Status.ACCEPTED 
            }
        })
 

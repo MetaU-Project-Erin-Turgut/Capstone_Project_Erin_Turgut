@@ -1,6 +1,15 @@
 const { PrismaClient } = require('../generated/prisma');
 const prisma = new PrismaClient()
 
+
+//enums for user's status for an event or group
+const Status = Object.freeze({
+    NONE: "NONE", //used for when no filter is applied
+    PENDING: "PENDING",
+    ACCEPTED: "ACCEPTED",
+    REJECTED: "REJECTED"
+});
+
 const getExpandedInterests = async (originalInterests, isGroup) => {
     let expandedInterestSet = [];
 
@@ -8,8 +17,10 @@ const getExpandedInterests = async (originalInterests, isGroup) => {
         let currInterest = interest;
         if (isGroup) currInterest = interest.interest;
 
-        if (currInterest.parent_id == null) continue;
-
+        if (currInterest.parent_id == null) {
+            expandedInterestSet.push(currInterest);
+            continue;
+        }
         //query for interest ancestry path for each original interest
         const path = await prisma.interest.findUnique({
             where: {id: currInterest.id},
@@ -32,7 +43,7 @@ const getExpandedInterests = async (originalInterests, isGroup) => {
 
         expandedInterestSet = [currInterest, ...expandedInterestSet, ...ancestorInterests]; //expand user's interest set to now include ancestor interests
     }
-    return [expandedInterestSet];
+    return expandedInterestSet;
 }
 
 const getUnionOfSets = (groupInterests, userInterests) => {
@@ -47,4 +58,12 @@ const getUnionOfSets = (groupInterests, userInterests) => {
     return groupInterestsSet.union(new Set(interestIds));
 }
 
-module.exports = { getExpandedInterests, getUnionOfSets};
+const filterMembersByStatus = (members, status) => {
+    return members.filter((member) => {
+        return member.status === status;
+    })
+}
+
+
+
+module.exports = { Status, getExpandedInterests, getUnionOfSets, filterMembersByStatus};
