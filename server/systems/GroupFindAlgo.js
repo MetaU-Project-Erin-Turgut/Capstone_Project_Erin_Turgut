@@ -1,6 +1,8 @@
 const { PrismaClient } = require('../generated/prisma');
 const prisma = new PrismaClient()
 
+const { getExpandedInterests } = require('./Utils');
+
 const LOCATION_SEARCH_RADIUS = 100; //in meters - will likely put in utils file later because will be used in event finding algo
 
 const findGroups = async (userData) => {
@@ -11,7 +13,7 @@ const findGroups = async (userData) => {
     const groupsByLocation = await filterGroupsByLocation(userCoordinates); 
 
     //expand user's selected interest list to include ancestor interests, so that these are also considered in group matching
-    const expandedUserInterests = await getExpandedUserInterests(userData.interests);
+    const expandedUserInterests = await getExpandedInterests(userData.interests, false);
 
     //get all groups that have at least one matching interest and are near the user
     const candidateGroups = await getCandidateGroups(groupsByLocation, expandedUserInterests);
@@ -26,20 +28,7 @@ const findGroups = async (userData) => {
     candidateGroups.sort((a, b) => b.compatibilityRatio - a.compatibilityRatio );
 
     //return these group suggestions to the user - limit the number sent?
-    return candidateGroups;
-
-    /*CURRENT APPROACH:
-        -For each group (filtered only by ones that include at least one of the user's extended interests and are within radius - AND group interest lists 
-        within each group only contain matching ones), go through group's interest list and tally interests with weighting for each group.
-    */
-    /*ALTERNATIVE APPROACH:
-        -Query the interest table for each interest in extended set and include the groups that include it.
-            -Additionally, these groups would need to be filtered by ones that are within distance requirement.
-        -I could then use this to create inverted index table (using Map) with interest ids as the keys and the list of groups 
-        that contain that interest as the value.
-        -Then for each of those interests and their weights (level attribute) go through each group and tally for jaccard calculation.
-    */
-        
+    return candidateGroups;        
 }
 
 const calcJaccardSimilarity = (group, numUserInterests) => {
@@ -60,7 +49,6 @@ const getCandidateGroups =  async (allGroupsNearby, allUserInterests) => {
     const interestIds = allUserInterests.map((interest) => {
         return interest.id;
     })
-    
     //get group candidates, filtered by ones nearby and ones that include at least one of the user's extended interests
     let groupCandidates =  await prisma.group.findMany({
         where: {
@@ -106,41 +94,9 @@ const getUserCoordinates = async (userId) => {
     WHERE id = ${userId}`;
     
     return {
-        longitude: userCoord[0].st_x,
-        latitude: userCoord[0].st_y,
+        longitude: userCoord.at(0).st_x,
+        latitude: userCoord.at(0).st_y,
     };
-}
-
-const getExpandedUserInterests = async (selectedInterests) => {
-    let expandedInterestSet = [];
-
-    for (const interest of selectedInterests) { //Plan is to limit interest selection to 5, so this loop shouldn't have too many iterations
-
-        if (interest.parent_id == null) continue;
-
-        //query for interest ancestry path for each selected interest
-        const path = await prisma.interest.findUnique({
-            where: {id: interest.id},
-            select: {
-                path: true
-            }
-        })
-        
-        //use path field to avoid recursive calls to get entire hierarchy 
-        const pathParsed = path.path.split('.').map((id) => {
-            return parseInt(id);
-        })
-
-        pathParsed.pop(); //don't need to include selected interest again
-
-        //get the actual interest objects of these ancestor ids
-        const ancestorInterests = await prisma.interest.findMany({
-            where: {id: { in: pathParsed}}
-        })
-
-        expandedInterestSet = [...expandedInterestSet, ...ancestorInterests]; //expand user's interest set to now include ancestor interests
-    }
-    return [...selectedInterests, ...expandedInterestSet];
 }
 
 //this will be used in events finding algo as well, so I will likely move this method to a utils file

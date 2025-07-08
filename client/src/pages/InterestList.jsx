@@ -16,7 +16,7 @@ const InterestList = () => {
             try {
                 const apiResultData = await APIUtils.fetchRootInterests();
                 const newArr = []; 
-                newArr[0] = apiResultData; //make first level interests (stored in first index of array) hold all returned root interests
+                newArr.at(0) = apiResultData; //make first level interests (stored in first index of array) hold all returned root interests
                 setInterestsByLevel(newArr);
             } catch (error) {
                 console.log("Status ", error.status);
@@ -47,7 +47,7 @@ const InterestList = () => {
         <Suspense fallback={<p>Loading...</p>}>
             {interestsByLevel.map((interestsArr) => (
                 <InterestLevelColumn 
-                    key={interestsArr[0].id} //use first interest's id in level as level's key.
+                    key={interestsArr.at(0).id} //use first interest's id in level as level's key.
                     interests={interestsArr}
                     onInterestClick={addNewColumn}
                 />

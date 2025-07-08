@@ -51,10 +51,10 @@ async function main() {
     for (const group of groups) {
         const groupRecordId = await prisma.$queryRaw`INSERT INTO "Group" (title, description, is_full, coord) VALUES(${group.title}, ${group.description}, ${group.is_full}, ST_SetSRID(ST_MakePoint(${group.longitude}, ${group.latitude}), 4326)::geography) RETURNING id`;
 
-        //for seeding, include interests - would not be done this way in finished product:
+        //for seeding, include interests 
         await prisma.group.update({
             where: {
-                id: groupRecordId[0].id
+                id: groupRecordId.at(0).id
             },
             data: {
                 interests: {
@@ -74,7 +74,7 @@ async function main() {
         //for seeding, include interests - would not be done this way in finished product:
         await prisma.event.update({
             where: {
-                id: eventRecordId[0].id
+                id: eventRecordId.at(0).id
             },
             data: {
                 interest: { connect: event.interest } 
