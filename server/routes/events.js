@@ -28,7 +28,7 @@ router.get('/user/events/', isAuthenticated, async (req, res) => {
 })
 
 //update user's status for an event
-router.patch('/user/events/:event_id', isAuthenticated, async (req, res) => {
+router.patch('/user/events/:event_id/status', isAuthenticated, async (req, res) => {
     const event_id = parseInt(req.params.event_id);
     const {updatedStatus} = req.body; 
 

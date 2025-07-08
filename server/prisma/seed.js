@@ -54,7 +54,7 @@ async function main() {
         //for seeding, include interests 
         await prisma.group.update({
             where: {
-                id: groupRecordId[0].id
+                id: groupRecordId.at(0).id
             },
             data: {
                 interests: {
@@ -74,7 +74,7 @@ async function main() {
         //for seeding, include interests - would not be done this way in finished product:
         await prisma.event.update({
             where: {
-                id: eventRecordId[0].id
+                id: eventRecordId.at(0).id
             },
             data: {
                 interest: { connect: event.interest } 

@@ -9,7 +9,7 @@ const { findGroups } = require('../systems/GroupFindAlgo');
 const { updateGroupCentralLocation, updateGroupInterests } = require('../systems/GroupUpdateMethods')
 const { Status, filterMembersByStatus } = require('../systems/Utils');
 
-const FULL_GROUP_SIZE = 6;
+const FULL_GROUP_SIZE = 3;
 
 //get user's groups 
 router.get('/user/groups/', isAuthenticated, async (req, res) => {
@@ -30,7 +30,7 @@ router.get('/user/groups/', isAuthenticated, async (req, res) => {
 })
 
 //update user's status for a group
-router.patch('/user/groups/:groupId', isAuthenticated, async (req, res) => {
+router.patch('/user/groups/:groupId/status', isAuthenticated, async (req, res) => {
     const groupId = parseInt(req.params.groupId);
     const {updatedStatus} = req.body; 
 
@@ -69,7 +69,7 @@ router.patch('/user/groups/:groupId', isAuthenticated, async (req, res) => {
 })
 
 //get new group suggestions - will be called immediately after user updates their interests
-router.get('/user/newGroups/', isAuthenticated, async (req, res) => {
+router.get('/user/groups/new', isAuthenticated, async (req, res) => {
     
 
     try {
@@ -119,7 +119,7 @@ router.put('/user/groups/:groupId/accept', isAuthenticated, async (req, res) => 
 
 
    try {
-        //Need to merge below database calls?
+        //get group and user relationship and each of their coordinates
        const group_user = await prisma.group_User.findUnique({
            where: {
                user_id_group_id: {
@@ -147,23 +147,15 @@ router.put('/user/groups/:groupId/accept', isAuthenticated, async (req, res) => 
            res.status(404).json({error: 'This user - group relationship does not exist'});
        }
 
-
-//TO DO:
-       //NOTE: is it better to instead make it so that when group becomes full it is removed from all users’ lists where it is pending?
-       if (group_user.group.is_full) {
-           //notify user
-           //remove from their list
-           const pendingMembers = filterMembersByStatus(group_user.group.members, Status.PENDING);
-       }
-
-
        //now that user accepted this group, we need to update the group's interest list and central location
-       const newGroupCoords = updateGroupCentralLocation(groupCoord[0], userCoord[0]);
+
+       const newGroupCoords = updateGroupCentralLocation(groupCoord.at(0), userCoord.at(0));
        const newGroupInterests = await updateGroupInterests(group_user.group.interests, group_user.user.interests);
 
        const acceptedMembers = filterMembersByStatus(group_user.group.members, Status.ACCEPTED);
        let newIsFullStatus = false;
-       if (acceptedMembers.length + 1 === FULL_GROUP_SIZE) {
+
+       if (acceptedMembers.length + 1 >= FULL_GROUP_SIZE) {
             newIsFullStatus = true;
        }
        
@@ -181,6 +173,7 @@ router.put('/user/groups/:groupId/accept', isAuthenticated, async (req, res) => 
              },
        })
 
+       //update group coordinates
        await prisma.$queryRaw`
        UPDATE "Group" 
        SET "coord" = (ST_SetSRID(ST_MakePoint(${newGroupCoords.longitude}, ${newGroupCoords.latitude}), 4326)::geography)
@@ -199,6 +192,22 @@ router.put('/user/groups/:groupId/accept', isAuthenticated, async (req, res) => 
                status: Status.ACCEPTED 
            }
        })
+
+       //if group is now full, remove it as a "Pending" option from users' lists who have not accepted the group
+       if (newIsFullStatus) {
+            await prisma.group.update({
+                where: {
+                    id: groupId
+                },
+                data: {
+                    members: {
+                        deleteMany: {
+                            status: Status.PENDING,
+                        },
+                    }
+                }
+            });
+       }
 
 
        res.status(200).json(updatedGroup);

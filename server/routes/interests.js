@@ -55,11 +55,10 @@ router.get('/interests/:interestId', isAuthenticated, async (req, res) => {
 })
 
 //update user interests
-router.post('/interests', isAuthenticated, async (req, res) => {
+router.post('/user/interests', isAuthenticated, async (req, res) => {
     const { chosenInterests } = req.body;
 
     try {
-        //may want to make this a raw query to be able to get coordinates here too.
         const updatedUser = await prisma.user.update({
             where: {
                 id: req.session.userId,

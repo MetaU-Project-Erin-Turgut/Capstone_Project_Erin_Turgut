@@ -94,8 +94,8 @@ const getUserCoordinates = async (userId) => {
     WHERE id = ${userId}`;
     
     return {
-        longitude: userCoord[0].st_x,
-        latitude: userCoord[0].st_y,
+        longitude: userCoord.at(0).st_x,
+        latitude: userCoord.at(0).st_y,
     };
 }
 
