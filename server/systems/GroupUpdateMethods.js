@@ -1,7 +1,7 @@
 const { PrismaClient } = require('../generated/prisma');
 const prisma = new PrismaClient()
 
-const { getExpandedInterests } = require('./Utils');
+const { getUnionOfSets } = require('./Utils');
 
 const updateGroupCentralLocation = (groupCoord, userCoord) => {
    //Given the fact that the accepted group's location and user's location are close by, the midpoint formula is good enough for midpoint calculation:
@@ -14,12 +14,13 @@ const updateGroupCentralLocation = (groupCoord, userCoord) => {
 }
 
 
-const updateGroupInterests = async (groupInterests, user) => {
+const updateGroupInterests = async (groupInterests, userInterests) => {
     //this method will create a union set between group's existing interests and user's interests
     
-    //1) need to extend group's interest set to make sure duplicates aren't included later on
-    const expandedGroupInterests = await getExpandedInterests(groupInterests, true);
+    //need to union the expandedGroupInterests set with the user's selected interests set
+    const unionInterests = await getUnionOfSets(groupInterests, userInterests);
 
+    return [...unionInterests]; //return as array, not set object
 }
 
 

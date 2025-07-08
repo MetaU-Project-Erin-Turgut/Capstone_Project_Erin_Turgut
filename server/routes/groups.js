@@ -16,7 +16,7 @@ router.get('/user/groups/', isAuthenticated, async (req, res) => {
                 id: req.session.userId, 
             },
             include: { 
-                groups: {include: {group: { include: {interests: true}}}}
+                groups: {include: {group: { include: {interests: true, members: true}}}}
             }
         })
         res.status(201).json(userData)
@@ -121,8 +121,8 @@ router.put('/user/groups/:groupId/accept', isAuthenticated, async (req, res) => 
                }
            },
            include: {
-               group: { include: {interests: {select: {interest: true}}}},
-               user: true
+               group: { include: {interests: {select: {interest: true}}, members: true}},
+               user: { include: {interests: true} }
            }
        });
        const userCoord = await prisma.$queryRaw`
@@ -141,7 +141,7 @@ router.put('/user/groups/:groupId/accept', isAuthenticated, async (req, res) => 
        }
 
 
-       //IMPLEMENTED LATER:
+//TO DO:
        //NOTE: is it better to instead make it so that when group becomes full it is removed from all users’ lists where it is pending?
        if (group_user.group.is_full) {
            //notify user
@@ -153,8 +153,26 @@ router.put('/user/groups/:groupId/accept', isAuthenticated, async (req, res) => 
        const newGroupCoords = updateGroupCentralLocation(groupCoord[0], userCoord[0]);
        const newGroupInterests = await updateGroupInterests(group_user.group.interests, group_user.user.interests);
 
+//TO DO:
+       //INCLUDE MEMBERS TO CHECK IF IS FULL NEEDS TO BE CHANGED
+       
+//TO DO:
+       //update group in database (update members, check if full, update coordinates, update interests list-CHECK)
+       const updatedGroup = await prisma.group.update({
+            where: {id: groupId},
+            data: {
+                 interests: {
+                    deleteMany: {},
+                    create: newGroupInterests.map((interest) => {
+                        return { interest: { connect: {id: interest} } }
+                    })
+                 }
+             },
+       })
 
-       const updatedGroup = await prisma.group_User.update({
+
+       //update status of group_user relationship
+       const updatedGroupUser = await prisma.group_User.update({
            where: {
                user_id_group_id: {
                    group_id: groupId,
@@ -162,6 +180,7 @@ router.put('/user/groups/:groupId/accept', isAuthenticated, async (req, res) => 
                }
            },
            data: {
+//TO DO:
                status: 'ACCEPTED' //NEED TO USE ENUM HERE
            }
        })

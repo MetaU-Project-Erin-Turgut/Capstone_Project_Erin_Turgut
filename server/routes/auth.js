@@ -1,6 +1,6 @@
 const express = require('express')
 const bcrypt = require('bcrypt')
-const { PrismaClient, Prisma } = require('../generated/prisma');
+const { PrismaClient } = require('../generated/prisma');
 
 const prisma = new PrismaClient()
 const router = express.Router()
@@ -50,7 +50,7 @@ router.post('/signup', async (req, res) => {
 
         // Create a new user in the database
         //for mock data, have all users start out with location at meta's headquarters
-        const queryResult = await prisma.$queryRaw`INSERT INTO "User" (address, username, email, password, coord) VALUES(${address}, ${username}, ${email}, ${hashedPassword}, ST_SetSRID(ST_MakePoint(${-122.1500}, ${37.4855}), 4326)::geography) RETURNING id, address, username, email, password, ST_AsText(coord);`;
+        const queryResult = await prisma.$queryRaw`INSERT INTO "User" (address, username, email, password, coord) VALUES(${address}, ${username}, ${email}, ${hashedPassword}, ST_SetSRID(ST_MakePoint(${-122.1500}, ${37.485949}), 4326)::geography) RETURNING id, address, username, email, password, ST_AsText(coord);`;
 
         const newUser = queryResult[0];
         // Store user ID and username in the session, allowing them to remain authenticated as they navigate the website

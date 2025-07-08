@@ -35,4 +35,16 @@ const getExpandedInterests = async (originalInterests, isGroup) => {
     return [expandedInterestSet];
 }
 
-module.exports = { getExpandedInterests};
+const getUnionOfSets = (groupInterests, userInterests) => {
+    const groupIds = groupInterests.map((group) => {
+        return group.interest.id;
+    })
+    const interestIds = userInterests.map((interest) => {
+        return interest.id;
+    })
+
+    const groupInterestsSet = new Set(groupIds);
+    return groupInterestsSet.union(new Set(interestIds));
+}
+
+module.exports = { getExpandedInterests, getUnionOfSets};
