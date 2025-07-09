@@ -1,6 +1,7 @@
 const { PrismaClient } = require('../generated/prisma');
 const prisma = new PrismaClient()
 
+const LOCATION_SEARCH_RADIUS = 100; //in meters
 
 //enums for user's status for an event or group
 const Status = Object.freeze({
@@ -64,6 +65,18 @@ const filterMembersByStatus = (members, status) => {
     })
 }
 
+const filterGroupsByLocation = async (eventCoordinates, forEventSearch) => {
+    //returns groups within radius 
+
+    if (forEventSearch) { //do not need to exclude full groups for event search
+        return await prisma.$queryRaw`SELECT id, title FROM "Group" WHERE ST_DWithin(coord, ST_SetSRID(ST_MakePoint(${eventCoordinates.longitude}, ${eventCoordinates.latitude}), 4326)::geography, ${LOCATION_SEARCH_RADIUS})`;
+    } 
+
+    //if it is for group search for users to join, we do need to exclude full groups
+    return await prisma.$queryRaw`SELECT id, title FROM "Group" WHERE ST_DWithin(coord, ST_SetSRID(ST_MakePoint(${eventCoordinates.longitude}, ${eventCoordinates.latitude}), 4326)::geography, ${LOCATION_SEARCH_RADIUS}) AND is_full= FALSE`;
+
+}
 
 
-module.exports = { Status, getExpandedInterests, getUnionOfSets, filterMembersByStatus};
+
+module.exports = { Status, getExpandedInterests, getUnionOfSets, filterMembersByStatus, filterGroupsByLocation };

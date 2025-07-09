@@ -2,15 +2,15 @@ const { PrismaClient } = require('../generated/prisma');
 const prisma = new PrismaClient()
 
 const { getExpandedInterests } = require('./Utils');
+const { filterGroupsByLocation } = require('./Utils');
 
-const LOCATION_SEARCH_RADIUS = 100; //in meters - will likely put in utils file later because will be used in event finding algo
 
 const findGroups = async (userData) => {
 
     const userCoordinates = await getUserCoordinates(userData.id);
 
     //filter all groups to only include ones within accessible distance to user - and ones that aren't full
-    const groupsByLocation = await filterGroupsByLocation(userCoordinates); 
+    const groupsByLocation = await filterGroupsByLocation(userCoordinates, false); //pass 'false' to clarify this is not an event search (see method definition)
 
     //expand user's selected interest list to include ancestor interests, so that these are also considered in group matching
     const expandedUserInterests = await getExpandedInterests(userData.interests, false);
@@ -99,13 +99,6 @@ const getUserCoordinates = async (userId) => {
     };
 }
 
-//this will be used in events finding algo as well, so I will likely move this method to a utils file
-const filterGroupsByLocation = async (userCoordinates) => {
-    //returns groups within radius AND ones that are not full
-
-    return await prisma.$queryRaw`SELECT id FROM "Group" WHERE ST_DWithin(coord, ST_SetSRID(ST_MakePoint(${userCoordinates.longitude}, ${userCoordinates.latitude}), 4326)::geography, ${LOCATION_SEARCH_RADIUS}) AND is_full= FALSE`;
-    
-}
 
 module.exports = { findGroups };
 

@@ -22,7 +22,7 @@ router.get('/user/groups/', isAuthenticated, async (req, res) => {
                 groups: {include: {group: { include: {interests: true, members: true}}}}
             }
         })
-        res.status(201).json(userData)
+        res.status(201).json(userData.groups)
     } catch (error) {
         console.error("Error fetching groups:", error)
         res.status(500).json({ error: "Something went wrong while fetching groups." })
