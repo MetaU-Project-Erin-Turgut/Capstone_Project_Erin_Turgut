@@ -170,8 +170,9 @@ router.put('/user/groups/:groupId/accept', isAuthenticated, async (req, res) => 
                         return { interest: { connect: {id: interest} } }
                     })
                  },
-                 is_full: newIsFullStatus
-             },
+                 is_full: newIsFullStatus,
+            },
+
        })
 
        //update group coordinates
@@ -191,7 +192,9 @@ router.put('/user/groups/:groupId/accept', isAuthenticated, async (req, res) => 
            },
            data: {
                status: Status.ACCEPTED 
-           }
+           },
+           include: {group: {include: {interests: {include: {interest: true}}, members: {where: {NOT: {user_id: req.session.userId}}, include: {user: true}}}}}
+           
        })
 
        //if group is now full, remove it as a "Pending" option from users' lists who have not accepted the group
@@ -211,7 +214,7 @@ router.put('/user/groups/:groupId/accept', isAuthenticated, async (req, res) => 
        }
 
 
-       res.status(200).json(updatedGroup);
+       res.status(200).json(updatedGroupUser);
 
 
    } catch (error) {

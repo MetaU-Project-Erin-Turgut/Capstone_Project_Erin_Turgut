@@ -1,4 +1,3 @@
-
 export default class APIUtils {
 
     static updateEventStatus = async (id, statusState) => {
@@ -125,6 +124,23 @@ export default class APIUtils {
             throw {status: response.status, message: data.error};
         }
 
+    }
+
+    static acceptGroup = async (id) => {
+        
+        const response = await fetch(`http://localhost:3000/user/groups/${id}/accept`, {
+            method: "PUT",
+            headers: { "Content-Type": "application/json" },
+            credentials: "include",
+        });
+
+        const data = await response.json();
+
+        if (response.ok) {
+            return data;
+        } else {
+            throw {status: response.status, message: data.error};
+        }
     }
 
 

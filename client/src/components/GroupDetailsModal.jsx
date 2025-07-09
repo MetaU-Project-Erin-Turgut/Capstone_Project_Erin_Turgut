@@ -1,6 +1,7 @@
 import { Suspense } from 'react';
 import APIUtils from '../utils/APIUtils';
 import StatusForm from './StatusForm';
+import { Status } from '../utils/utils';
 import "../styles/Modal.css";
 
 const GroupDetailsModal = ( {onModalClose, groupData, onStatusChange}) => {
@@ -10,9 +11,14 @@ const GroupDetailsModal = ( {onModalClose, groupData, onStatusChange}) => {
     const handleStatusUpdate = async (statusState) => {
         //put request to change status of group
         try {
-            const apiResultData = await APIUtils.updateGroupStatus(id, statusState);
-
-            onStatusChange({...groupData, status: apiResultData.status});
+            if (statusState === Status.ACCEPTED) {
+                const apiResultData = await APIUtils.acceptGroup(id);
+                onStatusChange(apiResultData);
+            } else {
+                const apiResultData = await APIUtils.updateGroupStatus(id, statusState);
+                onStatusChange({...groupData, status: apiResultData.status});
+            } 
+            
             onModalClose();
         } catch (error) {
             console.log("Status ", error.status);
