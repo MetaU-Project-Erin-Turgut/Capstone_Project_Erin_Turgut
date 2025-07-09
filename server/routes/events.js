@@ -6,6 +6,7 @@ const prisma = new PrismaClient()
 
 const { isAuthenticated } = require('../middleware/CheckAutheticated');
 const { scheduleEventsForGroups } = require('../systems/EventFindAlgo');
+const { Status } = require('../systems/Utils');
 
 //get user's events 
 router.get('/user/events/', isAuthenticated, async (req, res) => {
@@ -17,7 +18,35 @@ router.get('/user/events/', isAuthenticated, async (req, res) => {
             include: { 
                 events: { 
                     //retrieve all events of the logged in user
-                    include: { event: true } 
+                    include: { 
+                        event: {
+                            include: {
+                                attendees:{
+                                    include: {
+                                        user: true
+                                    },
+                                }, 
+                                //filter the groups included by only the ones user is associated with and has accepted
+                                groups:{
+                                    where: {
+                                        group: {
+                                            is: {
+                                                members: {
+                                                    some: {
+                                                        AND: [
+                                                            {user_id: req.session.userId}, 
+                                                            {status: Status.ACCEPTED}
+                                                        ]   
+                                                    }
+                                                }
+                                            }, 
+                                        }
+                                    },
+                                    include: {group: {include: {members: true}}}
+                                }
+                            }
+                        }
+                    } 
                 } 
             }
         })
