@@ -19,10 +19,10 @@ router.get('/user/groups/', isAuthenticated, async (req, res) => {
                 id: req.session.userId, 
             },
             include: { 
-                groups: {include: {group: { include: {interests: true, members: true}}}}
+                groups: {include: {group: { include: {interests: {include: {interest: true}}, members: {where: {NOT: {user_id: req.session.userId}}, include: {user: true}}}}}}
             }
         })
-        res.status(201).json(userData)
+        res.status(201).json(userData.groups)
     } catch (error) {
         console.error("Error fetching groups:", error)
         res.status(500).json({ error: "Something went wrong while fetching groups." })
@@ -98,7 +98,8 @@ router.get('/user/groups/new', isAuthenticated, async (req, res) => {
                     data: {
                         group: {connect: {id: group.id} },
                         user: {connect: {id: req.session.userId} },
-                        status: Status.PENDING 
+                        status: Status.PENDING, 
+                        compatibilityRatio: group.compatibilityRatio 
                     }
                 })
             }

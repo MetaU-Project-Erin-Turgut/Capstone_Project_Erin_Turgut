@@ -16,7 +16,7 @@ const InterestList = () => {
             try {
                 const apiResultData = await APIUtils.fetchRootInterests();
                 const newArr = []; 
-                newArr.at(0) = apiResultData; //make first level interests (stored in first index of array) hold all returned root interests
+                newArr[0] = apiResultData; //make first level interests (stored in first index of array) hold all returned root interests
                 setInterestsByLevel(newArr);
             } catch (error) {
                 console.log("Status ", error.status);
