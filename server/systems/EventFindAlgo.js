@@ -1,7 +1,8 @@
 const { PrismaClient } = require('../generated/prisma');
 const prisma = new PrismaClient()
 
-const { filterGroupsByLocation } = require('./Utils');
+const { Status, filterGroupsByLocation } = require('./Utils');
+
 
 const scheduleEventsForGroups = async () => {
     //get all events from Event table that have not passed - this method also filters out events from the database that have passed
@@ -22,8 +23,10 @@ const scheduleEventsForGroups = async () => {
             if (inviteStatus === 200) {
                 //invites sent, now update group_event table
                 await createGroup_Event(group.id, retrievedEvent.id);
-
-                // TODO: also update user_event tables for each user in the group
+                //update user_event tables for each user in the group
+                for (member of group.members) {
+                    await createEvent_User(member.user, retrievedEvent.id);
+                }
 
             } else {
                 throw Error("Invites failed to send");
@@ -39,6 +42,16 @@ const createGroup_Event = async (groupId, eventId) => {
         data: {
             group: { connect: { id: groupId } },
             event: { connect: { id: eventId } }
+        }
+    })
+}
+
+const createEvent_User = async (user, eventId) => {
+    return await prisma.event_User.create({ 
+        data: {
+            user: { connect: { id: user.id } },
+            event: { connect: { id: eventId } },
+            status: Status.PENDING 
         }
     })
 }
@@ -70,7 +83,11 @@ const getCandidateGroups = async (allGroupsNearby, eventInterest, eventId) => {
         include: {
             interests: {
                 select: { interest: { select: { level: true, title: true } } }
-            }
+            },
+            members: {
+                where: {status: Status.ACCEPTED},
+                include: {user: true}
+            } //only include members of the group who have accepted the group
         }
     });
 }
