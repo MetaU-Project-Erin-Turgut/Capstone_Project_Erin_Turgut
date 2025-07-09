@@ -15,7 +15,7 @@ const scheduleEventsForGroups = async () => {
         //for this event, find groups within location range
         const groupsNearby = await filterGroupsByLocation(eventCoords, true);
 
-        //for these groups, additionally filter by ones that include this event's interest in their array of interests
+        //for these groups, additionally filter by ones that include this event's interest in their array of interests AND haven't been sent this event invite yet
         const candidateGroups = await getCandidateGroups(groupsNearby, retrievedEvent.interest_id, retrievedEvent.id);
         for (group of candidateGroups) {
             const inviteStatus = sendInvitesToUsers();
