@@ -1,23 +1,17 @@
-import { useState, Suspense } from 'react';
-import { Status } from "../utils/utils";
+import { Suspense } from 'react';
 import APIUtils from '../utils/APIUtils';
-
+import StatusForm from './StatusForm';
 import "../styles/Modal.css";
 
 const GroupDetailsModal = ( {onModalClose, groupData, onStatusChange}) => {
     
-    const [statusState, setStatusState] = useState(groupData.status); 
-
     const { id, title, description, interests, members } = groupData.group;
 
-    const handleDropdownChange = (event) => {
-        setStatusState(event.target.value);
-    }
-
-    const handleStatusUpdate = async () => {
+    const handleStatusUpdate = async (statusState) => {
         //put request to change status of group
         try {
             const apiResultData = await APIUtils.updateGroupStatus(id, statusState);
+
             onStatusChange({...groupData, status: apiResultData.status});
             onModalClose();
         } catch (error) {
@@ -45,16 +39,8 @@ const GroupDetailsModal = ( {onModalClose, groupData, onStatusChange}) => {
                             <p key={member.user.id}>{member.user.username} {member.status}</p> 
                         ))}
                     </Suspense>
-                    <div className="select-form">
-                        <select name="update-sattus" defaultValue={statusState} onChange={handleDropdownChange}>
-                            <option disabled value="">Choose status</option>
-                            <option value={Status.PENDING}>{Status.PENDING}</option>
-                            <option value={Status.ACCEPTED}>{Status.ACCEPTED}</option>
-                            <option value={Status.REJECTED}>{Status.REJECTED}</option>
-                        </select>
-                        <button onClick={handleStatusUpdate}>Submit Changes</button>
-                    </div>
-
+                    {/* show form with options accept group or ignore when pending OR show form with only drop group option */}
+                    <StatusForm onSubmitChange={handleStatusUpdate} currStatus={groupData.status}/>
                 </div>
             </div>
         </div>
