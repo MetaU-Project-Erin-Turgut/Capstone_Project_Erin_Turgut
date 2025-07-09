@@ -2,7 +2,27 @@
 export default class APIUtils {
 
     static updateEventStatus = async (id, statusState) => {
-        const response = await fetch(`http://localhost:3000/user/events/${id}`, { //path param is event id
+        const response = await fetch(`http://localhost:3000/user/events/${id}/status`, { //path param is event id
+            method: "PATCH",
+            headers: { "Content-Type": "application/json" },
+            body: JSON.stringify({
+                "updatedStatus": statusState
+            }),
+            credentials: "include",
+        });
+
+        const data = await response.json();
+
+        if (response.ok) {
+            return data;
+        } else {
+            throw {status: response.status, message: data.error};
+        }
+   
+    }
+
+    static updateGroupStatus = async (id, statusState) => {
+        const response = await fetch(`http://localhost:3000/user/groups/${id}/status`, { //path param is group id
             method: "PATCH",
             headers: { "Content-Type": "application/json" },
             body: JSON.stringify({

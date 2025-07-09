@@ -28,7 +28,7 @@ const GroupsList = () => {
         try {
             const apiResultData = await APIUtils.fetchGroups();
             const mappedGroups = new Map(
-                apiResultData.map(group => [group.group_id, group.group])
+                apiResultData.map(group => [group.group_id, group])
             );
             setGroups(mappedGroups);
         } catch (error) {
@@ -39,7 +39,7 @@ const GroupsList = () => {
 
     return (
         <>
-        <h2>Events</h2>
+        <h2>Groups</h2>
         <FilterOptions onFilterChange={(status) => {setStatusFilter(status)}}/>
         <div className="card-container">
             <Suspense fallback={<p>Loading...</p>}>
@@ -49,7 +49,7 @@ const GroupsList = () => {
                         groupData={value}
                         updateGroup = {(newGroupObj) => {
                             const updatedGroups = new Map(groups);
-                            updatedGroups.set(newGroupObj.id, newGroupObj);
+                            updatedGroups.set(newGroupObj.group_id, newGroupObj);
                             setGroups(updatedGroups);
                         }}
                     />

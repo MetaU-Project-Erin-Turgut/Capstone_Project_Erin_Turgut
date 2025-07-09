@@ -75,11 +75,12 @@ model Event_User {
 }
 
 model Group_User {
-  user_id  Int
-  group_id Int
-  status   Status @default(PENDING)
-  group    Group  @relation(fields: [group_id], references: [id])
-  user     User   @relation(fields: [user_id], references: [id])
+  user_id             Int
+  group_id            Int
+  status              Status @default(PENDING)
+  compatibilityRatio  Decimal @default("0.00")
+  group    Group      @relation(fields: [group_id], references: [id])
+  user     User       @relation(fields: [user_id], references: [id])
 
   @@id([user_id, group_id])
 }

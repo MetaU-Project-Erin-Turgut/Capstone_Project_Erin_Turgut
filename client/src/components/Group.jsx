@@ -8,10 +8,9 @@ import "../styles/Card.css";
 
 
 const Group = ( {groupData, updateGroup}) => {
-    console.log("GROUPDATA: ", groupData);
     const [isGroupDetailsModalVisible, setIsGroupDetailsModalVisible] = useState(false);
-
-    const { title, description } = groupData; //due to nature of prisma relational queries, event table data is in nested event property
+    const compatibilityRatio = groupData.compatibilityRatio;
+    const { title, description } = groupData.group; 
 
     const renderStatus = () => {
         switch(groupData.status) {
@@ -39,6 +38,8 @@ const Group = ( {groupData, updateGroup}) => {
                 <h4 className="title">{title}</h4>
             </section>
             <p>{description}</p>
+            <h5>Compatibility Ratio: </h5>
+            <p>{compatibilityRatio * 100}%</p>
         </div>
         {isGroupDetailsModalVisible && <GroupDetailsModal onModalClose={closeModal} groupData={groupData} onStatusChange={(newGroupObj) => {updateGroup(newGroupObj)}}/>}
         </>
