@@ -4,7 +4,8 @@ const router = express.Router()
 const { PrismaClient } = require('../generated/prisma');
 const prisma = new PrismaClient()
 
-const { isAuthenticated } = require('../middleware/CheckAutheticated')
+const { isAuthenticated } = require('../middleware/CheckAutheticated');
+const { scheduleEventsForGroups } = require('../systems/EventFindAlgo');
 
 //get user's events 
 router.get('/user/events/', isAuthenticated, async (req, res) => {
@@ -64,6 +65,17 @@ router.patch('/user/events/:event_id/status', isAuthenticated, async (req, res) 
         console.error("Error fetching events:", error)
         res.status(500).json({ error: "Could not update your response to this event." });
     }
+})
+
+//start event search for groups
+router.get('/events/search', isAuthenticated, async (req, res) => {
+   try {
+       const allEvents = await scheduleEventsForGroups();
+       res.status(200).json(allEvents);
+   } catch (error) {
+       console.error("Error fetching events:", error)
+       res.status(500).json({ error: "Could not get events." });
+   }
 })
 
 
