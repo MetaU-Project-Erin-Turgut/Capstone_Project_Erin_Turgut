@@ -54,6 +54,24 @@ router.get('/interests/:interestId', isAuthenticated, async (req, res) => {
     }
 })
 
+//get user's selected interests
+router.get('/user/interests', isAuthenticated, async(req, res) => {
+    try {
+        const userInterests = await prisma.user.findUnique({
+            where: {
+                id: req.session.userId,
+            },
+            include: { 
+                interests: true
+            }
+        })
+        res.status(201).json(userInterests.interests)
+    } catch (error) {
+        console.error("Error fetching user's interests:", error)
+        res.status(500).json({ error: "Something went wrong while fetching user's interests." })
+    }
+})
+
 //update user interests
 router.post('/user/interests', isAuthenticated, async (req, res) => {
     const { chosenInterests } = req.body;

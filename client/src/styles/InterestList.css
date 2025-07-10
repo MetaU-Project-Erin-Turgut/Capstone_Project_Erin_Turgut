@@ -1,4 +1,4 @@
-.interest-list-container {
+.interest-list-columns-container {
     display: flex;
     flex-direction: row;
     overflow-x: scroll;

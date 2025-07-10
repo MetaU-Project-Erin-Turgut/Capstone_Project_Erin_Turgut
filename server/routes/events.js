@@ -22,10 +22,12 @@ router.get('/user/events/', isAuthenticated, async (req, res) => {
                         event: {
                             include: {
                                 attendees:{
+                                    where: {NOT: {user_id: req.session.userId}},
                                     include: {
-                                        user: true
+                                        user: {include: {groups: true}}
                                     },
-                                }, 
+                                },
+                                interest: true, 
                                 //filter the groups included by only the ones user is associated with and has accepted
                                 groups:{
                                     where: {
@@ -42,7 +44,6 @@ router.get('/user/events/', isAuthenticated, async (req, res) => {
                                             }, 
                                         }
                                     },
-                                    include: {group: {include: {members: true}}}
                                 }
                             }
                         }
