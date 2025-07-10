@@ -11,8 +11,9 @@ const Event = ( {eventData, updateEvent}) => {
 
     const [isEventDetailsModalVisible, setIsEventDetailsModalVisible] = useState(false);
 
-    const { title, description, zip_code, address  } = eventData.event; //due to nature of prisma relational queries, event table data is in nested event property
+    const { title, description, dateTime } = eventData.event; //due to nature of prisma relational queries, event table data is in nested event property
 
+    const eventDateTime = (new Date(dateTime)).toDateString();
     const renderStatus = () => {
         switch(eventData.status) {
             case Status.ACCEPTED: 
@@ -39,7 +40,7 @@ const Event = ( {eventData, updateEvent}) => {
                 <h4 className="title">{title}</h4>
             </section>
             <p>{description}</p>
-            <p>{zip_code}</p>
+            <p>{eventDateTime}</p> 
         </div>
         {isEventDetailsModalVisible && <EventDetailsModal onModalClose={closeModal} eventData={eventData} onStatusChange={(newEventObj) => {updateEvent(newEventObj)}}/>}
         </>

@@ -1,20 +1,13 @@
-import { useState } from 'react';
-import { Status } from "../utils/utils";
+import { Suspense } from 'react';
 import APIUtils from '../utils/APIUtils';
-
+import StatusForm from './StatusForm';
 import "../styles/Modal.css";
 
 const EventDetailsModal = ( {onModalClose, eventData, onStatusChange}) => {
     
-    const [statusState, setStatusState] = useState(eventData.status); 
+    const { id, title, description, interest, attendees } = eventData.event;
 
-    const { id, address, description, title, zip_code } = eventData.event;
-
-    const handleDropdownChange = (event) => {
-        setStatusState(event.target.value);
-    }
-
-    const handleStatusUpdate = async () => {
+    const handleStatusUpdate = async (statusState) => {
         //put request to change status of event
         try {
             const apiResultData = await APIUtils.updateEventStatus(id, statusState);
@@ -33,18 +26,15 @@ const EventDetailsModal = ( {onModalClose, eventData, onStatusChange}) => {
                     <button className="close-btn" onClick={onModalClose}>X</button>
                     <h4>{title}</h4>
                     <p>{description}</p>
-                    <p>{address}</p>
-                    <p>{zip_code}</p>
-                    <div className="select-form">
-                        <select name="update-sattus" defaultValue={statusState} onChange={handleDropdownChange}>
-                            <option disabled value="">Choose status</option>
-                            <option value={Status.PENDING}>{Status.PENDING}</option>
-                            <option value={Status.ACCEPTED}>{Status.ACCEPTED}</option>
-                            <option value={Status.REJECTED}>{Status.REJECTED}</option>
-                        </select>
-                        <button onClick={handleStatusUpdate}>Submit Changes</button>
-                    </div>
-
+                    <h4>Core Interest:</h4>
+                    <p>{interest.title}</p>
+                    <Suspense fallback={<p>Loading Attendees...</p>}>
+                        <h4>Attendees:</h4>
+                        {attendees.map((attendee) => (
+                            <p key={attendee.user.id}>{attendee.user.username} {attendee.status} </p> 
+                        ))}
+                    </Suspense>
+                    <StatusForm onSubmitChange={handleStatusUpdate} currStatus={eventData.status}/>
                 </div>
             </div>
         </div>

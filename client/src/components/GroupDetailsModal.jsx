@@ -11,7 +11,6 @@ const GroupDetailsModal = ( {onModalClose, groupData, onStatusChange}) => {
         //put request to change status of group
         try {
             const apiResultData = await APIUtils.updateGroupStatus(id, statusState);
-
             onStatusChange({...groupData, status: apiResultData.status});
             onModalClose();
         } catch (error) {
