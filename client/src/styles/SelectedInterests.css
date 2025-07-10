@@ -1,3 +1,6 @@
 .selected-interests-section {
+    display: flex;
+    flex-direction: row;
+    justify-content: center;
     box-shadow: 0px 10px 10px rgb(114, 112, 112); 
 }

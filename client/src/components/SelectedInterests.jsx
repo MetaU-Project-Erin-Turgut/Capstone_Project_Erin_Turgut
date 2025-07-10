@@ -1,10 +1,18 @@
+import { Suspense } from 'react';
 import "../styles/SelectedInterests.css";
 
-const SelectedInterests = () => {
+const SelectedInterests = ({ userInterests }) => {
     return (
-        <div className="selected-interests-section">
-            <p>Selected interests will show up here</p>
-        </div>
+        <>
+            <h4>Your current interests:</h4>
+            <div className="selected-interests-section">
+                <Suspense fallback={<p>Loading...</p>}>
+                    {userInterests.map((interest) => (
+                        <p key={interest.id}>{interest.title}, </p> 
+                    ))}
+                </Suspense>
+            </div>
+        </>
     )
 }
 
