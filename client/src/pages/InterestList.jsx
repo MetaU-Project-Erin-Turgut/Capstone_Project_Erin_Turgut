@@ -1,6 +1,7 @@
 import { useState, useEffect, Suspense } from 'react';
 import InterestLevelColumn from "../components/InterestLevelColumn";
 import APIUtils from "../utils/APIUtils";
+import SelectedInterests from '../components/SelectedInterests';
 import "../styles/InterestList.css";
 
 const InterestList = () => {
@@ -47,7 +48,9 @@ const InterestList = () => {
         }
     }
 
-    return <div className="interest-list-container">
+    return (<div className="interest-list-container">
+        <SelectedInterests />
+        <div className="interest-list-columns-container">
         <Suspense fallback={<p>Loading...</p>}>
             {interestsByLevel.map((interestsArr) => (
                 <InterestLevelColumn 
@@ -57,7 +60,8 @@ const InterestList = () => {
                 />
             ))}
         </Suspense>
-    </div>
+        </div>
+    </div>)
 }
 
 export default InterestList;

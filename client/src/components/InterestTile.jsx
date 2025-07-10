@@ -7,6 +7,7 @@ const InterestTile = ({ interest, onTileClick }) => {
                 // TODO: add class to change shading
             }}>
             <p>{interest.title}</p>
+            <input className="checkbox" type="checkbox" id={interest.id} name={interest.id} onClick={(event) => {event.stopPropagation()}}/>
         </div>
     )
 }
