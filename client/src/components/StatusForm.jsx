@@ -1,21 +1,21 @@
-import { useState } from 'react';
+import { useState, useRef } from 'react';
 import { Status } from "../utils/utils";
 import '../styles/StatusForm.css';
 
 const StatusForm = ({ onSubmitChange, currStatus }) => {
-    const [notif, setNotif] = useState(''); //notification to user if they make an invalid action - in this case pressing submit without changing status
-    let selectedStatus = currStatus;
+    const [isSubmitDisabled, setIsSubmitDisabled] = useState(true);
+    let selectedStatus = useRef(currStatus);
 
     const changeSelectedState = (newStatus) => {
-        selectedStatus = newStatus;
-        setNotif('');
+        selectedStatus.current = newStatus;
+        setIsSubmitDisabled(false);
     }
 
     const handleSubmit = () => {
-        if (selectedStatus === currStatus) {
-            setNotif("You haven't selected anything");
+        if (selectedStatus.current === currStatus) {
+            setIsSubmitDisabled(true);
         } else {
-            onSubmitChange(selectedStatus);
+            onSubmitChange(selectedStatus.current);
         }
         
     }
@@ -26,8 +26,7 @@ const StatusForm = ({ onSubmitChange, currStatus }) => {
             {currStatus === Status.PENDING?<p>You haven't responded to this invite yet.</p> : <p>Click "Drop" if you would like to drop this group.</p> }
             {currStatus === Status.PENDING&&<button onClick={() => changeSelectedState(Status.ACCEPTED)}>Accept</button>}
             <button onClick={() => changeSelectedState(Status.REJECTED)}>{currStatus === Status.PENDING? "Ignore": "Drop" }</button>
-            <p>{notif}</p>
-            <button onClick={() => handleSubmit()}>Submit Changes</button>
+            <button onClick={() => handleSubmit()} disabled={isSubmitDisabled}>Submit Changes</button>
         </section>
         
     )

@@ -15,9 +15,13 @@ const InterestList = () => {
     const fetchRootInterests = async () => {
             try {
                 const apiResultData = await APIUtils.fetchRootInterests();
-                const newArr = []; 
-                newArr[0] = apiResultData; //make first level interests (stored in first index of array) hold all returned root interests
-                setInterestsByLevel(newArr);
+                if (apiResultData.length >= 1) {
+                    const newArr = []; 
+                    newArr[0] = apiResultData; //make first level interests (stored in first index of array) hold all returned root interests
+                    setInterestsByLevel(newArr);
+                } else {
+                    alert("Could not load interests"); // TODO: will have better visual display for this later
+                }
             } catch (error) {
                 console.log("Status ", error.status);
                 console.log("Error: ", error.message);
@@ -35,7 +39,7 @@ const InterestList = () => {
                 newArr[clickedInterestLevel] = apiResultData;
                 setInterestsByLevel(newArr);
             } else {
-                alert("No more subinterests!"); //will have better visual display for this later
+                alert("No more subinterests!"); // TODO: will have better visual display for this later
             }
         } catch (error) {
             console.log("Status ", error.status);
