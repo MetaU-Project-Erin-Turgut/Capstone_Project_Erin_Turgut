@@ -157,7 +157,7 @@ router.put('/user/groups/:groupId/accept', isAuthenticated, async (req, res) => 
         if (acceptedMembers.length + 1 >= FULL_GROUP_SIZE) {
             newIsFullStatus = true;
         }
-//
+
         //update group in database (update if is now full, update coordinates, update interests list)
         const updatedGroup = await prisma.group.update({
             where: { id: groupId },
@@ -242,9 +242,9 @@ router.put('/user/groups/:groupId/drop', isAuthenticated, async (req, res) => {
         }
         
         //filter to only users that actaully accepted the group
-        const acceptedMembers = group_user.group.members.filter((user) => {
-            return user.status === Status.ACCEPTED;
-        })
+        const acceptedMembers = filterMembersByStatus(group_user.group.members, Status.ACCEPTED);
+
+        let updatedGroupUser = null; //what will be returned in res.json - need to keep outside of if/else
  
         //if group is now empty with removal of this user, remove the group
         if (acceptedMembers.length === 0) { //remember, user is already excluded for list from db query - so should check against 0
@@ -269,12 +269,46 @@ router.put('/user/groups/:groupId/drop', isAuthenticated, async (req, res) => {
             
             const newGroupInterests = await recalculateGroupInterests(acceptedMembers, group_user.group.interests);
 
+            //update group in database (update coordinates, update interests list)
+            const updatedGroup = await prisma.group.update({
+                where: { id: groupId },
+                data: {
+                    interests: {
+                        deleteMany: {},
+                        create: newGroupInterests.map((interest) => {
+                            return { interest: { connect: { id: interest.id } } }
+                        })
+                    }
+                },
+            })
+
+            //update group coordinates
+            await prisma.$queryRaw`
+            UPDATE "Group" 
+            SET "coord" = (ST_SetSRID(ST_MakePoint(${newGroupCoords.st_x}, ${newGroupCoords.st_y}), 4326)::geography)
+            WHERE id=${groupId}`;
+
+
+            //update status of group_user relationship
+            updatedGroupUser = await prisma.group_User.update({
+                where: {
+                    user_id_group_id: {
+                        group_id: groupId,
+                        user_id: req.session.userId
+                    }
+                },
+                data: {
+                    status: Status.REJECTED
+                },
+                include: { group: { include: { interests: { include: { interest: true } }, members: { where: { NOT: { user_id: req.session.userId } }, include: { user: true } } } } }
+            })
+
         }
-        res.status(200).json({});
+        res.status(200).json(updatedGroupUser? updatedGroupUser: {"message": "group has been deleted because no members remain"});
 
     } catch (error) {
-        console.error("Error updating group:", error)
-        res.status(500).json({ error: "Could not update your response to this group." });
+        console.error("Error dropping group:", error)
+        res.status(500).json({ error: "Could not update your response to dropping this group." });
     }
 })
 

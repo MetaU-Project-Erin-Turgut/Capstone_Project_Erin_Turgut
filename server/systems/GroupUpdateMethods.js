@@ -25,7 +25,7 @@ const updateGroupInterests = async (groupInterests, userInterests) => {
 const recalculateGroupCentralLocation = async (memberCoords) => {
     let currGroupCoord = memberCoords.at(0)
     for(let i = 1; i < memberCoords.length; i++) {
-        currGroupCoord = updateGroupCentralLocation(currGroupCoord, members[i].coord)
+        currGroupCoord = updateGroupCentralLocation(currGroupCoord, memberCoords.at(i))
     }
     return currGroupCoord;
 }
@@ -44,7 +44,7 @@ const recalculateGroupInterests = async (members, groupInterests) => {
     //for all group interests, check map if it exists. If not, remove the interest
     for (interest of groupInterests) {
         if (interestsToKeep.has(interest.interest.id)) {
-            newGroupInterests.push(interest);
+            newGroupInterests.push(interest.interest);
         }
     }
 
