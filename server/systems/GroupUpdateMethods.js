@@ -30,5 +30,26 @@ const recalculateGroupCentralLocation = async (memberCoords) => {
     return currGroupCoord;
 }
 
+const recalculateGroupInterests = async (members, groupInterests) => {
+    //go through all members' interests (not including current user trying to drop out) and create a set of interest ids
+    const interestsToKeep = new Set();
 
-module.exports = { updateGroupCentralLocation, updateGroupInterests, recalculateGroupCentralLocation };
+    for (member of members) {
+        for (interest of member.user.interests) {
+            interestsToKeep.add(interest.id)
+        }
+    }
+            
+    let newGroupInterests = [];
+    //for all group interests, check map if it exists. If not, remove the interest
+    for (interest of groupInterests) {
+        if (interestsToKeep.has(interest.interest.id)) {
+            newGroupInterests.push(interest);
+        }
+    }
+
+    return newGroupInterests;
+}
+
+
+module.exports = { updateGroupCentralLocation, updateGroupInterests, recalculateGroupCentralLocation, recalculateGroupInterests };

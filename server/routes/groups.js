@@ -6,7 +6,7 @@ const prisma = new PrismaClient();
 
 const { isAuthenticated } = require('../middleware/CheckAutheticated')
 const { findGroups } = require('../systems/GroupFindAlgo');
-const { updateGroupCentralLocation, updateGroupInterests, recalculateGroupCentralLocation } = require('../systems/GroupUpdateMethods')
+const { updateGroupCentralLocation, updateGroupInterests, recalculateGroupCentralLocation, recalculateGroupInterests } = require('../systems/GroupUpdateMethods')
 const { Status, filterMembersByStatus } = require('../systems/Utils');
 
 const FULL_GROUP_SIZE = 10;
@@ -232,7 +232,7 @@ router.put('/user/groups/:groupId/drop', isAuthenticated, async (req, res) => {
                 }
             },
             include: {
-                group: { include: { interests: { select: { interest: true } }, members: { where: { NOT: { user_id: req.session.userId } } } }},
+                group: { include: { interests: { select: { interest: true } }, members: { where: { NOT: { user_id: req.session.userId } }, include: {user: { include: { interests: true } }} } }},
                 user: { include: { interests: true } }
             }
         });
@@ -246,7 +246,6 @@ router.put('/user/groups/:groupId/drop', isAuthenticated, async (req, res) => {
             return user.status === Status.ACCEPTED;
         })
  
-        //TODO: update group interests with member removal
         //if group is now empty with removal of this user, remove the group
         if (acceptedMembers.length === 0) { //remember, user is already excluded for list from db query - so should check against 0
             await prisma.group.delete({
@@ -265,6 +264,10 @@ router.put('/user/groups/:groupId/drop', isAuthenticated, async (req, res) => {
             WHERE id = ANY(${(memberIds)})`;
 
             const newGroupCoords = await recalculateGroupCentralLocation(memberCoords);
+
+            //remove user's interests from overall group interests
+            
+            const newGroupInterests = await recalculateGroupInterests(acceptedMembers, group_user.group.interests);
 
         }
         res.status(200).json({});
