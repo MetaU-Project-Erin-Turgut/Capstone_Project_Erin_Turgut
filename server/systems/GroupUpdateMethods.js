@@ -8,11 +8,10 @@ const updateGroupCentralLocation = (groupCoord, userCoord) => {
    const newLongitude = (groupCoord.st_x + userCoord.st_x) / 2;
    const newLatitude = (groupCoord.st_y + userCoord.st_y) / 2;
    return {
-        longitude: newLongitude,
-        latitude: newLatitude
+        st_x: newLongitude,
+        st_y: newLatitude
    }
 }
-
 
 const updateGroupInterests = async (groupInterests, userInterests) => {
     //this method will create a union set between group's existing interests and user's interests
@@ -23,5 +22,34 @@ const updateGroupInterests = async (groupInterests, userInterests) => {
     return [...unionInterests]; //return as array, not set object
 }
 
+const recalculateGroupCentralLocation = async (memberCoords) => {
+    let currGroupCoord = memberCoords.at(0)
+    for(let i = 1; i < memberCoords.length; i++) {
+        currGroupCoord = updateGroupCentralLocation(currGroupCoord, memberCoords.at(i))
+    }
+    return currGroupCoord;
+}
 
-module.exports = { updateGroupCentralLocation, updateGroupInterests };
+const recalculateGroupInterests = async (members, groupInterests) => {
+    //go through all members' interests (not including current user trying to drop out) and create a set of interest ids
+    const interestsToKeep = new Set();
+
+    for (member of members) {
+        for (interest of member.user.interests) {
+            interestsToKeep.add(interest.id)
+        }
+    }
+            
+    let newGroupInterests = [];
+    //for all group interests, check map if it exists. If not, remove the interest
+    for (interest of groupInterests) {
+        if (interestsToKeep.has(interest.interest.id)) {
+            newGroupInterests.push(interest.interest);
+        }
+    }
+
+    return newGroupInterests;
+}
+
+
+module.exports = { updateGroupCentralLocation, updateGroupInterests, recalculateGroupCentralLocation, recalculateGroupInterests };
