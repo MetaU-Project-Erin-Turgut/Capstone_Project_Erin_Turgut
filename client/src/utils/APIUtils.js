@@ -1,46 +1,6 @@
 
 export default class APIUtils {
 
-    static updateEventStatus = async (id, statusState) => {
-        const response = await fetch(`http://localhost:3000/user/events/${id}/status`, { //path param is event id
-            method: "PATCH",
-            headers: { "Content-Type": "application/json" },
-            body: JSON.stringify({
-                "updatedStatus": statusState
-            }),
-            credentials: "include",
-        });
-
-        const data = await response.json();
-
-        if (response.ok) {
-            return data;
-        } else {
-            throw {status: response.status, message: data.error};
-        }
-   
-    }
-
-    static updateGroupStatus = async (id, statusState) => {
-        const response = await fetch(`http://localhost:3000/user/groups/${id}/status`, { //path param is group id
-            method: "PATCH",
-            headers: { "Content-Type": "application/json" },
-            body: JSON.stringify({
-                "updatedStatus": statusState
-            }),
-            credentials: "include",
-        });
-
-        const data = await response.json();
-
-        if (response.ok) {
-            return data;
-        } else {
-            throw {status: response.status, message: data.error};
-        }
-   
-    }
-
     static handleLogout = async () => {
         const response = await fetch("http://localhost:3000/logout", {
             method: "POST",
@@ -110,6 +70,26 @@ export default class APIUtils {
 
     }
 
+    static updateEventStatus = async (id, statusState) => {
+        const response = await fetch(`http://localhost:3000/user/events/${id}/status`, { //path param is event id
+            method: "PATCH",
+            headers: { "Content-Type": "application/json" },
+            body: JSON.stringify({
+                "updatedStatus": statusState
+            }),
+            credentials: "include",
+        });
+
+        const data = await response.json();
+
+        if (response.ok) {
+            return data;
+        } else {
+            throw {status: response.status, message: data.error};
+        }
+   
+    }
+
     static fetchGroups = async () => {
         const response = await fetch("http://localhost:3000/user/groups/", {
             method: "GET",
@@ -127,9 +107,8 @@ export default class APIUtils {
 
     }
 
-    static acceptGroup = async (id) => {
-
-        const response = await fetch(`http://localhost:3000/user/groups/${id}/accept`, {
+    static updateGroupStatus = async (id, newStatus) => {
+        const response = await fetch(`http://localhost:3000/user/groups/${id}/${newStatus}`, { //path param is group id
             method: "PUT",
             headers: { "Content-Type": "application/json" },
             credentials: "include",
@@ -142,24 +121,8 @@ export default class APIUtils {
         } else {
             throw {status: response.status, message: data.error};
         }
+   
     }
-
-    static dropGroup = async (id) => {
-        const response = await fetch(`http://localhost:3000/user/groups/${id}/drop`, {
-            method: "PUT",
-            headers: { "Content-Type": "application/json" },
-            credentials: "include",
-        });
-
-        const data = await response.json();
-
-        if (response.ok) {
-            return data;
-        } else {
-            throw {status: response.status, message: data.error};
-        }
-    }
-
 
     static fetchRootInterests = async () => {
         const response = await fetch("http://localhost:3000/interests/", {

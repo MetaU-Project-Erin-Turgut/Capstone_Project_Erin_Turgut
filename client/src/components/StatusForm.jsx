@@ -26,9 +26,8 @@ const StatusForm = ({ onSubmitChange, currStatus }) => {
             {currStatus === Status.PENDING?<p>You haven't responded to this invite yet.</p> : <p>Click "Drop" if you would like to drop this group.</p> }
             {currStatus === Status.PENDING&&<button onClick={() => changeSelectedState(Status.ACCEPTED)}>Accept</button>}
             {currStatus === Status.PENDING?<button onClick={() => changeSelectedState(Status.REJECTED)}>Ignore</button>:<button onClick={() => changeSelectedState(Status.DROPPED)}>Drop</button>}
-            <button onClick={() => handleSubmit()} disabled={isSubmitDisabled}>Submit Changes</button>
+            <button onClick={handleSubmit} disabled={isSubmitDisabled}>Submit Changes</button>  
         </section>
-        
     )
 }
 

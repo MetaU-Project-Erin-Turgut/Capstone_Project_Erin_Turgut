@@ -11,18 +11,8 @@ const GroupDetailsModal = ( {onModalClose, groupData, onStatusChange}) => {
     const handleStatusUpdate = async (statusState) => {
         //put request to change status of group
         try {
-            if (statusState === Status.ACCEPTED) {
-                const apiResultData = await APIUtils.acceptGroup(id);
-                onStatusChange(apiResultData);
-            } else if (statusState === Status.REJECTED && groupData.status === Status.ACCEPTED) { 
-                //if user was not the group (original status is 'pending') and status changed to 'rejected' that means they just ignored the group invite
-                await APIUtils.updateGroupStatus(id, statusState);
-                onStatusChange({...groupData, status: Status.REJECTED});
-            } else if (statusState === Status.DROPPED && groupData.status === Status.ACCEPTED) {
-                //if user was in the group (original status is 'accepted') and status changed to 'rejected' that means they dropped the group
-                await APIUtils.dropGroup(id);
-                onStatusChange({...groupData, status: Status.DROPPED});
-            }
+            const apiResultData = await APIUtils.updateGroupStatus(id, statusState);
+            onStatusChange(apiResultData);
             onModalClose();
         } catch (error) {
             console.log("Status ", error.status);
@@ -50,7 +40,7 @@ const GroupDetailsModal = ( {onModalClose, groupData, onStatusChange}) => {
                         ))}
                     </Suspense>
                     {/* show form with options accept group or ignore when pending OR show form with only drop group option */}
-                    <StatusForm onSubmitChange={handleStatusUpdate} currStatus={groupData.status}/>
+                    {(groupData.status !== Status.DROPPED && groupData.status !== Status.REJECTED)&&<StatusForm onSubmitChange={handleStatusUpdate} currStatus={groupData.status}/>}
                 </div>
             </div>
         </div>
