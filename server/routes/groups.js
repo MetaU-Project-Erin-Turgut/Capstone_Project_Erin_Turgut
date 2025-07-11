@@ -191,7 +191,8 @@ router.put('/user/groups/:groupId/accept', isAuthenticated, async (req, res) => 
            },
            data: {
                status: Status.ACCEPTED 
-           }
+           },
+           include: {group: {include: {interests: {include: {interest: true}}, members: {where: {NOT: {user_id: req.session.userId}}, include: {user: true}}}}}
        })
 
        //if group is now full, remove it as a "Pending" option from users' lists who have not accepted the group
@@ -211,7 +212,7 @@ router.put('/user/groups/:groupId/accept', isAuthenticated, async (req, res) => 
        }
 
 
-       res.status(200).json(updatedGroup);
+       res.status(200).json(updatedGroupUser);
 
 
    } catch (error) {
@@ -219,5 +220,4 @@ router.put('/user/groups/:groupId/accept', isAuthenticated, async (req, res) => 
        res.status(500).json({ error: "Could not update your response to this group." });
    }
 })
-
 module.exports = router

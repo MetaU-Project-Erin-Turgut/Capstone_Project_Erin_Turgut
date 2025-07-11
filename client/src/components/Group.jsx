@@ -38,8 +38,12 @@ const Group = ( {groupData, updateGroup}) => {
                 <h4 className="title">{title}</h4>
             </section>
             <p>{description}</p>
-            <h5>Compatibility Ratio: </h5>
-            <p>{compatibilityRatio * 100}%</p>
+            {groupData.status !== Status.ACCEPTED&&
+                <section className="compatibility-display">
+                    <h5>Compatibility Ratio: </h5>
+                    <p>{compatibilityRatio * 100}%</p>
+                </section>
+            }
         </div>
         {isGroupDetailsModalVisible && <GroupDetailsModal onModalClose={closeModal} groupData={groupData} onStatusChange={(newGroupObj) => {updateGroup(newGroupObj)}}/>}
         </>
