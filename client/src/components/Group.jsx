@@ -49,7 +49,7 @@ const Group = ( {groupData, updateGroup}) => {
                 </section>
             }
         </div>
-        {isGroupDetailsModalVisible && <GroupDetailsModal onModalClose={closeModal} groupData={groupData} onStatusChange={(newGroupObj) => {updateGroup(newGroupObj)}}/>}
+        {isGroupDetailsModalVisible && <GroupDetailsModal onModalClose={closeModal} groupData={groupData} onStatusChange={(newGroupObj, isGroupDeleted, groupId) => {updateGroup(newGroupObj, isGroupDeleted, groupId)}}/>}
         </>
     )
 }

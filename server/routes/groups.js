@@ -313,7 +313,7 @@ router.put(`/user/groups/:groupId/${Status.DROPPED}`, isAuthenticated, async (re
             })
 
         }
-        res.status(200).json(updatedGroupUser? updatedGroupUser: {"message": "group has been deleted because no members remain"});
+        res.status(200).json(updatedGroupUser? {...updatedGroupUser, isGroupDeleted: false}: {isGroupDeleted: true});
 
     } catch (error) {
         console.error("Error dropping group:", error)

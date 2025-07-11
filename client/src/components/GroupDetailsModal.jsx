@@ -12,7 +12,11 @@ const GroupDetailsModal = ( {onModalClose, groupData, onStatusChange}) => {
         //put request to change status of group
         try {
             const apiResultData = await APIUtils.updateGroupStatus(id, statusState);
-            onStatusChange(apiResultData);
+            if (statusState === Status.DROPPED) {
+                 onStatusChange(apiResultData, apiResultData.isGroupDeleted, id)
+            } else {
+                onStatusChange(apiResultData, false, id) //no dropping occurred, so group can't have been deleted - pass false
+            }
             onModalClose();
         } catch (error) {
             console.log("Status ", error.status);
