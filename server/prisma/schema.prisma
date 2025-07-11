@@ -116,4 +116,5 @@ enum Status {
   PENDING
   ACCEPTED
   REJECTED
+  DROPPED
 }

@@ -1,7 +1,8 @@
 import { useState } from 'react';
-import { LiaUserTimesSolid as RejectedIcon} from "react-icons/lia";//icon for "rejected event"
-import { LiaUserCheckSolid as AcceptedIcon} from "react-icons/lia";//icon for "accepted event"
-import { LiaUserClockSolid as PendingIcon} from "react-icons/lia";//icon for "pending response"
+import { LiaUserTimesSolid as RejectedIcon} from "react-icons/lia";//icon for "rejected/ignored"
+import { LiaUserCheckSolid as AcceptedIcon} from "react-icons/lia";//icon for "accepted"
+import { LiaUserClockSolid as PendingIcon} from "react-icons/lia";//icon for "pending"
+import { FaRunning as DroppedIcon} from "react-icons/fa"; //icon for "dropped"
 import GroupDetailsModal from './GroupDetailsModal';
 import { Status } from "../utils/utils";
 import "../styles/Card.css";
@@ -20,6 +21,9 @@ const Group = ( {groupData, updateGroup}) => {
                 return <PendingIcon className="status-icon"/>
             case Status.REJECTED:
                 return <RejectedIcon className="status-icon"/>
+            case Status.DROPPED:
+                return <DroppedIcon className="status-icon"/>
+
         }
     }
 
@@ -38,14 +42,14 @@ const Group = ( {groupData, updateGroup}) => {
                 <h4 className="title">{title}</h4>
             </section>
             <p>{description}</p>
-            {groupData.status !== Status.ACCEPTED&&
+            {(groupData.status !== Status.ACCEPTED && groupData.status !== Status.DROPPED && groupData.status !== Status.REJECTED)&&
                 <section className="compatibility-display">
                     <h5>Compatibility Ratio: </h5>
                     <p>{compatibilityRatio * 100}%</p>
                 </section>
             }
         </div>
-        {isGroupDetailsModalVisible && <GroupDetailsModal onModalClose={closeModal} groupData={groupData} onStatusChange={(newGroupObj) => {updateGroup(newGroupObj)}}/>}
+        {isGroupDetailsModalVisible && <GroupDetailsModal onModalClose={closeModal} groupData={groupData} onStatusChange={(newGroupObj, isGroupDeleted, groupId) => {updateGroup(newGroupObj, isGroupDeleted, groupId)}}/>}
         </>
     )
 }

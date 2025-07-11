@@ -29,49 +29,8 @@ router.get('/user/groups/', isAuthenticated, async (req, res) => {
     }
 })
 
-//update user's status for a group
-router.patch('/user/groups/:groupId/status', isAuthenticated, async (req, res) => {
-    const groupId = parseInt(req.params.groupId);
-    const { updatedStatus } = req.body;
-
-    try {
-        const isGroup_user = await prisma.group_User.findUnique({
-            where: {
-                user_id_group_id: {
-                    group_id: groupId,
-                    user_id: req.session.userId
-                }
-            }
-        });
-
-        if (!isGroup_user) {
-            res.status(404).json({ error: 'This user - group relationship does not exist' });
-        }
-
-        const updatedGroup = await prisma.group_User.update({
-            where: {
-                user_id_group_id: {
-                    group_id: groupId,
-                    user_id: req.session.userId
-                }
-            },
-            data: {
-                status: updatedStatus
-            }
-        })
-
-        res.status(200).json(updatedGroup);
-
-    } catch (error) {
-        console.error("Error updating group:", error)
-        res.status(500).json({ error: "Could not update your response to this group." });
-    }
-})
-
 //get new group suggestions - will be called immediately after user updates their interests
 router.get('/user/groups/new', isAuthenticated, async (req, res) => {
-
-
     try {
         const updatedUser = await prisma.user.findUnique({
             where: { id: req.session.userId },
@@ -115,7 +74,7 @@ router.get('/user/groups/new', isAuthenticated, async (req, res) => {
 
 //accept group - first, the endpoint above will be called, then this endpoint will be called
 //update user's status for a group
-router.put('/user/groups/:groupId/accept', isAuthenticated, async (req, res) => {
+router.put(`/user/groups/:groupId/${Status.ACCEPTED}`, isAuthenticated, async (req, res) => {
     const groupId = parseInt(req.params.groupId);
 
 
@@ -214,13 +173,51 @@ router.put('/user/groups/:groupId/accept', isAuthenticated, async (req, res) => 
 
 
     } catch (error) {
-        console.error("Error updating group:", error)
-        res.status(500).json({ error: "Could not update your response to this group." });
+        console.error("Error joining group:", error)
+        res.status(500).json({ error: "Could not join this group at this time." });
     }
 })
 
-//drop group
-router.put('/user/groups/:groupId/drop', isAuthenticated, async (req, res) => {
+//ignore group invite - status: "REJECTED"
+router.patch(`/user/groups/:groupId/${Status.REJECTED}`, isAuthenticated, async (req, res) => {
+    const groupId = parseInt(req.params.groupId);
+
+    try {
+        const isGroup_user = await prisma.group_User.findUnique({
+            where: {
+                user_id_group_id: {
+                    group_id: groupId,
+                    user_id: req.session.userId
+                }
+            }
+        });
+
+        if (!isGroup_user) {
+            res.status(404).json({ error: 'This user - group relationship does not exist' });
+        }
+
+        const updatedGroup = await prisma.group_User.update({
+            where: {
+                user_id_group_id: {
+                    group_id: groupId,
+                    user_id: req.session.userId
+                }
+            },
+            data: {
+                status: Status.REJECTED
+            }
+        })
+
+        res.status(200).json(updatedGroup);
+
+    } catch (error) {
+        console.error("Error rejecting group invite:", error)
+        res.status(500).json({ error: "Could not reject invite to this group at this time." });
+    }
+})
+
+//drop group - status: "DROPPED"
+router.put(`/user/groups/:groupId/${Status.DROPPED}`, isAuthenticated, async (req, res) => {
     const groupId = parseInt(req.params.groupId);
     try {
         //get group and user relationship
@@ -241,13 +238,26 @@ router.put('/user/groups/:groupId/drop', isAuthenticated, async (req, res) => {
             res.status(404).json({ error: 'This user - group relationship does not exist' });
         }
         
-        //filter to only users that actaully accepted the group
+        //filter to only users that actually accepted the group
         const acceptedMembers = filterMembersByStatus(group_user.group.members, Status.ACCEPTED);
 
         let updatedGroupUser = null; //what will be returned in res.json - need to keep outside of if/else
  
         //if group is now empty with removal of this user, remove the group
         if (acceptedMembers.length === 0) { //remember, user is already excluded for list from db query - so should check against 0
+            //delete all group_user many to many relations
+            await prisma.group_User.deleteMany({
+                where: { group_id: groupId }
+            })
+            //delete all group_event many to many relations
+            await prisma.group_Event.deleteMany({
+                where: { group_id: groupId }
+            })
+            //delete all group_interest many to many relations
+            await prisma.group_Interest.deleteMany({
+                where: { group_id: groupId }
+            })
+            //delete group
             await prisma.group.delete({
                 where: { id: groupId }
             })
@@ -288,7 +298,6 @@ router.put('/user/groups/:groupId/drop', isAuthenticated, async (req, res) => {
             SET "coord" = (ST_SetSRID(ST_MakePoint(${newGroupCoords.st_x}, ${newGroupCoords.st_y}), 4326)::geography)
             WHERE id=${groupId}`;
 
-
             //update status of group_user relationship
             updatedGroupUser = await prisma.group_User.update({
                 where: {
@@ -298,17 +307,17 @@ router.put('/user/groups/:groupId/drop', isAuthenticated, async (req, res) => {
                     }
                 },
                 data: {
-                    status: Status.REJECTED
+                    status: Status.DROPPED
                 },
                 include: { group: { include: { interests: { include: { interest: true } }, members: { where: { NOT: { user_id: req.session.userId } }, include: { user: true } } } } }
             })
 
         }
-        res.status(200).json(updatedGroupUser? updatedGroupUser: {"message": "group has been deleted because no members remain"});
+        res.status(200).json(updatedGroupUser? {...updatedGroupUser, isGroupDeleted: false}: {isGroupDeleted: true});
 
     } catch (error) {
         console.error("Error dropping group:", error)
-        res.status(500).json({ error: "Could not update your response to dropping this group." });
+        res.status(500).json({ error: "Could not update your response to dropping this group at this time." });
     }
 })
 

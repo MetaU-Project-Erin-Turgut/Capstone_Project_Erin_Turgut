@@ -12,14 +12,11 @@ const GroupDetailsModal = ( {onModalClose, groupData, onStatusChange}) => {
         //put request to change status of group
         try {
             const apiResultData = await APIUtils.updateGroupStatus(id, statusState);
-            onStatusChange({...groupData, status: apiResultData.status});
-            if (statusState === Status.ACCEPTED) {
-                const apiResultData = await APIUtils.acceptGroup(id);
-                onStatusChange(apiResultData);
+            if (statusState === Status.DROPPED) {
+                 onStatusChange(apiResultData, apiResultData.isGroupDeleted, id)
             } else {
-                const apiResultData = await APIUtils.updateGroupStatus(id, statusState);
-                onStatusChange({...groupData, status: apiResultData.status});
-            } 
+                onStatusChange(apiResultData, false, id) //no dropping occurred, so group can't have been deleted - pass false
+            }
             onModalClose();
         } catch (error) {
             console.log("Status ", error.status);
@@ -41,13 +38,13 @@ const GroupDetailsModal = ( {onModalClose, groupData, onStatusChange}) => {
                         ))}
                     </Suspense>
                     <Suspense fallback={<p>Loading Members...</p>}>
-                        <h5>Members:</h5>
+                        <h5>People:</h5>
                         {members.map((member) => (
                             <p key={member.user.id}>{member.user.username} {member.status}</p> 
                         ))}
                     </Suspense>
                     {/* show form with options accept group or ignore when pending OR show form with only drop group option */}
-                    <StatusForm onSubmitChange={handleStatusUpdate} currStatus={groupData.status}/>
+                    {(groupData.status !== Status.DROPPED && groupData.status !== Status.REJECTED)&&<StatusForm onSubmitChange={handleStatusUpdate} currStatus={groupData.status}/>}
                 </div>
             </div>
         </div>
