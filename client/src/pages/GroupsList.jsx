@@ -49,7 +49,11 @@ const GroupsList = () => {
                         groupData={value}
                         updateGroup = {(newGroupObj) => {
                             const updatedGroups = new Map(groups);
-                            updatedGroups.set(newGroupObj.group_id, newGroupObj);
+                            if (newGroupObj.status === Status.DROPPED) {
+                                updatedGroups.delete(newGroupObj.group_id)
+                            } else {
+                                updatedGroups.set(newGroupObj.group_id, newGroupObj);
+                            }
                             setGroups(updatedGroups);
                         }}
                     />

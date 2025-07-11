@@ -248,6 +248,19 @@ router.put('/user/groups/:groupId/drop', isAuthenticated, async (req, res) => {
  
         //if group is now empty with removal of this user, remove the group
         if (acceptedMembers.length === 0) { //remember, user is already excluded for list from db query - so should check against 0
+            //delete all group_user many to many relations
+            await prisma.group_User.deleteMany({
+                where: { group_id: groupId }
+            })
+            //delete all group_event many to many relations
+            await prisma.group_Event.deleteMany({
+                where: { group_id: groupId }
+            })
+            //delete all group_interest many to many relations
+            await prisma.group_Interest.deleteMany({
+                where: { group_id: groupId }
+            })
+            //delete group
             await prisma.group.delete({
                 where: { id: groupId }
             })
@@ -298,7 +311,7 @@ router.put('/user/groups/:groupId/drop', isAuthenticated, async (req, res) => {
                     }
                 },
                 data: {
-                    status: Status.REJECTED
+                    status: Status.DROPPED
                 },
                 include: { group: { include: { interests: { include: { interest: true } }, members: { where: { NOT: { user_id: req.session.userId } }, include: { user: true } } } } }
             })

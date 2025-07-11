@@ -144,6 +144,22 @@ export default class APIUtils {
         }
     }
 
+    static dropGroup = async (id) => {
+        const response = await fetch(`http://localhost:3000/user/groups/${id}/drop`, {
+            method: "PUT",
+            headers: { "Content-Type": "application/json" },
+            credentials: "include",
+        });
+
+        const data = await response.json();
+
+        if (response.ok) {
+            return data;
+        } else {
+            throw {status: response.status, message: data.error};
+        }
+    }
+
 
     static fetchRootInterests = async () => {
         const response = await fetch("http://localhost:3000/interests/", {

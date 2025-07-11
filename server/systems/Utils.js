@@ -8,7 +8,8 @@ const Status = Object.freeze({
     NONE: "NONE", //used for when no filter is applied
     PENDING: "PENDING",
     ACCEPTED: "ACCEPTED",
-    REJECTED: "REJECTED"
+    REJECTED: "REJECTED",
+    DROPPED: "DROPPED"
 });
 
 const getExpandedInterests = async (originalInterests, isGroup) => {

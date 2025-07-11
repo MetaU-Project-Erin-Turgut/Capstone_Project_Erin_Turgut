@@ -25,7 +25,7 @@ const StatusForm = ({ onSubmitChange, currStatus }) => {
         <section className="change-status-form">
             {currStatus === Status.PENDING?<p>You haven't responded to this invite yet.</p> : <p>Click "Drop" if you would like to drop this group.</p> }
             {currStatus === Status.PENDING&&<button onClick={() => changeSelectedState(Status.ACCEPTED)}>Accept</button>}
-            <button onClick={() => changeSelectedState(Status.REJECTED)}>{currStatus === Status.PENDING? "Ignore": "Drop" }</button>
+            {currStatus === Status.PENDING?<button onClick={() => changeSelectedState(Status.REJECTED)}>Ignore</button>:<button onClick={() => changeSelectedState(Status.DROPPED)}>Drop</button>}
             <button onClick={() => handleSubmit()} disabled={isSubmitDisabled}>Submit Changes</button>
         </section>
         

@@ -10,7 +10,8 @@ const Status = Object.freeze({
     NONE: "NONE", //used for when no filter is applied
     PENDING: "PENDING",
     ACCEPTED: "ACCEPTED",
-    REJECTED: "REJECTED"
+    REJECTED: "REJECTED",
+    DROPPED: "DROPPED"
 });
 
 //const form value defaults used in login and sign up

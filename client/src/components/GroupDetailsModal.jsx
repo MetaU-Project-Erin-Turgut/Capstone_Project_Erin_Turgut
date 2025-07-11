@@ -11,15 +11,18 @@ const GroupDetailsModal = ( {onModalClose, groupData, onStatusChange}) => {
     const handleStatusUpdate = async (statusState) => {
         //put request to change status of group
         try {
-            const apiResultData = await APIUtils.updateGroupStatus(id, statusState);
-            onStatusChange({...groupData, status: apiResultData.status});
             if (statusState === Status.ACCEPTED) {
                 const apiResultData = await APIUtils.acceptGroup(id);
                 onStatusChange(apiResultData);
-            } else {
-                const apiResultData = await APIUtils.updateGroupStatus(id, statusState);
-                onStatusChange({...groupData, status: apiResultData.status});
-            } 
+            } else if (statusState === Status.REJECTED && groupData.status === Status.ACCEPTED) { 
+                //if user was not the group (original status is 'pending') and status changed to 'rejected' that means they just ignored the group invite
+                await APIUtils.updateGroupStatus(id, statusState);
+                onStatusChange({...groupData, status: Status.REJECTED});
+            } else if (statusState === Status.DROPPED && groupData.status === Status.ACCEPTED) {
+                //if user was in the group (original status is 'accepted') and status changed to 'rejected' that means they dropped the group
+                await APIUtils.dropGroup(id);
+                onStatusChange({...groupData, status: Status.DROPPED});
+            }
             onModalClose();
         } catch (error) {
             console.log("Status ", error.status);
@@ -41,7 +44,7 @@ const GroupDetailsModal = ( {onModalClose, groupData, onStatusChange}) => {
                         ))}
                     </Suspense>
                     <Suspense fallback={<p>Loading Members...</p>}>
-                        <h5>Members:</h5>
+                        <h5>People:</h5>
                         {members.map((member) => (
                             <p key={member.user.id}>{member.user.username} {member.status}</p> 
                         ))}
