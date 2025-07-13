@@ -1,4 +1,5 @@
 import { Suspense } from 'react';
+import { Status } from "../utils/utils";
 import APIUtils from '../utils/APIUtils';
 import StatusForm from './StatusForm';
 import "../styles/Modal.css";
@@ -34,7 +35,7 @@ const EventDetailsModal = ( {onModalClose, eventData, onStatusChange}) => {
                             <p key={attendee.user.id}>{attendee.user.username} {attendee.status} </p> 
                         ))}
                     </Suspense>
-                    <StatusForm onSubmitChange={handleStatusUpdate} currStatus={eventData.status}/>
+                    {(eventData.status !== Status.DROPPED && eventData.status !== Status.REJECTED)&&<StatusForm onSubmitChange={handleStatusUpdate} currStatus={eventData.status}/>}
                 </div>
             </div>
         </div>

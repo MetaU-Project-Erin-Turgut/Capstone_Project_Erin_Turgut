@@ -2,10 +2,11 @@ import { useNavigate } from  "react-router";
 import { FaUserCircle } from "react-icons/fa";
 import { useUser } from "../contexts/UserContext";
 import { mainPageRoute, profileRoute } from "../utils/NavigationConsts";
+import SearchForm from "./SearchForm";
 import APIUtils from "../utils/APIUtils";
 import "../styles/NavBar.css";
 
-const NavBar = () => {
+const NavBar = ({}) => {
 
     const { setUser } = useUser(); 
 
@@ -27,10 +28,13 @@ const NavBar = () => {
             <h1 className="title-text" onClick={() => {
                 navigate(mainPageRoute);
             }}>Pivot</h1>
-            <FaUserCircle size={50} onClick={() => {
-                navigate(profileRoute);
-            }}/>
-            <button onClick={handleLogout}>Log Out</button>
+            <SearchForm />
+            <div className="profile-nav-btns">
+                <FaUserCircle size={50} onClick={() => {
+                    navigate(profileRoute);
+                }}/>
+                <button onClick={handleLogout}>Log Out</button>
+            </div>
         </nav>
     )
 }
