@@ -43,7 +43,6 @@ const GroupDetailsModal = ( {onModalClose, groupData, onStatusChange}) => {
                             <p key={member.user.id}>{member.user.username} {member.status}</p> 
                         ))}
                     </Suspense>
-                    {/* show form with options accept group or ignore when pending OR show form with only drop group option */}
                     {(groupData.status !== Status.DROPPED && groupData.status !== Status.REJECTED)&&<StatusForm onSubmitChange={handleStatusUpdate} currStatus={groupData.status}/>}
                 </div>
             </div>
