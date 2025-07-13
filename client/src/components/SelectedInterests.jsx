@@ -2,7 +2,7 @@ import { Suspense } from 'react';
 import "../styles/SelectedInterests.css";
 import SingularSelectedInterest from './SingularSelectedInterest';
 
-const SelectedInterests = ({ initialInterests, onUpdateInterests, onDeleteSelectedInterest }) => {
+const SelectedInterests = ({ initialInterests, onSubmitInterests }) => {
 
     return (
         <>
@@ -10,10 +10,10 @@ const SelectedInterests = ({ initialInterests, onUpdateInterests, onDeleteSelect
             <div className="selected-interests-section">
                 <Suspense fallback={<p>Loading...</p>}>
                     {Array.from(initialInterests.entries()).map( ([key, value]) => (
-                        <SingularSelectedInterest key={key} interest={value} onDeleteSelectedInterest={onDeleteSelectedInterest}/>
+                        <SingularSelectedInterest key={key} interest={value}/>
                     ))}
                 </Suspense>
-                <button className="submit-changes-btn" onClick={onUpdateInterests}>Submit changes</button>
+                <button className="submit-changes-btn" onClick={onSubmitInterests}>Submit changes</button>
             </div>
             
         </>

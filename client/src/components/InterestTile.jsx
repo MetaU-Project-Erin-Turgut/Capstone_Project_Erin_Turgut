@@ -1,9 +1,13 @@
+import { useState } from 'react';
 import '../styles/InterestTile.css';
 
-const InterestTile = ({ interest, onTileClick }) => {
+const InterestTile = ({ interest, onTileClick, isSelectedInitially, onUpdateInterests }) => {
 
-    const handleCheck = (event) => {
-        event.stopPropagation()
+    const [isSelected, setIsSelected] = useState(isSelectedInitially);
+    const handleCheckChange = (event) => {
+        event.stopPropagation();
+        onUpdateInterests(!isSelected, interest.id, interest.title)
+        setIsSelected(prev => !prev)
     }
 
     return ( 
@@ -12,7 +16,9 @@ const InterestTile = ({ interest, onTileClick }) => {
                 // TODO: add class to change shading
             }}>
             <p>{interest.title}</p>
-            <input className="checkbox" type="checkbox" id={interest.id} name={interest.title} onClick={(event) => {handleCheck(event)}}/>
+            <input checked={isSelected} className="checkbox" type="checkbox" id={interest.id} name={interest.title} onClick={(event) => {
+                handleCheckChange(event);
+            }}/>
         </div>
     )
 }
