@@ -8,7 +8,7 @@ const InterestList = () => {
 
     //2D array with level by array index and all interests at that level value as an array at that index
     const [interestsByLevel, setInterestsByLevel] = useState([]); 
-    const [userInterests, setUserInterests] = useState([]); // TODO: make as map instead 
+    const [userInterests, setUserInterests] = useState(new Map());
 
     useEffect(() => {
         fetchUserInterests();
@@ -35,9 +35,10 @@ const InterestList = () => {
         try {
             const apiResultData = await APIUtils.fetchUserInterests();
             if (apiResultData.length >= 1) {
-                const newArr = []; 
-                newArr[0] = apiResultData; //make first level interests (stored in first index of array) hold all returned root interests
-                setUserInterests(newArr.at(0));
+                const mappedInterests = new Map(
+                    apiResultData.map(interest => [interest.id, interest.title])
+                );
+                setUserInterests(mappedInterests);
             } else {
                 alert("Could not load user interests"); // TODO: will have better visual display for this later
                 // TODO: also need to handle message for no previously selected interests
@@ -67,8 +68,12 @@ const InterestList = () => {
         }
     }
 
+    const updateSelectedInterests = () => {
+
+    }
+
     return (<div className="interest-list-container">
-        <SelectedInterests userInterests={userInterests}/>
+        <SelectedInterests initialInterests={userInterests} onUpdateInterests={updateSelectedInterests}/>
         <div className="interest-list-columns-container">
         <Suspense fallback={<p>Loading...</p>}>
             {interestsByLevel.map((interestsArr) => (

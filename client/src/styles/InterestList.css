@@ -3,3 +3,9 @@
     flex-direction: row;
     overflow-x: scroll;
 }
+
+.submit-changes-btn {
+    max-height: 25px;
+    align-self: center;
+    margin-left: 10px
+}

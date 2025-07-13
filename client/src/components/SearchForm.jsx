@@ -8,8 +8,8 @@ const SearchForm = () => {
 
     return (
         <div className="search-box">
+            <input placeholder="Search users..."/>
             <MagnifyingGlassIcon className="search-icon" onClick={() => navigate(searchResultsRoute)}/>
-            <input/>
         </div>
     )
 }

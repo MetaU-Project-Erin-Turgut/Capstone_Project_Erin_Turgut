@@ -1,0 +1,14 @@
+.selected-interest {
+    display: flex;
+    flex-direction: row;
+    align-items: center;
+    border-radius: 10px;
+    background-color: rgb(185, 182, 182);
+    padding: 0px 3px;
+    margin: 2px 4px;
+}
+
+.selected-interest button {
+    height: 50%;
+    margin-left: 5px;
+}
