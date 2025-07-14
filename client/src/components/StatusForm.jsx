@@ -1,6 +1,5 @@
 import { useState, useRef } from 'react';
 import { Status } from "../utils/utils";
-import '../styles/StatusForm.css';
 
 const StatusForm = ({ onSubmitChange, currStatus }) => {
     const [isSubmitDisabled, setIsSubmitDisabled] = useState(true);
