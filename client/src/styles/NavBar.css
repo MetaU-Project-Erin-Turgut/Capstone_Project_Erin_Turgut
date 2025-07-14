@@ -12,3 +12,8 @@
     font-size: 40px;
     margin: 5px;
 }
+
+.search-icon {
+    max-height: 75px;
+    max-width: 75px;
+}

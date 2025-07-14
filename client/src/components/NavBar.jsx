@@ -1,8 +1,10 @@
 import { useNavigate } from  "react-router";
 import { FaUserCircle } from "react-icons/fa";
 import { useUser } from "../contexts/UserContext";
-import { mainPageRoute, profileRoute } from "../utils/NavigationConsts";
-import SearchForm from "./SearchForm";
+import { mainPageRoute, profileRoute, searchResultsRoute } from "../utils/NavigationConsts";
+/* userSearchIcon retrieved from: https://pngtree.com/so/search-user
+ and background cleared using https://www.remove.bg/ */
+import userSearchIcon from "../assets/search-user-icon.png";
 import APIUtils from "../utils/APIUtils";
 import "../styles/NavBar.css";
 
@@ -28,7 +30,9 @@ const NavBar = ({}) => {
             <h1 className="title-text" onClick={() => {
                 navigate(mainPageRoute);
             }}>Pivot</h1>
-            <SearchForm />
+            <img className="search-icon" src={userSearchIcon} onClick={() => {
+                navigate(searchResultsRoute)
+            }}/>
             <div className="profile-nav-btns">
                 <FaUserCircle size={50} onClick={() => {
                     navigate(profileRoute);
