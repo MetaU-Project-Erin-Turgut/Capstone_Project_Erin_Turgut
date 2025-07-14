@@ -9,6 +9,7 @@ const eventRoutes = require('./routes/events')
 const groupRoutes = require('./routes/groups')
 const authRoutes = require('./routes/auth')
 const interestRoutes = require('./routes/interests')
+const userSearchRoutes = require('./routes/userSearch')
 
 app.use(cors({
   origin: 'http://localhost:5173', 
@@ -29,6 +30,7 @@ app.use(authRoutes) //sign up, login, logout, and check for active session
 app.use(eventRoutes) //operations relating to user's event data
 app.use(groupRoutes) //operations relating to user's group data
 app.use(interestRoutes) //operations relating to getting and selecting interests
+app.use(userSearchRoutes) //endpoints for user search
 
 app.listen(PORT, () => {
   console.log(`Server is running on http://localhost:${PORT}`)
