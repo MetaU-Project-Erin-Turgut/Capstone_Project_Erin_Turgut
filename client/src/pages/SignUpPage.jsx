@@ -7,8 +7,6 @@ import { DEFAULT_FORM_VALUE } from "../utils/utils";
 import APIUtils from "../utils/APIUtils";
 import "../styles/SignUpPage.css"
 
-
-
 const SignUpPage = () => {
     const { setUser } = useUser();
 

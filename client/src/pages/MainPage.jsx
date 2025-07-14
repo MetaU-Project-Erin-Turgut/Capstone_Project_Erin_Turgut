@@ -5,8 +5,6 @@ import EventsList from './EventsList';
 import GroupsList from './GroupsList';
 import InterestList from './InterestList';
 import { Tab } from "../utils/utils";
-import "../styles/MainPage.css";
-
 
 const MainPage = () => {
 

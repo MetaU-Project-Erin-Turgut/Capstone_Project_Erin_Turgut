@@ -10,7 +10,7 @@
     text-align: center;
 }
 
-.welcome-title h1 {
+.welcome-title .title-text {
     font-size: 150px;
     margin: 5px;
 }
