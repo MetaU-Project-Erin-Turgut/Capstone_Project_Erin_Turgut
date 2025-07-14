@@ -10,7 +10,7 @@ import "../styles/SignUpPage.css"
 const SignUpPage = () => {
     const { setUser } = useUser();
 
-    const [formData, setFormData] = useState({address: DEFAULT_FORM_VALUE.address, username: DEFAULT_FORM_VALUE.username, password: DEFAULT_FORM_VALUE.password,  email: DEFAULT_FORM_VALUE.email});
+    const [formData, setFormData] = useState({firstName: DEFAULT_FORM_VALUE.firstName, lastName: DEFAULT_FORM_VALUE.lastName, address: DEFAULT_FORM_VALUE.address, username: DEFAULT_FORM_VALUE.username, password: DEFAULT_FORM_VALUE.password,  email: DEFAULT_FORM_VALUE.email});
 
     const navigate = useNavigate();
 
@@ -50,11 +50,20 @@ const SignUpPage = () => {
 
                 <div className="input-side">
                     <form onSubmit={handleFormSubmit}>
-
-                        <input placeholder="First Name"></input><br />
-                        <input placeholder="Last Name"></input><br />
-
-                        {/* Handle just these for now  - use enums for 'name'??*/}
+                        <input 
+                            placeholder="First Name"
+                            type="text"
+                            name="firstName"
+                            value={formData.firstName}
+                            onChange={handleInputChange}
+                        ></input><br />
+                        <input 
+                            placeholder="Last Name"
+                            type="text"
+                            name="lastName"
+                            value={formData.lastName}
+                            onChange={handleInputChange}
+                        ></input><br />
                         <input 
                             placeholder="Address"
                             type="text"

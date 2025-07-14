@@ -22,9 +22,8 @@ model User {
 
 model User_Profile {
   id         Int    @id @default(autoincrement())
-  first_name String
-  last_name  String
-  zip_code   String @db.VarChar(5)
+  firstName String
+  lastName  String
   user_id    Int    @unique
   user       User   @relation(fields: [user_id], references: [id])
 }

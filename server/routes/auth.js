@@ -16,11 +16,11 @@ const saltRounds = 10;
 
 //Signup route
 router.post('/signup', async (req, res) => {
-    const { address, username, email, password } = req.body;
+    const { address, username, email, password, firstName, lastName } = req.body;
 
     try {
-        if (!username || !email || !password) {
-            return res.status(400).json({ error: "Username, email, and password are required." });
+        if (!username || !email || !password || !firstName || !lastName) {
+            return res.status(400).json({ error: "First name, last name, username, email, and password are required." });
         }
 
         if (password.length < 8) {
@@ -56,6 +56,13 @@ router.post('/signup', async (req, res) => {
         // Store user ID and username in the session, allowing them to remain authenticated as they navigate the website
         req.session.userId = newUser.id
         req.session.username = newUser.username
+
+        //connect to a new user profile as well
+        await prisma.user.update({
+            where: {id: req.session.userId},
+            data: {user_profile: { create: {firstName: firstName, lastName: lastName}}}
+        })
+
         res.status(201).json({ message: "Sign up successful!", id: newUser.id, username: newUser.username }) 
 
 
