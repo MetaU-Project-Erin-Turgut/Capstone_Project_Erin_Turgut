@@ -16,17 +16,16 @@ model User {
   address      String
   events       Event_User[]
   groups       Group_User[]
-  user_profile User_Profile?
+  userProfile  User_Profile?
   interests    Interest[]
 }
 
 model User_Profile {
   id         Int    @id @default(autoincrement())
-  first_name String
-  last_name  String
-  zip_code   String @db.VarChar(5)
-  user_id    Int    @unique
-  user       User   @relation(fields: [user_id], references: [id])
+  firstName  String
+  lastName   String
+  userId     Int    @unique
+  user       User   @relation(fields: [userId], references: [id])
 }
 
 model Event {
@@ -34,8 +33,8 @@ model Event {
   title       String
   description String
   dateTime    DateTime
-  interest_id Int?
-  interest    Interest?     @relation(fields: [interest_id], references: [id])
+  interestId  Int?
+  interest    Interest?     @relation(fields: [interestId], references: [id])
   attendees   Event_User[]
   groups      Group_Event[]
 }
@@ -44,7 +43,7 @@ model Group {
   id          Int           @id @default(autoincrement())
   title       String
   description String
-  is_full     Boolean       @default(false)
+  isFull      Boolean       @default(false)
   events      Group_Event[]
   members     Group_User[]
   interests   Group_Interest[]
@@ -53,54 +52,54 @@ model Group {
 model Interest {
   id        Int        @id @default(autoincrement())
   title     String
-  parent_id Int?
+  parentId  Int?
   level     Int
   path      String
-  parent    Interest?  @relation("InterestsSubInterests", fields: [parent_id], references: [id])
+  parent    Interest?  @relation("InterestsSubInterests", fields: [parentId], references: [id])
   children  Interest[] @relation("InterestsSubInterests")
 
-  users    User[]
-  groups   Group_Interest[]
-  events   Event[]
+  users     User[]
+  groups    Group_Interest[]
+  events    Event[]
 }
 
 model Event_User {
-  user_id  Int
-  event_id Int
+  userId   Int
+  eventId  Int
   status   Status @default(PENDING)
-  event    Event  @relation(fields: [event_id], references: [id])
-  user     User   @relation(fields: [user_id], references: [id])
+  event    Event  @relation(fields: [eventId], references: [id])
+  user     User   @relation(fields: [userId], references: [id])
 
-  @@id([user_id, event_id])
+  @@id([userId, eventId])
 }
 
 model Group_User {
-  user_id             Int
-  group_id            Int
+  userId              Int
+  groupId             Int
   status              Status @default(PENDING)
   compatibilityRatio  Decimal @default("0.00")
-  group    Group      @relation(fields: [group_id], references: [id])
-  user     User       @relation(fields: [user_id], references: [id])
+  group               Group      @relation(fields: [groupId], references: [id])
+  user                User       @relation(fields: [userId], references: [id])
 
-  @@id([user_id, group_id])
+  @@id([userId, groupId])
 }
 
 model Group_Event {
-  group_id Int
-  event_id Int
-  event    Event @relation(fields: [event_id], references: [id])
-  group    Group @relation(fields: [group_id], references: [id])
+  groupId  Int
+  eventId  Int
+  event    Event @relation(fields: [eventId], references: [id])
+  group    Group @relation(fields: [groupId], references: [id])
 
-  @@id([group_id, event_id])
+  @@id([groupId, eventId])
 }
 
 model Group_Interest {
-  group_id    Int
-  interest_id Int
-  interest    Interest @relation(fields: [interest_id], references: [id])
-  group       Group @relation(fields: [group_id], references: [id])
+  groupId     Int
+  interestId  Int
+  interest    Interest @relation(fields: [interestId], references: [id])
+  group       Group @relation(fields: [groupId], references: [id])
 
-  @@id([group_id, interest_id])
+  @@id([groupId, interestId])
 }
 
 /// This table contains check constraints and requires additional setup for migrations. Visit https://pris.ly/d/check-constraints for more info.

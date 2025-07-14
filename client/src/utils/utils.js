@@ -16,8 +16,8 @@ const Status = Object.freeze({
 
 //const form value defaults used in login and sign up
 const DEFAULT_FORM_VALUE = {
-    first_name: "",
-    last_name: "",
+    firstName: "",
+    lastName: "",
     address: "",
     username: "",
     password: "",

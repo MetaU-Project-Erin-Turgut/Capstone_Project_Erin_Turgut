@@ -12,7 +12,7 @@ router.get('/interests', isAuthenticated, async (req, res) => {
     try {
         const parentInterests = await prisma.interest.findMany({
             where: {
-                parent_id: null, 
+                parentId: null, 
             },
             include: { 
                 children: true

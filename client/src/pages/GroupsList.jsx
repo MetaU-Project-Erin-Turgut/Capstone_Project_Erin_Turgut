@@ -28,7 +28,7 @@ const GroupsList = () => {
         try {
             const apiResultData = await APIUtils.fetchGroups();
             const mappedGroups = new Map(
-                apiResultData.map(group => [group.group_id, group])
+                apiResultData.map(group => [group.groupId, group])
             );
             setGroups(mappedGroups);
         } catch (error) {

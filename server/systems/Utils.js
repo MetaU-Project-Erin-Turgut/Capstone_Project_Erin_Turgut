@@ -31,7 +31,7 @@ const getExpandedInterests = async (originalInterests, isGroup) => {
         let currInterest = interest;
         if (isGroup) currInterest = interest.interest;
 
-        if (currInterest.parent_id == null) {
+        if (currInterest.parentId == null) {
             expandedInterestSet.push(currInterest);
             continue;
         }
@@ -86,7 +86,7 @@ const filterGroupsByLocation = async (eventCoordinates, forEventSearch) => {
     } 
 
     //if it is for group search for users to join, we do need to exclude full groups
-    return await prisma.$queryRaw`SELECT id, title FROM "Group" WHERE ST_DWithin(coord, ST_SetSRID(ST_MakePoint(${eventCoordinates.longitude}, ${eventCoordinates.latitude}), 4326)::geography, ${LOCATION_SEARCH_RADIUS}) AND is_full= FALSE`;
+    return await prisma.$queryRaw`SELECT id, title FROM "Group" WHERE ST_DWithin(coord, ST_SetSRID(ST_MakePoint(${eventCoordinates.longitude}, ${eventCoordinates.latitude}), 4326)::geography, ${LOCATION_SEARCH_RADIUS}) AND "isFull"= FALSE`;
 
 }
 
