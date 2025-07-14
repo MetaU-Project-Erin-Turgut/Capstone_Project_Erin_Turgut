@@ -42,10 +42,10 @@ const Group = ( {groupData, updateGroup}) => {
                 <h4 className="title">{title}</h4>
             </section>
             <p>{description}</p>
-            {(groupData.status !== Status.ACCEPTED && groupData.status !== Status.DROPPED && groupData.status !== Status.REJECTED)&&
+            {(groupData.status !== Status.ACCEPTED && groupData.status !== Status.DROPPED && groupData.status !== Status.REJECTED) &&
                 <section className="compatibility-display">
                     <h5>Compatibility Ratio: </h5>
-                    <p>{compatibilityRatio * 100}%</p>
+                    <p>{Math.round(compatibilityRatio * 100)}%</p>
                 </section>
             }
         </div>
