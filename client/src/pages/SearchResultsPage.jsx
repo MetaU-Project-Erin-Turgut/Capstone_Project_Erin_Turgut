@@ -25,7 +25,11 @@ const SearchResultsPage = () => {
             try {
                 //get user object results from backend
                 const apiResultData = await APIUtils.userSearch(searchQuery);
-                setSearchResults(apiResultData);
+                if (apiResultData.length === 0) {
+                    setNotif("No results found!")
+                } else {
+                    setSearchResults(apiResultData);
+                }
             } catch (error) {
                 console.log("Status ", error.status);
                 console.log("Error: ", error.message);
