@@ -81,7 +81,7 @@ const InterestList = () => {
     }
 
     //this will update the selected interests in the database
-    const submitSelectedInterests = () => {
+    const submitSelectedInterests = async () => {
         const updatedInterests = {
             chosenInterests: Array.from(userInterests.entries()).map(([key, value]) => {
                 return {id: key}
@@ -89,7 +89,8 @@ const InterestList = () => {
         }
         
         try {
-            APIUtils.updateUserInterests(updatedInterests);
+            await APIUtils.updateUserInterests(updatedInterests);
+            await APIUtils.getNewGroupRecs();
         } catch (error) {
             console.log("Status ", error.status);
             console.log("Error: ", error.message);
