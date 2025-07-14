@@ -53,7 +53,7 @@ const getCandidateGroups =  async (allGroupsNearby, allUserInterests) => {
             id: { in: groupIds },
             interests: {
                 some: {
-                    interest_id: {in: interestIds}
+                    interestId: {in: interestIds}
                 }
             },
         },

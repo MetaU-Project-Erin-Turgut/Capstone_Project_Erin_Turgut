@@ -48,6 +48,7 @@ const SignUpPage = () => {
                     <h1 className="title-text">Sign Up</h1>
                 </div>
 
+{/* combine these into a component or use map? */}
                 <div className="input-side">
                     <form onSubmit={handleFormSubmit}>
                         <input 

@@ -19,7 +19,7 @@ router.get('/user/groups/', isAuthenticated, async (req, res) => {
                 id: req.session.userId,
             },
             include: {
-                groups: { include: { group: { include: { interests: { include: { interest: true } }, members: { where: { NOT: { user_id: req.session.userId } }, include: { user: true } } } } } }
+                groups: { include: { group: { include: { interests: { include: { interest: true } }, members: { where: { NOT: { userId: req.session.userId } }, include: { user: true } } } } } }
             }
         })
         res.status(201).json(userData.groups)
@@ -44,7 +44,7 @@ router.get('/user/groups/new', isAuthenticated, async (req, res) => {
 
             const userCoords = await getUserCoordinates(req.session.userId);
 
-            const newGroupRecordId = await prisma.$queryRaw`INSERT INTO "Group" (title, description, is_full, coord) VALUES('temp title', 'temp description', false, ST_SetSRID(ST_MakePoint(${userCoords.longitude}, ${userCoords.latitude}), 4326)::geography) RETURNING id`;
+            const newGroupRecordId = await prisma.$queryRaw`INSERT INTO "Group" (title, description, "isFull", coord) VALUES('temp title', 'temp description', false, ST_SetSRID(ST_MakePoint(${userCoords.longitude}, ${userCoords.latitude}), 4326)::geography) RETURNING id`;
 
             //include interests for the newly created group
             const newGroup = await prisma.group.update({
@@ -59,7 +59,7 @@ router.get('/user/groups/new', isAuthenticated, async (req, res) => {
                     },
                 },
                 include: {
-                    interests: { include: { interest: true } }, members: { where: { NOT: { user_id: req.session.userId } }, include: { user: true } }
+                    interests: { include: { interest: true } }, members: { where: { NOT: { userId: req.session.userId } }, include: { user: true } }
                 }
                 
             })
@@ -71,9 +71,9 @@ router.get('/user/groups/new', isAuthenticated, async (req, res) => {
 
             const isGroup_user = await prisma.group_User.findUnique({
                 where: {
-                    user_id_group_id: {
-                        group_id: group.id,
-                        user_id: req.session.userId
+                    userId_groupId: {
+                        groupId: group.id,
+                        userId: req.session.userId
                     }
                 }
             });
@@ -109,9 +109,9 @@ router.put(`/user/groups/:groupId/${Status.ACCEPTED}`, isAuthenticated, async (r
         //get group and user relationship and each of their coordinates
         const group_user = await prisma.group_User.findUnique({
             where: {
-                user_id_group_id: {
-                    group_id: groupId,
-                    user_id: req.session.userId
+                userId_groupId: {
+                    groupId: groupId,
+                    userId: req.session.userId
                 }
             },
             include: {
@@ -154,7 +154,7 @@ router.put(`/user/groups/:groupId/${Status.ACCEPTED}`, isAuthenticated, async (r
                         return { interest: { connect: { id: interest } } }
                     })
                 },
-                is_full: newIsFullStatus
+                isFull: newIsFullStatus
             },
         })
 
@@ -168,15 +168,15 @@ router.put(`/user/groups/:groupId/${Status.ACCEPTED}`, isAuthenticated, async (r
         //update status of group_user relationship
         const updatedGroupUser = await prisma.group_User.update({
             where: {
-                user_id_group_id: {
-                    group_id: groupId,
-                    user_id: req.session.userId
+                userId_groupId: {
+                    groupId: groupId,
+                    userId: req.session.userId
                 }
             },
             data: {
                 status: Status.ACCEPTED
             },
-            include: { group: { include: { interests: { include: { interest: true } }, members: { where: { NOT: { user_id: req.session.userId } }, include: { user: true } } } } }
+            include: { group: { include: { interests: { include: { interest: true } }, members: { where: { NOT: { userId: req.session.userId } }, include: { user: true } } } } }
         })
 
         //if group is now full, remove it as a "Pending" option from users' lists who have not accepted the group
@@ -212,9 +212,9 @@ router.patch(`/user/groups/:groupId/${Status.REJECTED}`, isAuthenticated, async 
     try {
         const isGroup_user = await prisma.group_User.findUnique({
             where: {
-                user_id_group_id: {
-                    group_id: groupId,
-                    user_id: req.session.userId
+                userId_groupId: {
+                    groupId: groupId,
+                    userId: req.session.userId
                 }
             }
         });
@@ -225,9 +225,9 @@ router.patch(`/user/groups/:groupId/${Status.REJECTED}`, isAuthenticated, async 
 
         const updatedGroup = await prisma.group_User.update({
             where: {
-                user_id_group_id: {
-                    group_id: groupId,
-                    user_id: req.session.userId
+                userId_groupId: {
+                    groupId: groupId,
+                    userId: req.session.userId
                 }
             },
             data: {
@@ -250,13 +250,13 @@ router.put(`/user/groups/:groupId/${Status.DROPPED}`, isAuthenticated, async (re
         //get group and user relationship
         const group_user = await prisma.group_User.findUnique({
             where: {
-                user_id_group_id: {
-                    group_id: groupId,
-                    user_id: req.session.userId
+                userId_groupId: {
+                    groupId: groupId,
+                    userId: req.session.userId
                 }
             },
             include: {
-                group: { include: { interests: { select: { interest: true } }, members: { where: { NOT: { user_id: req.session.userId } }, include: {user: { include: { interests: true } }} } }},
+                group: { include: { interests: { select: { interest: true } }, members: { where: { NOT: { userId: req.session.userId } }, include: {user: { include: { interests: true } }} } }},
                 user: { include: { interests: true } }
             }
         });
@@ -274,15 +274,15 @@ router.put(`/user/groups/:groupId/${Status.DROPPED}`, isAuthenticated, async (re
         if (acceptedMembers.length === 0) { //remember, user is already excluded for list from db query - so should check against 0
             //delete all group_user many to many relations
             await prisma.group_User.deleteMany({
-                where: { group_id: groupId }
+                where: { groupId: groupId }
             })
             //delete all group_event many to many relations
             await prisma.group_Event.deleteMany({
-                where: { group_id: groupId }
+                where: { groupId: groupId }
             })
             //delete all group_interest many to many relations
             await prisma.group_Interest.deleteMany({
-                where: { group_id: groupId }
+                where: { groupId: groupId }
             })
             //delete group
             await prisma.group.delete({
@@ -292,7 +292,7 @@ router.put(`/user/groups/:groupId/${Status.DROPPED}`, isAuthenticated, async (re
             //recalculate group's central location
 
             const memberIds = acceptedMembers.map((member) => {
-                return member.user_id
+                return member.userId
             })
 
             const memberCoords = await prisma.$queryRaw`
@@ -328,15 +328,15 @@ router.put(`/user/groups/:groupId/${Status.DROPPED}`, isAuthenticated, async (re
             //update status of group_user relationship
             updatedGroupUser = await prisma.group_User.update({
                 where: {
-                    user_id_group_id: {
-                        group_id: groupId,
-                        user_id: req.session.userId
+                    userId_groupId: {
+                        groupId: groupId,
+                        userId: req.session.userId
                     }
                 },
                 data: {
                     status: Status.DROPPED
                 },
-                include: { group: { include: { interests: { include: { interest: true } }, members: { where: { NOT: { user_id: req.session.userId } }, include: { user: true } } } } }
+                include: { group: { include: { interests: { include: { interest: true } }, members: { where: { NOT: { userId: req.session.userId } }, include: { user: true } } } } }
             })
 
         }

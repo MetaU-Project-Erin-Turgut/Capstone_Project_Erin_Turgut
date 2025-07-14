@@ -22,7 +22,7 @@ router.get('/user/events/', isAuthenticated, async (req, res) => {
                         event: {
                             include: {
                                 attendees:{
-                                    where: {NOT: {user_id: req.session.userId}},
+                                    where: {NOT: {userId: req.session.userId}},
                                     include: {
                                         user: {include: {groups: true}}
                                     },
@@ -36,7 +36,7 @@ router.get('/user/events/', isAuthenticated, async (req, res) => {
                                                 members: {
                                                     some: {
                                                         AND: [
-                                                            {user_id: req.session.userId}, 
+                                                            {userId: req.session.userId}, 
                                                             {status: Status.ACCEPTED}
                                                         ]   
                                                     }
@@ -59,16 +59,16 @@ router.get('/user/events/', isAuthenticated, async (req, res) => {
 })
 
 //update user's status for an event
-router.patch('/user/events/:event_id/status', isAuthenticated, async (req, res) => {
-    const event_id = parseInt(req.params.event_id);
+router.patch('/user/events/:eventId/status', isAuthenticated, async (req, res) => {
+    const eventId = parseInt(req.params.eventId);
     const {updatedStatus} = req.body; 
 
     try {
         const event_user = await prisma.event_User.findUnique({
                 where: {
-                    user_id_event_id: {
-                        user_id: req.session.userId,
-                        event_id: event_id
+                    userId_eventId: {
+                        userId: req.session.userId,
+                        eventId: eventId
                     }
                 }
         });
@@ -79,9 +79,9 @@ router.patch('/user/events/:event_id/status', isAuthenticated, async (req, res) 
 
         const updatedEvent = await prisma.event_User.update({
             where: {
-                user_id_event_id: {
-                    user_id: req.session.userId,
-                    event_id: event_id
+                userId_eventId: {
+                    userId: req.session.userId,
+                    eventId: eventId
                 }
             },
             data: {

@@ -60,7 +60,7 @@ router.post('/signup', async (req, res) => {
         //connect to a new user profile as well
         await prisma.user.update({
             where: {id: req.session.userId},
-            data: {user_profile: { create: {firstName: firstName, lastName: lastName}}}
+            data: {userProfile: { create: {firstName: firstName, lastName: lastName}}}
         })
 
         res.status(201).json({ message: "Sign up successful!", id: newUser.id, username: newUser.username }) 

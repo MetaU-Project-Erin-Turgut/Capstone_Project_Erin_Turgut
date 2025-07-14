@@ -2,24 +2,24 @@ const { PrismaClient } = require('../generated/prisma');
 const prisma = new PrismaClient()
 
 const interests = [
-    {id: 0, title: 'Music', parent_id: null, level: 1, path: "0"},
-    {id: 1, title: 'Sports',  parent_id: null, level: 1, path: "1"},
-    {id: 2, title: 'Cooking',  parent_id: null, level: 1, path: "2"},
-    {id: 3, title: 'Singing',  parent_id: 0, level: 2, path: "0.3"},
-    {id: 4, title: 'Karaoke',  parent_id: 3, level: 3, path: "0.3.4"},
-    {id: 5, title: 'Basketball',  parent_id: 1, level: 2, path: "1.5"},
-    {id: 6, title: 'Rock',  parent_id: 0, level: 2, path: "0.6"},
-    {id: 7, title: 'Indie Rock',  parent_id: 6, level: 3, path: "0.6.7"},
-    {id: 8, title: 'Hard Rock',  parent_id: 6, level: 3, path: "0.6.8"},
-    {id: 9, title: 'ACDC',  parent_id: 8, level: 4, path: "0.6.8.9"},
-    {id: 10, title: 'Tennis',  parent_id: 1, level: 2, path: "1.10"},
-    {id: 11, title: 'Baking',  parent_id: 2, level: 2, path: "2.11"},
+    {id: 0, title: 'Music', parentId: null, level: 1, path: "0"},
+    {id: 1, title: 'Sports',  parentId: null, level: 1, path: "1"},
+    {id: 2, title: 'Cooking',  parentId: null, level: 1, path: "2"},
+    {id: 3, title: 'Singing',  parentId: 0, level: 2, path: "0.3"},
+    {id: 4, title: 'Karaoke',  parentId: 3, level: 3, path: "0.3.4"},
+    {id: 5, title: 'Basketball',  parentId: 1, level: 2, path: "1.5"},
+    {id: 6, title: 'Rock',  parentId: 0, level: 2, path: "0.6"},
+    {id: 7, title: 'Indie Rock',  parentId: 6, level: 3, path: "0.6.7"},
+    {id: 8, title: 'Hard Rock',  parentId: 6, level: 3, path: "0.6.8"},
+    {id: 9, title: 'ACDC',  parentId: 8, level: 4, path: "0.6.8.9"},
+    {id: 10, title: 'Tennis',  parentId: 1, level: 2, path: "1.10"},
+    {id: 11, title: 'Baking',  parentId: 2, level: 2, path: "2.11"},
 ];
 const groups = [
-    {title: 'Group 1', description: 'group 1 in mpk', is_full: false, latitude: 37.4855, longitude: -122.1500, interests: [{"id": 10}, {"id": 6}, {"id": 11}]},
-    {title: 'Group 2', description: 'group 2 in mpk', is_full: false, latitude: 37.4855, longitude: -122.1500, interests: [{"id": 8}, {"id": 7}, {"id": 1}]},
-    {title: 'Group 3', description: 'group 3 in mpk', is_full: false, latitude: 37.4855, longitude: -122.1500, interests: [{"id": 5}, {"id": 10}]},
-    {title: 'Group Far away', description: 'far away from mpk', is_full: false, latitude: 35.6895, longitude: 139.6917, interests: [{"id": 10}, {"id": 2}, {"id": 7}]},
+    {title: 'Group 1', description: 'group 1 in mpk', isFull: false, latitude: 37.4855, longitude: -122.1500, interests: [{"id": 10}, {"id": 6}, {"id": 11}]},
+    {title: 'Group 2', description: 'group 2 in mpk', isFull: false, latitude: 37.4855, longitude: -122.1500, interests: [{"id": 8}, {"id": 7}, {"id": 1}]},
+    {title: 'Group 3', description: 'group 3 in mpk', isFull: false, latitude: 37.4855, longitude: -122.1500, interests: [{"id": 5}, {"id": 10}]},
+    {title: 'Group Far away', description: 'far away from mpk', isFull: false, latitude: 35.6895, longitude: 139.6917, interests: [{"id": 10}, {"id": 2}, {"id": 7}]},
 ];
 
 const events = [
@@ -47,7 +47,7 @@ async function main() {
     }
     
     for (const group of groups) {
-        const groupRecordId = await prisma.$queryRaw`INSERT INTO "Group" (title, description, is_full, coord) VALUES(${group.title}, ${group.description}, ${group.is_full}, ST_SetSRID(ST_MakePoint(${group.longitude}, ${group.latitude}), 4326)::geography) RETURNING id`;
+        const groupRecordId = await prisma.$queryRaw`INSERT INTO "Group" (title, description, "isFull", coord) VALUES(${group.title}, ${group.description}, ${group.isFull}, ST_SetSRID(ST_MakePoint(${group.longitude}, ${group.latitude}), 4326)::geography) RETURNING id`;
 
         //for seeding, include interests 
         await prisma.group.update({

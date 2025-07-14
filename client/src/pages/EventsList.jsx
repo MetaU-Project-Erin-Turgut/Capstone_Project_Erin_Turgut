@@ -29,7 +29,7 @@ const EventsList = () => {
         try {
             const apiResultData = await APIUtils.fetchEvents();
             const mappedEvents = new Map(
-                apiResultData.events.map(event => [event.event_id, event])
+                apiResultData.events.map(event => [event.eventId, event])
             );
             setEvents(mappedEvents);
         } catch (error) {
@@ -50,7 +50,7 @@ const EventsList = () => {
                         eventData={value}
                         updateEvent= {(newEventObj) => {
                             const updatedEvents = new Map(events);
-                            updatedEvents.set(newEventObj.event_id, newEventObj);
+                            updatedEvents.set(newEventObj.eventId, newEventObj);
                             setEvents(updatedEvents);
                         }}
                     />

@@ -17,7 +17,7 @@ const scheduleEventsForGroups = async () => {
         const groupsNearby = await filterGroupsByLocation(eventCoords, true);
 
         //for these groups, additionally filter by ones that include this event's interest in their array of interests AND haven't been sent this event invite yet
-        const candidateGroups = await getCandidateGroups(groupsNearby, retrievedEvent.interest_id, retrievedEvent.id);
+        const candidateGroups = await getCandidateGroups(groupsNearby, retrievedEvent.interestId, retrievedEvent.id);
         for (group of candidateGroups) {
             const inviteStatus = sendInvitesToUsers();
             if (inviteStatus === 200) {
@@ -71,12 +71,12 @@ const getCandidateGroups = async (allGroupsNearby, eventInterest, eventId) => {
             id: { in: groupIds },
             interests: {
                 some: {
-                    interest_id: eventInterest
+                    interestId: eventInterest
                 }
             },
             events: {
                 none: {
-                    event_id: eventId,
+                    eventId: eventId,
                 },
             }
         },
@@ -106,7 +106,7 @@ const getAllEvents = async () => {
 
     //return upcoming events - should be what's left
     return await prisma.$queryRaw`
-   SELECT ST_X(coord::geometry), ST_Y(coord::geometry), "id", "title", "description", "dateTime", "interest_id" FROM "Event"`;
+   SELECT ST_X(coord::geometry), ST_Y(coord::geometry), "id", "title", "description", "dateTime", "interestId" FROM "Event"`;
 
 
 }
