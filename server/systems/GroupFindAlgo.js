@@ -1,9 +1,7 @@
 const { PrismaClient } = require('../generated/prisma');
 const prisma = new PrismaClient()
 
-const { getExpandedInterests } = require('./Utils');
-const { filterGroupsByLocation } = require('./Utils');
-
+const { getExpandedInterests, getUserCoordinates, filterGroupsByLocation } = require('./Utils');
 
 const findGroups = async (userData) => {
 
@@ -20,8 +18,8 @@ const findGroups = async (userData) => {
     
     //for each of the possible groups, calculate the jaccard similarity to user's interests
     for (let i = 0; i < candidateGroups.length; i++) {
-        const compatibilityRatio = calcJaccardSimilarity(candidateGroups[i], expandedUserInterests.length).toFixed(2);
-        candidateGroups[i] = {...candidateGroups[i], compatibilityRatio: compatibilityRatio}
+        const compatibilityRatio = calcJaccardSimilarity(candidateGroups[i], expandedUserInterests.length)
+        candidateGroups[i] = {...candidateGroups[i], compatibilityRatio: compatibilityRatio.toFixed(2)}
     }
 
     //sort groups by most compatible to least compatible
@@ -85,20 +83,6 @@ const getCandidateGroups =  async (allGroupsNearby, allUserInterests) => {
     return groupCandidates;
     
 }
-
-
-const getUserCoordinates = async (userId) => {
-    const userCoord = await prisma.$queryRaw`
-    SELECT ST_X(coord::geometry), ST_Y(coord::geometry)
-    FROM "User" 
-    WHERE id = ${userId}`;
-    
-    return {
-        longitude: userCoord.at(0).st_x,
-        latitude: userCoord.at(0).st_y,
-    };
-}
-
 
 module.exports = { findGroups };
 
