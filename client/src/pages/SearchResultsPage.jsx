@@ -1,6 +1,7 @@
 import { useState } from "react";
 import NavBar from "../components/NavBar"
 import UserResultCard from "../components/UserResultCard";
+import APIUtils from "../utils/APIUtils";
 import "../styles/SearchResultsPage.css"
 import "../styles/CardListContainer.css"
 
@@ -12,8 +13,14 @@ const SearchResultsPage = () => {
         setSearchQuery(event.target.value)
     }
 
-    const handleSearchSubmit = () => {
-
+    const handleSearchSubmit = async () => {
+        try {
+            //get user object results from backend
+            const apiResultData = await APIUtils.userSearch(searchQuery);
+        } catch (error) {
+            console.log("Status ", error.status);
+            console.log("Error: ", error.message);
+        }
     }
     
     return (

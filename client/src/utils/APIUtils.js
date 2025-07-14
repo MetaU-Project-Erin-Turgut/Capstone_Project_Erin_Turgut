@@ -191,7 +191,7 @@ export default class APIUtils {
 
     //this will be called after the above method so that new groups are retrieved for user when their interests change
     static getNewGroupRecs = async () => {
-         const response = await fetch('http://localhost:3000/user/groups/new', {
+        const response = await fetch('http://localhost:3000/user/groups/new', {
             method: "GET",
             headers: { "Content-Type": "application/json" },
             credentials: "include",
@@ -204,5 +204,22 @@ export default class APIUtils {
         } else {
             throw {status: response.status, message: data.error};
         }
+    }
+
+    static userSearch = async (searchQuery) => {
+        const response = await fetch(`http://localhost:3000/search/users/?searchQuery=${searchQuery}`, {
+            method: "GET",
+            headers: { "Content-Type": "application/json" },
+            credentials: "include",
+        });
+
+        const data = await response.json();
+
+        if (response.ok) {
+            return data;
+        } else {
+            throw {status: response.status, message: data.error};
+        }
+
     }
 }
