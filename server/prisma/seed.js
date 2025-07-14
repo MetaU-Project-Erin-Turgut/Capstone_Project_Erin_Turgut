@@ -18,10 +18,8 @@ const interests = [
 const groups = [
     {title: 'Group 1', description: 'group 1 in mpk', is_full: false, latitude: 37.4855, longitude: -122.1500, interests: [{"id": 10}, {"id": 6}, {"id": 11}]},
     {title: 'Group 2', description: 'group 2 in mpk', is_full: false, latitude: 37.4855, longitude: -122.1500, interests: [{"id": 8}, {"id": 7}, {"id": 1}]},
-    {title: 'Group 3', description: 'group 3 in mpk', is_full: false, latitude: 37.4855, longitude: -122.1500, interests: [{"id": 5}, {"id": 10}, {"id": 0}]},
+    {title: 'Group 3', description: 'group 3 in mpk', is_full: false, latitude: 37.4855, longitude: -122.1500, interests: [{"id": 5}, {"id": 10}]},
     {title: 'Group Far away', description: 'far away from mpk', is_full: false, latitude: 35.6895, longitude: 139.6917, interests: [{"id": 10}, {"id": 2}, {"id": 7}]},
-    {title: 'Group No related interests', description: 'group not related in mpk', is_full: false, latitude: 37.4855, longitude: -122.1500, interests: [{"id": 4}]},
-
 ];
 
 const events = [

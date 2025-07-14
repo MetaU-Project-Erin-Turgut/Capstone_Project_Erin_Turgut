@@ -7,7 +7,7 @@ const prisma = new PrismaClient();
 const { isAuthenticated } = require('../middleware/CheckAutheticated')
 const { findGroups } = require('../systems/GroupFindAlgo');
 const { updateGroupCentralLocation, updateGroupInterests, recalculateGroupCentralLocation, recalculateGroupInterests } = require('../systems/GroupUpdateMethods')
-const { Status, filterMembersByStatus } = require('../systems/Utils');
+const { Status, filterMembersByStatus, getUserCoordinates } = require('../systems/Utils');
 
 const FULL_GROUP_SIZE = 10;
 
@@ -37,8 +37,35 @@ router.get('/user/groups/new', isAuthenticated, async (req, res) => {
             select: { id: true, interests: true }
         });
         //Call GroupFindAlgo, will return all suggested groups sorted by compatibility
-        const suggestedGroups = await findGroups(updatedUser); //NOTE: the interests attribute part of the returned objects won't be entirely accurate - not needed for now though
+        let suggestedGroups = await findGroups(updatedUser); //NOTE: the interests attribute part of the returned objects won't be entirely accurate - not needed for now though
 
+        //if no matching groups were found, create new group with just the user
+        if (suggestedGroups.length === 0) {
+
+            const userCoords = getUserCoordinates(req.session.userId);
+
+            const newGroupRecordId = await prisma.$queryRaw`INSERT INTO "Group" (title, description, is_full, coord) VALUES('temp title', 'temp description', false, ST_SetSRID(ST_MakePoint(${userCoords.longitude}, ${userCoords.latitude}), 4326)::geography) RETURNING id`;
+
+            //include interests for the newly created group
+            const newGroup = await prisma.group.update({
+                where: {
+                    id: newGroupRecordId.at(0).id
+                },
+                data: {
+                    interests: {
+                        create: updatedUser.interests.map((interest) => {
+                            return { interest: { connect: interest } }
+                        })
+                    },
+                },
+                include: {
+                    interests: { include: { interest: true } }, members: { where: { NOT: { user_id: req.session.userId } }, include: { user: true } }
+                }
+                
+            })
+
+            suggestedGroups.push({...newGroup, compatibilityRatio: 1});
+        }
         //update the user_group table with these invites
         for (group of suggestedGroups) {
 
@@ -58,7 +85,7 @@ router.get('/user/groups/new', isAuthenticated, async (req, res) => {
                         group: { connect: { id: group.id } },
                         user: { connect: { id: req.session.userId } },
                         status: Status.PENDING,
-                        compatibilityRatio: group.compatibilityRatio.toFixed(2)
+                        compatibilityRatio: group.compatibilityRatio
                     }
                 })
             }

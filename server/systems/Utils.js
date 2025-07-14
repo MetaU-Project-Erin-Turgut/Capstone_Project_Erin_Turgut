@@ -12,6 +12,18 @@ const Status = Object.freeze({
     DROPPED: "DROPPED"
 });
 
+const getUserCoordinates = async (userId) => {
+    const userCoord = await prisma.$queryRaw`
+    SELECT ST_X(coord::geometry), ST_Y(coord::geometry)
+    FROM "User" 
+    WHERE id = ${userId}`;
+    
+    return {
+        longitude: userCoord.at(0).st_x,
+        latitude: userCoord.at(0).st_y,
+    };
+}
+
 const getExpandedInterests = async (originalInterests, isGroup) => {
     let expandedInterestSet = [];
 
@@ -80,4 +92,4 @@ const filterGroupsByLocation = async (eventCoordinates, forEventSearch) => {
 
 
 
-module.exports = { Status, getExpandedInterests, getUnionOfSets, filterMembersByStatus, filterGroupsByLocation };
+module.exports = { Status, getUserCoordinates, getExpandedInterests, getUnionOfSets, filterMembersByStatus, filterGroupsByLocation };
