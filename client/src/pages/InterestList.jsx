@@ -82,6 +82,18 @@ const InterestList = () => {
 
     //this will update the selected interests in the database
     const submitSelectedInterests = () => {
+        const updatedInterests = {
+            chosenInterests: Array.from(userInterests.entries()).map(([key, value]) => {
+                return {id: key}
+            })
+        }
+        
+        try {
+            APIUtils.updateUserInterests(updatedInterests);
+        } catch (error) {
+            console.log("Status ", error.status);
+            console.log("Error: ", error.message);
+        }
         
     }
 

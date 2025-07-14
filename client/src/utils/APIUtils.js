@@ -171,4 +171,21 @@ export default class APIUtils {
             throw {status: response.status, message: data.error};
         }
     }
+
+    static updateUserInterests = async (newInterests) => {
+        const response = await fetch('http://localhost:3000/user/interests', {
+            method: "POST",
+            headers: { "Content-Type": "application/json" },
+            body: JSON.stringify(newInterests),
+            credentials: "include",
+        });
+
+        const data = await response.json();
+
+        if (response.ok) {
+            return data;
+        } else {
+            throw {status: response.status, message: data.error};
+        }
+    }
 }
