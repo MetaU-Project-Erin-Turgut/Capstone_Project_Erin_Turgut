@@ -42,7 +42,7 @@ router.get('/user/groups/new', isAuthenticated, async (req, res) => {
         //if no matching groups were found, create new group with just the user
         if (suggestedGroups.length === 0) {
 
-            const userCoords = getUserCoordinates(req.session.userId);
+            const userCoords = await getUserCoordinates(req.session.userId);
 
             const newGroupRecordId = await prisma.$queryRaw`INSERT INTO "Group" (title, description, is_full, coord) VALUES('temp title', 'temp description', false, ST_SetSRID(ST_MakePoint(${userCoords.longitude}, ${userCoords.latitude}), 4326)::geography) RETURNING id`;
 
