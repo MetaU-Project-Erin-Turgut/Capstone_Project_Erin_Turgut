@@ -35,7 +35,7 @@ router.get('/user/groups/new', isAuthenticated, async (req, res) => {
         const updatedUser = await prisma.user.findUnique({
             where: { id: req.session.userId },
             select: { id: true, interests: true }
-        });;
+        });
         //Call GroupFindAlgo, will return all suggested groups sorted by compatibility
         const suggestedGroups = await findGroups(updatedUser); //NOTE: the interests attribute part of the returned objects won't be entirely accurate - not needed for now though
 
@@ -58,7 +58,7 @@ router.get('/user/groups/new', isAuthenticated, async (req, res) => {
                         group: { connect: { id: group.id } },
                         user: { connect: { id: req.session.userId } },
                         status: Status.PENDING,
-                        compatibilityRatio: group.compatibilityRatio
+                        compatibilityRatio: group.compatibilityRatio.toFixed(2)
                     }
                 })
             }

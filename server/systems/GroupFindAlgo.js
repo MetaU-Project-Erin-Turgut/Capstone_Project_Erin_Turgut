@@ -20,7 +20,7 @@ const findGroups = async (userData) => {
     
     //for each of the possible groups, calculate the jaccard similarity to user's interests
     for (let i = 0; i < candidateGroups.length; i++) {
-        const compatibilityRatio = calcJaccardSimilarity(candidateGroups[i], expandedUserInterests.length).toFixed(2);
+        const compatibilityRatio = calcJaccardSimilarity(candidateGroups[i], expandedUserInterests.length)
         candidateGroups[i] = {...candidateGroups[i], compatibilityRatio: compatibilityRatio}
     }
 

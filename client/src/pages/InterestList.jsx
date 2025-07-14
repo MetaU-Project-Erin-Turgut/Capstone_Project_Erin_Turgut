@@ -46,9 +46,6 @@ const InterestList = () => {
                     apiResultData.map(interest => [interest.id, interest.title])
                 );
                 setUserInterests(initialUserInterests);
-            } else {
-                alert("Could not load user interests"); // TODO: will have better visual display for this later
-                // TODO: also need to handle message for no previously selected interests
             }
         } catch (error) {
             console.log("Status ", error.status);
@@ -91,6 +88,7 @@ const InterestList = () => {
         try {
             await APIUtils.updateUserInterests(updatedInterests);
             await APIUtils.getNewGroupRecs();
+            alert("New group recs! See Groups tab"); // TODO: Will have better visual display for this later
         } catch (error) {
             console.log("Status ", error.status);
             console.log("Error: ", error.message);

@@ -1,7 +1,8 @@
 import { useState } from 'react';
-import { LiaUserTimesSolid as RejectedIcon} from "react-icons/lia";//icon for "rejected event"
-import { LiaUserCheckSolid as AcceptedIcon} from "react-icons/lia";//icon for "accepted event"
-import { LiaUserClockSolid as PendingIcon} from "react-icons/lia";//icon for "pending response"
+import { LiaUserTimesSolid as RejectedIcon} from "react-icons/lia";//icon for "rejected/ignored"
+import { LiaUserCheckSolid as AcceptedIcon} from "react-icons/lia";//icon for "accepted"
+import { LiaUserClockSolid as PendingIcon} from "react-icons/lia";//icon for "pending"
+import { FaRunning as DroppedIcon} from "react-icons/fa"; //icon for "dropped"
 import EventDetailsModal from './EventDetailsModal';
 import { Status } from "../utils/utils";
 import "../styles/Card.css";
@@ -14,7 +15,8 @@ const Event = ( {eventData, updateEvent}) => {
     const { title, description, dateTime } = eventData.event; //due to nature of prisma relational queries, event table data is in nested event property
 
     const eventDateTime = (new Date(dateTime)).toDateString();
-    const renderStatus = () => {
+    
+     const renderStatus = () => {
         switch(eventData.status) {
             case Status.ACCEPTED: 
                 return <AcceptedIcon className="status-icon"/>
@@ -22,6 +24,9 @@ const Event = ( {eventData, updateEvent}) => {
                 return <PendingIcon className="status-icon"/>
             case Status.REJECTED:
                 return <RejectedIcon className="status-icon"/>
+            case Status.DROPPED:
+                return <DroppedIcon className="status-icon"/>
+
         }
     }
 

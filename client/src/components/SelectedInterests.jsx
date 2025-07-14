@@ -8,12 +8,19 @@ const SelectedInterests = ({ initialInterests, onSubmitInterests }) => {
         <>
             <h4>Your current interests:</h4>
             <div className="selected-interests-section">
-                <Suspense fallback={<p>Loading...</p>}>
-                    {Array.from(initialInterests.entries()).map( ([key, value]) => (
-                        <SingularSelectedInterest key={key} interest={value}/>
-                    ))}
-                </Suspense>
-                <button className="submit-changes-btn" onClick={onSubmitInterests}>Submit changes</button>
+                {initialInterests.size>0?
+                    <>
+                        <Suspense fallback={<p>Loading...</p>}>
+                            {Array.from(initialInterests.entries()).map( ([key, value]) => (
+                                <SingularSelectedInterest key={key} interest={value}/>
+                            ))}
+                        </Suspense>
+                        <button className="submit-changes-btn" onClick={onSubmitInterests}>Submit changes</button>
+                    </>
+                    :
+                    <p>"You haven't selected any interests yet! Select some to get group recommendations."</p>
+                }
+                
             </div>
             
         </>
