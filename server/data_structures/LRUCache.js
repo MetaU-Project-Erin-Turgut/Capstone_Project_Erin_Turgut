@@ -9,10 +9,7 @@ class LRUCache {
     }
 
     checkIsFull() {
-        if (this.DLL.getLength() === this.MAX_CACHE_SIZE) {
-            return true
-        }
-        return false
+        return this.DLL.getLength() === this.MAX_CACHE_SIZE
     }
 
     addEntry(newKey, newValue) {
