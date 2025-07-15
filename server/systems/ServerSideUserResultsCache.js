@@ -12,16 +12,16 @@ class ServerSideCache {
         this.userSpecificCache = new LRUCache(MAX_UPPER_LEVEL_CACHE_SIZE);
     }
 
-    checkUserSpecificCache(queriedKey) {
-        return this.userSpecificCache.getEntry(queriedKey);
+    checkUserSpecificCache(queriedKey, userId) {
+        return this.userSpecificCache.getEntry(queriedKey + "-" + userId);
     }
 
     checkGlobalUserCache(queriedKey) {
         return this.globalUserCache.getEntry(queriedKey);
     }
 
-    insertUserSpecificCache(newKey, newValue) {
-        this.userSpecificCache.addEntry(newKey, newValue);
+    insertUserSpecificCache(newKey, newValue, userId) {
+        this.userSpecificCache.addEntry(newKey + "-" + userId, newValue);
     }
 
     insertGlobalUserCache(newKey, newValue) {
