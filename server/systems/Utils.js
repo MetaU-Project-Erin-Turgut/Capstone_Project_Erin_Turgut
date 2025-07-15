@@ -90,6 +90,25 @@ const filterGroupsByLocation = async (eventCoordinates, forEventSearch) => {
 
 }
 
+const getOtherGroupMembers = async (userId) => {
+    const groups = await prisma.group_User.findMany({
+        where: {userId: userId, status: Status.ACCEPTED},
+        select: { group: { include: { members: { where: { NOT: { userId: userId } }, include: {user: true}} } } },
+    })
+
+    let groupMates = new Map(); //key is user id and value is number of times they were found in one of the current user's groups
+
+    for (group of groups) {
+        //note: the nested loops below are limited by a group's max member limit so it shouldn't be a complexity concern
+        const members = filterMembersByStatus(group.group.members, Status.ACCEPTED);
+        for (member of members) {
+            groupMates.set(member.user.id, groupMates.has(member.user.id) ? groupMates.get(member.user.id) + 1 : 1)
+        }
+    }
+    
+    return groupMates;
+}
 
 
-module.exports = { Status, getUserCoordinates, getExpandedInterests, getUnionOfSets, filterMembersByStatus, filterGroupsByLocation };
+
+module.exports = { Status, getUserCoordinates, getExpandedInterests, getUnionOfSets, filterMembersByStatus, filterGroupsByLocation, getOtherGroupMembers };

@@ -6,6 +6,7 @@ const prisma = new PrismaClient()
 
 const { isAuthenticated } = require('../middleware/CheckAutheticated');
 const { ServerSideCache } = require('../systems/ServerSideUserResultsCache');
+const { getOtherGroupMembers } = require('../systems/Utils');
 
 const serverSideCache = new ServerSideCache();
 
@@ -65,6 +66,7 @@ router.get('/search/users', isAuthenticated, async (req, res) => {
 
             //---Step 5: store only users in same groups in higher level cache and sort by highest amount of shared groups---//
             // TODO: filter based on user's groups
+            const groupMatesMap = await getOtherGroupMembers(req.session.userId);
             // TODO: sort based on users with most amount of matching groups
 
             res.status(201).json(userResults)
