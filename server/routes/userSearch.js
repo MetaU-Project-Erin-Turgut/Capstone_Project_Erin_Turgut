@@ -39,10 +39,10 @@ router.get('/search/users', isAuthenticated, async (req, res) => {
             //if the users from lower level cache for this searchQuery have no relation to current user, nothing new will be stored in user-specific cache, so just return result from lower level cache
             if (closestUsers === null) {
                 res.status(201).json(lowerLevelResults);
+            } else {
+                //return these prioritzed and specialized results to the user
+                res.status(201).json(closestUsers);
             }
-
-            //return these prioritzed and specialized results to the user
-            res.status(201).json(closestUsers);
 
         //---Step 3: cache miss, so load from database---//
         } else {

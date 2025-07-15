@@ -26,6 +26,26 @@ class DoublyLinkedList {
         return newNode;
     }
 
+    moveBeginning(node) {
+
+        const tempNodeKey = node.key
+        const tempNodeValue = node.value
+
+        if (node.prev) {
+            node.prev.next = node.next
+        }
+        if (node.next) {
+            node.next.prev = node.prev
+        }
+
+        node.next = null
+        node.prev = null
+
+        this.length--;
+
+        return this.insertBeginning(tempNodeKey, tempNodeValue);
+    }
+
     //end(tail) will be considered least recent
     removeEnd() {
         let tempTail = this.tail;
