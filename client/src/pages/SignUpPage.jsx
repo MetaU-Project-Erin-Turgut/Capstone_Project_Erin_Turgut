@@ -10,7 +10,7 @@ import "../styles/SignUpPage.css"
 const SignUpPage = () => {
     const { setUser } = useUser();
 
-    const [formData, setFormData] = useState({firstName: DEFAULT_FORM_VALUE.firstName, lastName: DEFAULT_FORM_VALUE.lastName, address: DEFAULT_FORM_VALUE.address, username: DEFAULT_FORM_VALUE.username, password: DEFAULT_FORM_VALUE.password,  email: DEFAULT_FORM_VALUE.email});
+    const [formData, setFormData] = useState(DEFAULT_FORM_VALUE);
 
     const navigate = useNavigate();
 

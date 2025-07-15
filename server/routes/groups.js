@@ -9,7 +9,7 @@ const { findGroups } = require('../systems/GroupFindAlgo');
 const { updateGroupCentralLocation, updateGroupInterests, recalculateGroupCentralLocation, recalculateGroupInterests } = require('../systems/GroupUpdateMethods')
 const { Status, filterMembersByStatus, getUserCoordinates } = require('../systems/Utils');
 
-const FULL_GROUP_SIZE = 10;
+const FULL_GROUP_SIZE = 15;
 
 //get user's groups 
 router.get('/user/groups/', isAuthenticated, async (req, res) => {
