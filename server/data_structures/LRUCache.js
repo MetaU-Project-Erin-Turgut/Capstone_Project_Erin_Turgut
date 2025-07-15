@@ -23,7 +23,12 @@ class LRUCache {
     }
 
     getEntry(queriedKey) {
-        if(this.HashMap.has(queriedKey)) return this.HashMap.get(queriedKey).value;
+        if(this.HashMap.has(queriedKey)) {
+            //if already in cache, also make head of DLL because it is now the most recent query
+            //moveBeginning return new node, so replace in map as well
+            this.HashMap.set(queriedKey, this.DLL.moveBeginning(this.HashMap.get(queriedKey)))
+            return this.HashMap.get(queriedKey).value;
+        }
         return null;
     }
 
