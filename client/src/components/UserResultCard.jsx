@@ -1,12 +1,13 @@
 import { FaUserCircle } from "react-icons/fa";
 import "../styles/UserResultCard.css";
 
-const UserResultCard = ({username}) => {
+const UserResultCard = ({username, numMutualGroups}) => {
     return (
         <div className="user-card">
             {/* temporary placement for user profile picture */}
             <FaUserCircle className="user-img"/> 
-            <p>{username}</p>            
+            <p>{username}</p>
+            {numMutualGroups && <p>You guys are in {numMutualGroups} groups together</p>}            
         </div>
     )
 }

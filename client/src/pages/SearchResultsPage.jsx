@@ -52,6 +52,7 @@ const SearchResultsPage = () => {
                             return <UserResultCard 
                                 key={userObj.id}
                                 username={userObj.username}
+                                numMutualGroups={userObj.numMutualGroups}
                             />
                         })}
                     </Suspense> 

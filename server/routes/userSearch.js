@@ -33,8 +33,16 @@ router.get('/search/users', isAuthenticated, async (req, res) => {
 
         //---Step 2: check lower level cache---//
         } else if (lowerLevelResults) { //cache hit
-            // TODO: See step 5 below (move filtered lowerLevelResults data to higher level cache and return this to user)
-            res.status(201).json(lowerLevelResults); 
+            //See step 5 below (move filtered lowerLevelResults data to higher level cache and return this to user)
+            const closestUsers = await makeUserSpecificEntry(lowerLevelResults, searchQuery, req.session.userId);
+
+            //if the users from lower level cache for this searchQuery have no relation to current user, nothing new will be stored in user-specific cache, so just return result from lower level cache
+            if (closestUsers === null) {
+                res.status(201).json(lowerLevelResults);
+            }
+
+            //return these prioritzed and specialized results to the user
+            res.status(201).json(closestUsers);
 
         //---Step 3: cache miss, so load from database---//
         } else {
@@ -65,11 +73,16 @@ router.get('/search/users', isAuthenticated, async (req, res) => {
             serverSideCache.insertGlobalUserCache(searchQuery, userResults);
 
             //---Step 5: store only users in same groups in higher level cache and sort by highest amount of shared groups---//
-            // TODO: filter based on user's groups
-            const groupMatesMap = await getOtherGroupMembers(req.session.userId);
-            // TODO: sort based on users with most amount of matching groups
+            const closestUsers = await makeUserSpecificEntry(userResults, searchQuery, req.session.userId); 
 
-            res.status(201).json(userResults)
+            //if the users from lower level cache for this searchQuery have no relation to current user, nothing new will be stored in user-specific cache, so just return result from lower level cache
+            if (closestUsers === null) {
+                res.status(201).json(userResults);
+            } else {
+                //return these prioritzed and specialized results to the user
+                res.status(201).json(closestUsers);
+            }
+            
         }
 
     } catch (error) {
@@ -78,7 +91,27 @@ router.get('/search/users', isAuthenticated, async (req, res) => {
     }
 })
 
+const makeUserSpecificEntry = async (userResults, searchQuery, userId) => {
+    const groupMatesMap = await getOtherGroupMembers(userId);
 
+    //filter userResults based on ones that are in current user's groups
+    const closestUsers = []
+    for (user of userResults) {
+        if (groupMatesMap.has(user.id)) {
+            closestUsers.push({...user, numMutualGroups: groupMatesMap.get(user.id)})
+        }
+    }
+
+    if (closestUsers.length === 0) return null;
+    
+    //sort based on users with most amount of matching groups
+    closestUsers.sort((a, b) => b.numMutualGroups - a.numMutualGroups)
+
+    //store this in higher level cache
+    serverSideCache.insertUserSpecificCache(searchQuery, closestUsers, userId);
+
+    return closestUsers;
+}
 
 
 module.exports = router
