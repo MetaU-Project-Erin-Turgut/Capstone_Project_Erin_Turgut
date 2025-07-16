@@ -9,7 +9,7 @@ const SearchResultsPage = () => {
 
     const [searchQuery, setSearchQuery] = useState("");
     const [searchResults, setSearchResults] = useState([]);
-    const [notif, setNotif] = useState("User results will show up here...");
+    const [notif, setNotif] = useState("User results will show up here..."); //TODO: make notification better appearance and closer to search bar
     const [searchHasBeenClicked, setSearchHasBeenClicked] = useState(false);
     const [autocompleteSuggestions, setAutocompleteSuggestions] = useState(new Set());
     const displayedAutocompleteSuggestions = useMemo(
@@ -83,17 +83,25 @@ const SearchResultsPage = () => {
     return (
         <div id="search-page">
             <NavBar />
-            <form onSubmit={handleSearchSubmit}>
-                <input className="search-input" value={searchQuery} placeholder="Search users..." onClick={() => {if(!searchHasBeenClicked) handleSearchStart();}} onChange={handleQueryChange}/>
-                <button type="submit" className="search-btn">Search</button>
-            </form>
-            {searchHasBeenClicked &&
-                <Suspense fallback={<p>Loading...</p>}>
-                    {Array.from(displayedAutocompleteSuggestions).slice(0).reverse().map((suggestion, index) => { //need to reverse because sets/maps maintain order by insertion and we want order by recency
-                        return <p key={suggestion + index}>{suggestion}</p>
-                    })}
-                </Suspense>
-            }   
+            <div className="search-area">
+                <form onSubmit={handleSearchSubmit}>
+                    <input className="search-input" value={searchQuery} placeholder="Search users..." onClick={() => {if(!searchHasBeenClicked) handleSearchStart();}} onChange={handleQueryChange}/>
+                    <button type="submit" className="search-btn">Search</button>
+                </form>
+                {searchHasBeenClicked &&
+                    <Suspense fallback={<p>Loading...</p>}>
+                        {Array.from(displayedAutocompleteSuggestions).slice(0).reverse().map((suggestion, index) => { //need to reverse because sets/maps maintain order by insertion and we want order by recency
+                            return <div 
+                                key={suggestion + index} 
+                                className="autocomplete-recommendation">
+                                    {suggestion}
+                                </div>
+                        })}
+                    </Suspense>
+                } 
+            </div>
+            
+            <div className="user-results-list">
             {searchResults.length < 1 ? <p>{notif}</p> :
                 <div className="card-container">
                     <Suspense fallback={<p>Loading...</p>}>
@@ -107,6 +115,7 @@ const SearchResultsPage = () => {
                     </Suspense> 
                 </div>
             }
+            </div>
         </div>
     )
 }
