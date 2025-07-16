@@ -1,4 +1,4 @@
-import { useState, Suspense } from "react";
+import { useState, Suspense, useMemo, useEffect } from "react";
 import NavBar from "../components/NavBar"
 import UserResultCard from "../components/UserResultCard";
 import APIUtils from "../utils/APIUtils";
@@ -11,8 +11,39 @@ const SearchResultsPage = () => {
     const [searchResults, setSearchResults] = useState([]);
     const [notif, setNotif] = useState("User results will show up here...");
     const [searchHasBeenClicked, setSearchHasBeenClicked] = useState(false);
+    const [autocompleteSuggestions, setAutocompleteSuggestions] = useState(new Set());
+    const displayedAutocompleteSuggestions = useMemo(
+        () => {
+            if (searchQuery === "") {
+                return autocompleteSuggestions;
+            } else { 
+                const filteredSuggestions = autocompleteSuggestions.filter((suggestion) => {
+                    return suggestion.startsWith(searchQuery)
+                })
+                return filteredSuggestions
+            }
+            
+        },
+        [autocompleteSuggestions, searchQuery]
+    );
+
+    useEffect(() => {
+        fetchAutocompleteSuggestions();
+    }, []);
+
+    const fetchAutocompleteSuggestions = async () => {
+        try {
+            //get suggested searches for autocomplete/typeahead
+            const apiResultData = await APIUtils.userSearchTypeAhead();
+            setAutocompleteSuggestions(apiResultData);
+        } catch (error) {
+            console.log("Status ", error.status);
+            console.log("Error: ", error.message);
+        }
+    }
 
     const handleQueryChange = (event) => {
+        if (!searchHasBeenClicked && searchQuery === "") setNotif("");
         setSearchQuery(event.target.value)
     }
 
@@ -23,6 +54,7 @@ const SearchResultsPage = () => {
             setNotif("You haven't searched for anything!")
         } else {
             setNotif("")
+            setAutocompleteSuggestions(prev => [searchQuery, ...prev])
             try {
                 //get user object results from backend
                 const apiResultData = await APIUtils.userSearch(searchQuery);
@@ -41,13 +73,7 @@ const SearchResultsPage = () => {
 
     const handleSearchStart = async () => {
         setSearchHasBeenClicked(true);
-        try {
-            //get user object results from backend
-            const apiResultData = await APIUtils.userSearchTypeAhead();
-        } catch (error) {
-            console.log("Status ", error.status);
-            console.log("Error: ", error.message);
-        }
+        setNotif("");
     }
     
     return (
@@ -57,6 +83,13 @@ const SearchResultsPage = () => {
                 <input className="search-input" value={searchQuery} placeholder="Search users..." onClick={() => {if(!searchHasBeenClicked) handleSearchStart();}} onChange={handleQueryChange}/>
                 <button type="submit" className="search-btn">Search</button>
             </form>
+            {searchHasBeenClicked &&
+                <Suspense fallback={<p>Loading...</p>}>
+                    {displayedAutocompleteSuggestions.map((suggestion) => {
+                        return <p>{suggestion}</p>
+                    })}
+                </Suspense>
+            }   
             {searchResults.length < 1 ? <p>{notif}</p> :
                 <div className="card-container">
                     <Suspense fallback={<p>Loading...</p>}>
