@@ -17,7 +17,7 @@ const SearchResultsPage = () => {
             if (searchQuery === "") {
                 return autocompleteSuggestions;
             } else { 
-                const filteredSuggestions = autocompleteSuggestions.filter((suggestion) => {
+                const filteredSuggestions = Array.from(autocompleteSuggestions).filter((suggestion) => {
                     return suggestion.startsWith(searchQuery)
                 })
                 return filteredSuggestions
@@ -35,7 +35,7 @@ const SearchResultsPage = () => {
         try {
             //get suggested searches for autocomplete/typeahead
             const apiResultData = await APIUtils.userSearchTypeAhead();
-            setAutocompleteSuggestions(apiResultData);
+            setAutocompleteSuggestions(new Set(apiResultData));
         } catch (error) {
             console.log("Status ", error.status);
             console.log("Error: ", error.message);
@@ -50,11 +50,15 @@ const SearchResultsPage = () => {
     const handleSearchSubmit = async (event) => {
         event.preventDefault();
         setSearchResults([]);
+        if (autocompleteSuggestions.has(searchQuery)) {
+            setAutocompleteSuggestions(autocompleteSuggestions.delete(searchQuery))
+        }
         if (searchQuery === "") {
             setNotif("You haven't searched for anything!")
         } else {
             setNotif("")
-            setAutocompleteSuggestions(prev => [searchQuery, ...prev])
+            const prevSetAsArr = new Set(autocompleteSuggestions)
+            setAutocompleteSuggestions(new Set([...prevSetAsArr, searchQuery]))
             try {
                 //get user object results from backend
                 const apiResultData = await APIUtils.userSearch(searchQuery);
@@ -85,8 +89,8 @@ const SearchResultsPage = () => {
             </form>
             {searchHasBeenClicked &&
                 <Suspense fallback={<p>Loading...</p>}>
-                    {displayedAutocompleteSuggestions.map((suggestion) => {
-                        return <p>{suggestion}</p>
+                    {Array.from(displayedAutocompleteSuggestions).slice(0).reverse().map((suggestion, index) => { //need to reverse because sets/maps maintain order by insertion and we want order by recency
+                        return <p key={suggestion + index}>{suggestion}</p>
                     })}
                 </Suspense>
             }   

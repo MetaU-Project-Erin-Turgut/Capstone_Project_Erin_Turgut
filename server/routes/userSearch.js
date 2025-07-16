@@ -13,10 +13,9 @@ const serverSideCache = new ServerSideCache();
 
 router.get('/search/users/typeahead', isAuthenticated, async (req, res) => {
     const allUserSpecificSearches = serverSideCache.getUserSpecificCacheByUserId(req.session.userId);
-    let recentAndLikelyQueries = [];
-    for (let i = allUserSpecificSearches.length - 1; i >= 0; i--) { //in js maps, recent additions are appended to the end, so need to return a reversed array
-        recentAndLikelyQueries.push(allUserSpecificSearches.at(i).at(0).slice(1))
-    }
+    const recentAndLikelyQueries = allUserSpecificSearches.map((searchEntry) => {
+        return searchEntry.at(0).slice(1);
+    })
     res.status(201).json(recentAndLikelyQueries);
 })
 
