@@ -1,12 +1,39 @@
+.search-page {
+    position: relative;
+}
+
+.search-area {
+    justify-self: center;
+    width: 30vw;
+    position: absolute;
+    z-index: 10;
+}
+
 .search-input {
     border-width: 2px;
     border-radius: 20px;
     padding: 10px;
     min-width: 300px;
-    margin: 30px 0px;
+    margin-top: 30px;
 }
 
 .search-btn {
     height: 40px;
     border-radius: 20px;
+}
+
+.autocomplete-recommendation {
+    padding: 5px;
+    background-color: rgb(209, 207, 207);
+    margin: 2px 2px 2px 30px;
+    text-align: left;
+    border-width: 2px;
+    border-radius: 20px;
+    max-width: 300px;
+    position: static;
+}
+
+.user-results-list {
+    top: 200px;
+    position: absolute;
 }
