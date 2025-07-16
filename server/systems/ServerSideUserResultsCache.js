@@ -13,7 +13,7 @@ class ServerSideCache {
     }
 
     checkUserSpecificCache(queriedKey, userId) {
-        return this.userSpecificCache.getEntry(queriedKey + "-" + userId);
+        return this.userSpecificCache.getEntry(userId + queriedKey);
     }
 
     checkGlobalUserCache(queriedKey) {
@@ -21,11 +21,18 @@ class ServerSideCache {
     }
 
     insertUserSpecificCache(newKey, newValue, userId) {
-        this.userSpecificCache.addEntry(newKey + "-" + userId, newValue);
+        this.userSpecificCache.addEntry(userId + newKey, newValue);
     }
 
     insertGlobalUserCache(newKey, newValue) {
         this.globalUserCache.addEntry(newKey, newValue);
+    }
+
+    getUserSpecificCacheByUserId(userId) {
+        const userSpecificEntries = Array.from(this.userSpecificCache.HashMap.entries()).filter((entry) => {
+            return entry[0].toString().charAt(0) == userId;
+        })
+        return userSpecificEntries;
     }
 
     //for debugging
