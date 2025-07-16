@@ -222,4 +222,20 @@ export default class APIUtils {
         }
 
     }
+
+    static userSearchTypeAhead = async () => {
+        const response = await fetch('http://localhost:3000/search/users/typeahead', {
+            method: "GET",
+            headers: { "Content-Type": "application/json" },
+            credentials: "include",
+        });
+
+        const data = await response.json();
+
+        if (response.ok) {
+            return data;
+        } else {
+            throw {status: response.status, message: data.error};
+        }
+    }
 }

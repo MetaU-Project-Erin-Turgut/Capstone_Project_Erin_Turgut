@@ -9,7 +9,8 @@ const SearchResultsPage = () => {
 
     const [searchQuery, setSearchQuery] = useState("");
     const [searchResults, setSearchResults] = useState([]);
-    const [notif, setNotif] = useState("User results will show up here...")
+    const [notif, setNotif] = useState("User results will show up here...");
+    const [searchHasBeenClicked, setSearchHasBeenClicked] = useState(false);
 
     const handleQueryChange = (event) => {
         setSearchQuery(event.target.value)
@@ -37,12 +38,23 @@ const SearchResultsPage = () => {
         }
         
     }
+
+    const handleSearchStart = async () => {
+        setSearchHasBeenClicked(true);
+        try {
+            //get user object results from backend
+            const apiResultData = await APIUtils.userSearchTypeAhead();
+        } catch (error) {
+            console.log("Status ", error.status);
+            console.log("Error: ", error.message);
+        }
+    }
     
     return (
         <div id="search-page">
             <NavBar />
             <form onSubmit={handleSearchSubmit}>
-                <input className="search-input" value={searchQuery} placeholder="Search users..." onChange={handleQueryChange}/>
+                <input className="search-input" value={searchQuery} placeholder="Search users..." onClick={() => {if(!searchHasBeenClicked) handleSearchStart();}} onChange={handleQueryChange}/>
                 <button type="submit" className="search-btn">Search</button>
             </form>
             {searchResults.length < 1 ? <p>{notif}</p> :

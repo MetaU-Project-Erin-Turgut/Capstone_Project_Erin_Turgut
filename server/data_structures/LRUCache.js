@@ -26,7 +26,10 @@ class LRUCache {
         if(this.HashMap.has(queriedKey)) {
             //if already in cache, also make head of DLL because it is now the most recent query
             //moveBeginning return new node, so replace in map as well
-            this.HashMap.set(queriedKey, this.DLL.moveBeginning(this.HashMap.get(queriedKey)))
+
+            const currValue = this.HashMap.get(queriedKey)
+            this.HashMap.delete(queriedKey); //need to delete before setting again so that order of recent queries is not only maintained in DLL but also the Map
+            this.HashMap.set(queriedKey, this.DLL.moveBeginning(currValue))
             return this.HashMap.get(queriedKey).value;
         }
         return null;

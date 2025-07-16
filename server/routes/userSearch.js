@@ -10,6 +10,15 @@ const { getOtherGroupMembers } = require('../systems/Utils');
 
 const serverSideCache = new ServerSideCache();
 
+
+router.get('/search/users/typeahead', isAuthenticated, async (req, res) => {
+    const allUserSpecificSearches = serverSideCache.getUserSpecificCacheByUserId(req.session.userId);
+    const recentAndLikelyQueries = allUserSpecificSearches.map((searchEntry) => {
+        return searchEntry.at(0).slice(1);
+    })
+    res.status(201).json(recentAndLikelyQueries);
+})
+
 //user search endpoint
 router.get('/search/users', isAuthenticated, async (req, res) => {
 
@@ -102,7 +111,11 @@ const makeUserSpecificEntry = async (userResults, searchQuery, userId) => {
         }
     }
 
-    if (closestUsers.length === 0) return null;
+    if (closestUsers.length === 0) {
+        //no value to insert into user-specific cache, but need to store the searchQuery-userId key so that we know this search was made
+        serverSideCache.insertUserSpecificCache(searchQuery, null, userId) 
+        return null;
+    }
     
     //sort based on users with most amount of matching groups
     closestUsers.sort((a, b) => b.numMutualGroups - a.numMutualGroups)
