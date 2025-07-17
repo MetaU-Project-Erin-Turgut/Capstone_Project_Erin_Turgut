@@ -1,14 +1,17 @@
 import { useState, Suspense, useMemo, useEffect, useRef } from "react";
 import NavBar from "../components/NavBar"
 import UserResultCard from "../components/UserResultCard";
+import FilterDropDown from "../components/FilterDropDown";
 import APIUtils from "../utils/APIUtils";
 import "../styles/SearchResultsPage.css"
 import "../styles/CardListContainer.css"
 
 const SearchResultsPage = () => {
 
+    let searchIsReset = false; //set to true when search is triggered - NOT when load more is triggered
     const [searchQuery, setSearchQuery] = useState("");
     const [searchResults, setSearchResults] = useState([]);
+    const [interestIdFilter, setInterestIdFilter] = useState(-1); //interest id used for filtering user resukts by ones that have this selected interest
     const [notif, setNotif] = useState("User results will show up here..."); //TODO: make notification better appearance and closer to search bar
     const [isDisplayedAutocompleteSuggestions, setIsDisplayedAutocompleteSuggestions] = useState(false);
     const [autocompleteSuggestions, setAutocompleteSuggestions] = useState(new Set());
@@ -28,6 +31,16 @@ const SearchResultsPage = () => {
         },
         [autocompleteSuggestions, searchQuery]
     );
+    const displayedSearchResults = useMemo(
+        () => {
+            if (interestIdFilter === -1) return searchResults;
+            const filteredSearchResults = searchResults.filter((user)  => 
+                user.interests.includes(interestIdFilter)
+            )
+            return filteredSearchResults;
+        },
+        [searchResults, interestIdFilter]
+    )
 
     useEffect(() => {
         fetchAutocompleteSuggestions();
@@ -80,13 +93,18 @@ const SearchResultsPage = () => {
                 if (apiResultData.results.length === 0) {
                     setNotif("No results found!")
                 } else {
-                    //handling duplicate data:
-                    const currentResultsIds = new Set(searchResults.map((currResult) => currResult.id));
-                    const filteredNewResults = apiResultData.results.filter((newResult) => {
-                        return !currentResultsIds.has(newResult.id) //having created a set makes this operation O(1)
-                    })
-                    setSearchResults([...searchResults, ...filteredNewResults]);
+                    if (searchIsReset) {
+                        setSearchResults(apiResultData.results);
+                    } else {
+                        //handling duplicate data:
+                        const currentResultsIds = new Set(searchResults.map((currResult) => currResult.id));
+                        const filteredNewResults = apiResultData.results.filter((newResult) => {
+                            return !currentResultsIds.has(newResult.id) //having created a set makes this operation O(1)
+                        })
+                        setSearchResults([...searchResults, ...filteredNewResults]);
+                    }  
                 }
+                searchIsReset = false;
             } catch (error) {
                 console.log("Status ", error.status);
                 console.log("Error: ", error.message);
@@ -100,10 +118,11 @@ const SearchResultsPage = () => {
         <div id="search-page">
             <NavBar />
             <div className="search-area">
+                <FilterDropDown onFilterChange={(filter) => {setInterestIdFilter(parseInt(filter))}}/>
                 <form onSubmit={(event) => {
                         event.preventDefault();
+                        searchIsReset = true;
                         pageMarker.current = 'HL0';
-                        setSearchResults([]);
                         handleSearchSubmit();
                     }}>
                     <input className="search-input" value={searchQuery} placeholder="Search users..." onFocus={() => setIsDisplayedAutocompleteSuggestions(true)} onBlur={(event) => setIsDisplayedAutocompleteSuggestions(false)} onChange={handleQueryChange}/>
@@ -118,7 +137,7 @@ const SearchResultsPage = () => {
                                     onMouseDown={() => { //used onMouseDown to activate before onBlur
                                         setSearchQuery(suggestion);
                                         pageMarker.current = 'HL0';
-                                        setSearchResults([]);
+                                        searchIsReset = true;
                                         handleSearchSubmit(suggestion);
                                     }}
                                 >
@@ -133,7 +152,7 @@ const SearchResultsPage = () => {
                 {searchResults.length < 1 ? <p className="notif-para">{notif}</p> :
                     <div className="card-container">
                         <Suspense fallback={<p>Loading...</p>}>
-                            {searchResults.map((userObj) => {
+                            {displayedSearchResults.map((userObj) => {
                                 return <UserResultCard 
                                     key={userObj.id}
                                     username={userObj.username}

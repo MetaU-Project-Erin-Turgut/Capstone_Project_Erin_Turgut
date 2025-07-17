@@ -46,29 +46,8 @@ router.get('/search/users', isAuthenticated, async (req, res) => {
 
         //---Step 2: check lower level cache---//
         } else if (lowerLevelResults) { //cache hit
-            if (pageMarker.startsWith('L')) {
-                if ((lowerLevelResults.length > pageIndex) && (lowerLevelResults.length > pageIndex + NUM_RESULTS_PER_CALL)) { //ensure index increment is still within array size
-                    res.status(201).json({ results: lowerLevelResults.slice(pageIndex, pageIndex + NUM_RESULTS_PER_CALL), newPageMarker: `LL${pageIndex + NUM_RESULTS_PER_CALL}` });
-                } else {
-                    res.status(201).json({ results: lowerLevelResults.slice(pageIndex), newPageMarker: 'END' }); //send back end of list notification 
-                }
-
-            } else {
-                //See step 5 below (move filtered lowerLevelResults data to higher level cache and return this to user)
-                const closestUsers = await makeUserSpecificEntry(lowerLevelResults, searchQuery, req.session.userId);
-
-                //if the users from lower level cache for this searchQuery have no relation to current user, nothing new will be stored in user-specific cache, so just return result from lower level cache
-                if (closestUsers === null) {
-                    if (lowerLevelResults.length > NUM_RESULTS_PER_CALL) {
-                        res.status(201).json({ results: lowerLevelResults.slice(0, NUM_RESULTS_PER_CALL), newPageMarker: `LL${NUM_RESULTS_PER_CALL}` }); 
-                    } else {
-                        res.status(201).json({ results: lowerLevelResults, newPageMarker: 'END' });
-                    }
-                } else {
-                    //return these prioritzed and specialized results to the user
-                    res.status(201).json({ results: closestUsers, newPageMarker: 'LL0' }); //send back LL0
-                }
-            }
+            const returnedLowerLevelData = await getLowerLevelData(lowerLevelResults, req.session.userId, searchQuery, pageMarker, pageIndex);
+            res.status(201).json(returnedLowerLevelData);
 
         //---Step 3: cache miss, so load from database---//
         } else {
@@ -92,36 +71,22 @@ router.get('/search/users', isAuthenticated, async (req, res) => {
                         }
                     )
                 },
-                select: { username: true, id: true }
+                select: { username: true, id: true, interests: { select: { id: true } } }
             })
+
+            //make sure interests are stored as just an array of interest ids - not an array of objects like {id: 1}. This will make filtering on frontend easier later
+            for (let i = 0; i < userResults.length; i++) {
+                const refactoredInterestList = userResults[i].interests.map((interest) => {
+                    return interest.id
+                })
+                userResults[i].interests = refactoredInterestList;
+            }
 
             //---Step 4: store in lower level cache---//
             serverSideCache.insertGlobalUserCache(searchQuery, userResults);
 
-            // TODO: combine below with above similar structure
-            if (pageMarker.startsWith('L')) {
-                if ((userResults.length > pageIndex) && (userResults.length > pageIndex + NUM_RESULTS_PER_CALL)) {
-                    res.status(201).json({ results: userResults.slice(pageIndex, pageIndex + NUM_RESULTS_PER_CALL), newPageMarker: `LL${pageIndex + NUM_RESULTS_PER_CALL}` }); 
-                } else {
-                    res.status(201).json({ results: userResults.slice(pageIndex), newPageMarker: 'END' }); //send back end of list
-                }
-            } else {
-                //---Step 5: store only users in same groups in higher level cache and sort by highest amount of shared groups---//
-                const closestUsers = await makeUserSpecificEntry(userResults, searchQuery, req.session.userId);
-
-                //if the users from lower level cache for this searchQuery have no relation to current user, nothing new will be stored in user-specific cache, so just return result from lower level cache
-                if (closestUsers === null) {
-                    if (userResults.length > NUM_RESULTS_PER_CALL) {
-                        res.status(201).json({ results: userResults.slice(0, NUM_RESULTS_PER_CALL), newPageMarker: `LL${NUM_RESULTS_PER_CALL}` }); 
-                    } else {
-                        res.status(201).json({ results: userResults, newPageMarker: 'END' });
-                    }
-                } else {
-                    //return these prioritzed and specialized results to the user
-                    res.status(201).json({ results: closestUsers, newPageMarker: 'LL0' }); //send back LL0
-                }
-            }
-            
+            const returnedLowerLevelData = await getLowerLevelData(userResults, req.session.userId, searchQuery, pageMarker, pageIndex);
+            res.status(201).json(returnedLowerLevelData);
 
         }
 
@@ -131,6 +96,35 @@ router.get('/search/users', isAuthenticated, async (req, res) => {
     }
 })
 
+/*This function gets next section of data from lower cache if page marker starts with 'L'.
+If starts with 'H', it triggers makeUserSpecificEntry to get filtered data into HL cache and returns that if exists (else, just returns lower level cache first set of items)*/
+const getLowerLevelData = async (lowerLevelResults, userId, searchQuery, pageMarker, pageIndex) => {
+    if (pageMarker.startsWith('L')) {
+        if ((lowerLevelResults.length > pageIndex) && (lowerLevelResults.length > pageIndex + NUM_RESULTS_PER_CALL)) { //ensure index increment is still within array size
+            return { results: lowerLevelResults.slice(pageIndex, pageIndex + NUM_RESULTS_PER_CALL), newPageMarker: `LL${pageIndex + NUM_RESULTS_PER_CALL}` };
+        } else {
+            return { results: lowerLevelResults.slice(pageIndex), newPageMarker: 'END' }; //send back end of list notification 
+        }
+
+    } else {
+        //See below (move filtered lowerLevelResults data to higher level cache and return this to user)
+        const closestUsers = await makeUserSpecificEntry(lowerLevelResults, searchQuery, userId);
+
+        //if the users from lower level cache for this searchQuery have no relation to current user, nothing new will be stored in user-specific cache, so just return result from lower level cache
+        if (closestUsers === null) {
+            if (lowerLevelResults.length > NUM_RESULTS_PER_CALL) {
+                return { results: lowerLevelResults.slice(0, NUM_RESULTS_PER_CALL), newPageMarker: `LL${NUM_RESULTS_PER_CALL}` };
+            } else {
+                return { results: lowerLevelResults, newPageMarker: 'END' };
+            }
+        } else {
+            //return these prioritzed and specialized results to the user
+            return { results: closestUsers, newPageMarker: 'LL0' }; //send back LL0
+        }
+    }
+}
+
+//This function filters and stores users from lower level cache results that are in a group with current user into the higher level cache
 const makeUserSpecificEntry = async (userResults, searchQuery, userId) => {
     const groupMatesMap = await getOtherGroupMembers(userId);
 
