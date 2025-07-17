@@ -13,7 +13,7 @@ const SearchResultsPage = () => {
     const [isDisplayedAutocompleteSuggestions, setIsDisplayedAutocompleteSuggestions] = useState(false);
     const [autocompleteSuggestions, setAutocompleteSuggestions] = useState(new Set());
     const [isLoadMoreHidden, setIsLoadMoreHidden] = useState(false);
-    const pageMarker = useRef('HL0');
+    const pageMarker = useRef('HL0'); //'HL' means higher level cache. 'LL' means lower level cache. the number at the end of the pageMarker is the index
     const displayedAutocompleteSuggestions = useMemo(
         () => {
             if (searchQuery === "") {
@@ -80,7 +80,12 @@ const SearchResultsPage = () => {
                 if (apiResultData.results.length === 0) {
                     setNotif("No results found!")
                 } else {
-                    setSearchResults([...searchResults, ...apiResultData.results]);
+                    //handling duplicate data:
+                    const currentResultsIds = new Set(searchResults.map((currResult) => currResult.id));
+                    const filteredNewResults = apiResultData.results.filter((newResult) => {
+                        return !currentResultsIds.has(newResult.id) //having created a set makes this operation O(1)
+                    })
+                    setSearchResults([...searchResults, ...filteredNewResults]);
                 }
             } catch (error) {
                 console.log("Status ", error.status);
@@ -125,7 +130,7 @@ const SearchResultsPage = () => {
             </div>
             
             <div className="user-results-list">
-                {searchResults.length < 1 ? <p>{notif}</p> :
+                {searchResults.length < 1 ? <p className="notif-para">{notif}</p> :
                     <div className="card-container">
                         <Suspense fallback={<p>Loading...</p>}>
                             {searchResults.map((userObj) => {
@@ -138,7 +143,7 @@ const SearchResultsPage = () => {
                         </Suspense> 
                     </div>
                 }
-                {!isLoadMoreHidden && <button onClick={handleSearchSubmit}>Load More</button>}
+                {!isLoadMoreHidden && <button className="load-more-btn" onClick={handleSearchSubmit}>Load More</button>}
             </div>
         </div>
     )
