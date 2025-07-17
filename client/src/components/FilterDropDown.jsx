@@ -1,27 +1,7 @@
-import { useState, useEffect, Suspense } from "react";
-import APIUtils from "../utils/APIUtils";
+import { Suspense } from "react";
 import "../styles/FilterDropDown.css";
 
-const FilterDropDown = ({ onFilterChange }) => {
-
-    const [userInterests, setUserInterests] = useState([]);
-
-    useEffect(() => {
-        fetchUserInterests();
-    }, [])
-
-    const fetchUserInterests = async () => {
-        try {
-            const apiResultData = await APIUtils.fetchUserInterests();
-            if (apiResultData.length >= 1) {
-                setUserInterests(apiResultData);
-            }
-        } catch (error) {
-            console.log("Status ", error.status);
-            console.log("Error: ", error.message);
-        }
-    }
-
+const FilterDropDown = ({ onFilterChange, userInterests }) => {
     const handleSelect = (event) => {
         onFilterChange(event.target.value)
     }
@@ -33,10 +13,9 @@ const FilterDropDown = ({ onFilterChange }) => {
                 <option disabled value="">Select interest...</option>
                 <option value={-1}>None</option>
                 <Suspense fallback={<p>Loading...</p>}>
-                    {userInterests.map((interest) => {
-                        return <option key={interest.id} value={interest.id}>{interest.title}</option>
+                    {Array.from(userInterests.entries()).map(([key, value]) => {
+                        return <option key={key} value={value.id}>{value.title} {value.tally}</option>
                     })}
-                
                 </Suspense>
             </select>
         </div>
