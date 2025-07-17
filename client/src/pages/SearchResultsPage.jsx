@@ -1,4 +1,4 @@
-import { useState, Suspense, useMemo, useEffect } from "react";
+import { useState, Suspense, useMemo, useEffect, useRef } from "react";
 import NavBar from "../components/NavBar"
 import UserResultCard from "../components/UserResultCard";
 import APIUtils from "../utils/APIUtils";
@@ -12,6 +12,8 @@ const SearchResultsPage = () => {
     const [notif, setNotif] = useState("User results will show up here..."); //TODO: make notification better appearance and closer to search bar
     const [isDisplayedAutocompleteSuggestions, setIsDisplayedAutocompleteSuggestions] = useState(false);
     const [autocompleteSuggestions, setAutocompleteSuggestions] = useState(new Set());
+    const [isLoadMoreHidden, setIsLoadMoreHidden] = useState(false);
+    const pageMarker = useRef('HL0');
     const displayedAutocompleteSuggestions = useMemo(
         () => {
             if (searchQuery === "") {
@@ -51,14 +53,13 @@ const SearchResultsPage = () => {
         if (searchQuery === "" && suggestion === undefined) { //suggestion is defined if a search query occurred by clicking on an autocomplete suggestion
             setNotif("You haven't searched for anything!")
         } else {
-            setSearchResults([]);
             if (autocompleteSuggestions.has(searchQuery)) {
                 setAutocompleteSuggestions(autocompleteSuggestions.delete(searchQuery)) //will move to make more recent, but delete first to avoid duplicates
             }
             setNotif("")
             //append new query to set of autocomplete suggestions - will be reversed on render to show as the most recent
             const prevSetAsArr = new Set(autocompleteSuggestions)
-            if (suggestion) {
+            if (searchQuery === "") {
                 setAutocompleteSuggestions(new Set([...prevSetAsArr, suggestion]))
             } else {
                 setAutocompleteSuggestions(new Set([...prevSetAsArr, searchQuery]))
@@ -66,16 +67,20 @@ const SearchResultsPage = () => {
                 
             try {
                 //get user object results from backend
-                let apiResultData = []
-                if (suggestion) {
-                    apiResultData = await APIUtils.userSearch(suggestion);
+                let apiResultData = {}
+                if (searchQuery === "") {
+                    apiResultData = await APIUtils.userSearch(suggestion, pageMarker.current);
                 } else {
-                    apiResultData = await APIUtils.userSearch(searchQuery);
+                    apiResultData = await APIUtils.userSearch(searchQuery, pageMarker.current);
                 }
-                if (apiResultData.length === 0) {
+                setIsLoadMoreHidden(apiResultData.newPageMarker === 'END');
+                
+                pageMarker.current = apiResultData.newPageMarker;
+
+                if (apiResultData.results.length === 0) {
                     setNotif("No results found!")
                 } else {
-                    setSearchResults(apiResultData);
+                    setSearchResults([...searchResults, ...apiResultData.results]);
                 }
             } catch (error) {
                 console.log("Status ", error.status);
@@ -92,6 +97,8 @@ const SearchResultsPage = () => {
             <div className="search-area">
                 <form onSubmit={(event) => {
                         event.preventDefault();
+                        pageMarker.current = 'HL0';
+                        setSearchResults([]);
                         handleSearchSubmit();
                     }}>
                     <input className="search-input" value={searchQuery} placeholder="Search users..." onFocus={() => setIsDisplayedAutocompleteSuggestions(true)} onBlur={(event) => setIsDisplayedAutocompleteSuggestions(false)} onChange={handleQueryChange}/>
@@ -105,6 +112,8 @@ const SearchResultsPage = () => {
                                     key={suggestion + index} 
                                     onMouseDown={() => { //used onMouseDown to activate before onBlur
                                         setSearchQuery(suggestion);
+                                        pageMarker.current = 'HL0';
+                                        setSearchResults([]);
                                         handleSearchSubmit(suggestion);
                                     }}
                                 >
@@ -116,19 +125,20 @@ const SearchResultsPage = () => {
             </div>
             
             <div className="user-results-list">
-            {searchResults.length < 1 ? <p>{notif}</p> :
-                <div className="card-container">
-                    <Suspense fallback={<p>Loading...</p>}>
-                        {searchResults.map((userObj) => {
-                            return <UserResultCard 
-                                key={userObj.id}
-                                username={userObj.username}
-                                numMutualGroups={userObj.numMutualGroups}
-                            />
-                        })}
-                    </Suspense> 
-                </div>
-            }
+                {searchResults.length < 1 ? <p>{notif}</p> :
+                    <div className="card-container">
+                        <Suspense fallback={<p>Loading...</p>}>
+                            {searchResults.map((userObj) => {
+                                return <UserResultCard 
+                                    key={userObj.id}
+                                    username={userObj.username}
+                                    numMutualGroups={userObj.numMutualGroups}
+                                />
+                            })}
+                        </Suspense> 
+                    </div>
+                }
+                {!isLoadMoreHidden && <button onClick={handleSearchSubmit}>Load More</button>}
             </div>
         </div>
     )

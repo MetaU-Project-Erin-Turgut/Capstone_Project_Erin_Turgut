@@ -206,8 +206,8 @@ export default class APIUtils {
         }
     }
 
-    static userSearch = async (searchQuery) => {
-        const response = await fetch(`http://localhost:3000/search/users/?searchQuery=${searchQuery}`, {
+    static userSearch = async (searchQuery, pageMarker) => {
+        const response = await fetch(`http://localhost:3000/search/users/?searchQuery=${searchQuery}&pageMarker=${pageMarker}`, {
             method: "GET",
             headers: { "Content-Type": "application/json" },
             credentials: "include",
