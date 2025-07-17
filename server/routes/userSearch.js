@@ -92,9 +92,15 @@ router.get('/search/users', isAuthenticated, async (req, res) => {
                         }
                     )
                 },
-                select: { username: true, id: true }
+                select: { username: true, id: true, interests: { select: { id: true } } }
             })
 
+            for(let i = 0; i < userResults.length; i++) {
+                const refactoredInterestList = userResults[i].interests.map((interest) => {
+                    return interest.id
+                })
+                userResults[i].interests = refactoredInterestList;
+            }
             //---Step 4: store in lower level cache---//
             serverSideCache.insertGlobalUserCache(searchQuery, userResults);
 
