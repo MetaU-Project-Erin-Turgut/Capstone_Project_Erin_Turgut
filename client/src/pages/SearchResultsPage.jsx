@@ -83,67 +83,17 @@ const SearchResultsPage = () => {
         if (searchQuery === "" && suggestion === undefined) { //suggestion is defined if a search query occurred by clicking on an autocomplete suggestion
             setNotif("You haven't searched for anything!")
         } else {
-            if (autocompleteSuggestions.has(searchQuery)) {
-                setAutocompleteSuggestions(autocompleteSuggestions.delete(searchQuery)) //will move to make more recent, but delete first to avoid duplicates
-            }
-            setNotif("")
-            //append new query to set of autocomplete suggestions - will be reversed on render to show as the most recent
-            const prevSetAsArr = new Set(autocompleteSuggestions)
-            if (searchQuery === "") {
-                setAutocompleteSuggestions(new Set([...prevSetAsArr, suggestion]))
-            } else {
-                setAutocompleteSuggestions(new Set([...prevSetAsArr, searchQuery]))
-            }
-
+            //new search happened, so add it to top of typeahead suggestions
+            addNewAutocompleteSuggestion(suggestion);
+            
             try {
-                //get user object results from backend
-                let apiResultData = {}
-                let objUserInterests = {}
-                if(searchIsReset) { //if it's a new search and not just load more, then send user's selected interests to the backend.
-                    objUserInterests = {
-                        userInterests: Array.from(userInterestMap.keys())
-                    }
-                } else {
-                    objUserInterests = {
-                        userInterests: []
-                    }
-                }
-
-                if (searchQuery === "") {
-                    apiResultData = await APIUtils.userSearch(suggestion, pageMarker.current, objUserInterests);
-                } else {
-                    apiResultData = await APIUtils.userSearch(searchQuery, pageMarker.current, objUserInterests);
-                }
                 
-                setIsLoadMoreHidden(apiResultData.newPageMarker === 'END');
+                const apiResultData = await searchAPICall(suggestion);
 
-                pageMarker.current = apiResultData.newPageMarker;
-
-                //update userInterest map with tallies from backend
-                if (apiResultData.userInterestMap) {
-                    let updatedUserInterestMap = new Map()
-                    for (let i = 0; i < apiResultData.userInterestMap.length; i++) {
-                        updatedUserInterestMap.set(apiResultData.userInterestMap[i][0], {...userInterestMap.get(apiResultData.userInterestMap[i][0]), tally: apiResultData.userInterestMap[i][1]})
-                    }
+                handleSearchAPICallResponse(apiResultData)
                 
-                    setUserInterestMap(updatedUserInterestMap);
-                }
-
-                if (apiResultData.results.length === 0) {
-                    setNotif("No results found!")
-                } else {
-                    if (searchIsReset) {
-                        setSearchResults(apiResultData.results);
-                    } else {
-                        //handling duplicate data:
-                        const currentResultsIds = new Set(searchResults.map((currResult) => currResult.id));
-                        const filteredNewResults = apiResultData.results.filter((newResult) => {
-                            return !currentResultsIds.has(newResult.id) //having created a set makes this operation O(1)
-                        })
-                        setSearchResults([...searchResults, ...filteredNewResults]);
-                    }
-                }
                 searchIsReset = false;
+                
             } catch (error) {
                 console.log("Status ", error.status);
                 console.log("Error: ", error.message);
@@ -151,6 +101,68 @@ const SearchResultsPage = () => {
         }
 
     }
+
+    //---The below 4 functions are helper methods for handleSearchSubmit---//
+    const addNewAutocompleteSuggestion = (suggestion) => {
+        if (autocompleteSuggestions.has(searchQuery)) {
+            setAutocompleteSuggestions(autocompleteSuggestions.delete(searchQuery)) //will move to make more recent, but delete first to avoid duplicates
+        }
+        setNotif("")
+        //append new query to set of autocomplete suggestions - will be reversed on render to show as the most recent
+        const prevSetAsArr = new Set(autocompleteSuggestions)
+        if (searchQuery === "") {
+            setAutocompleteSuggestions(new Set([...prevSetAsArr, suggestion]))
+        } else {
+            setAutocompleteSuggestions(new Set([...prevSetAsArr, searchQuery]))
+        }
+    }
+
+    const searchAPICall = async (suggestion) => {
+        //if it's a new search and not just load more, then send user's selected interests to the backend.
+        const objUserInterests = searchIsReset ? { userInterests: Array.from(userInterestMap.keys()) } : { userInterests: [] }
+
+        if (searchQuery === "") { //meaning user just hit an autocomplete suggestion
+            return await APIUtils.userSearch(suggestion, pageMarker.current, objUserInterests);
+        }
+
+        return await APIUtils.userSearch(searchQuery, pageMarker.current, objUserInterests);
+    }
+
+    const handleSearchAPICallResponse = (apiResultData) => {
+        setIsLoadMoreHidden(apiResultData.newPageMarker === 'END');
+
+        pageMarker.current = apiResultData.newPageMarker;
+
+        //update userInterest map with tallies from backend
+        if (apiResultData.userInterestMap) {
+            let updatedUserInterestMap = new Map()
+            for (let i = 0; i < apiResultData.userInterestMap.length; i++) {
+                updatedUserInterestMap.set(apiResultData.userInterestMap[i][0], {...userInterestMap.get(apiResultData.userInterestMap[i][0]), tally: apiResultData.userInterestMap[i][1]})
+            }
+                
+            setUserInterestMap(updatedUserInterestMap);
+        }
+
+        if (apiResultData.results.length === 0) {
+            setNotif("No results found!")
+        } else {
+            if (searchIsReset) {
+                setSearchResults(apiResultData.results);
+            } else {
+                //handling duplicate data:
+                filterOutDuplicates(apiResultData);
+            }
+        }
+    }
+
+    const filterOutDuplicates = (apiResultData) => {
+        const currentResultsIds = new Set(searchResults.map((currResult) => currResult.id));
+        const filteredNewResults = apiResultData.results.filter((newResult) => {
+            return !currentResultsIds.has(newResult.id) //having created a set makes this operation O(1)
+        })
+        setSearchResults([...searchResults, ...filteredNewResults]);
+    }
+
 
 
     return (
