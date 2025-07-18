@@ -21,7 +21,8 @@
     "express-rate-limit": "^7.5.1",
     "express-session": "^1.18.1",
     "geokdbush": "^2.0.1",
-    "kdbush": "^4.0.2"
+    "kdbush": "^4.0.2",
+    "opencage-api-client": "^2.0.0"
   },
   "devDependencies": {
     "prisma": "^6.10.1"

@@ -9,7 +9,7 @@ const FilterOptions = ( {onFilterChange}) => {
     return <div className="filter-form">
         {
             Object.values(Status).map((status) => (
-                <button key={status} value={status} onClick={handleFilterClick}>{status}</button>
+                <button className="filter-btn" key={status} value={status} onClick={handleFilterClick}>{status}</button>
             ))
         }
     </div>

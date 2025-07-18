@@ -6,6 +6,8 @@ const prisma = new PrismaClient()
 const router = express.Router()
 const rateLimit = require("express-rate-limit");
 
+const opencage = require('opencage-api-client'); //public api
+
 const loginLimiter = rateLimit({
     windowMs: 15 * 60 * 1000, // 15 minutes
     max: 5, // Limit each IP to 5 login attempts per windowMs
@@ -19,8 +21,8 @@ router.post('/signup', async (req, res) => {
     const { address, username, email, password, firstName, lastName } = req.body;
 
     try {
-        if (!username || !email || !password || !firstName || !lastName) {
-            return res.status(400).json({ error: "First name, last name, username, email, and password are required." });
+        if (!username || !email || !password || !firstName || !lastName || !address) {
+            return res.status(400).json({ error: "First name, last name, address, username, email, and password are required." });
         }
 
         if (password.length < 8) {
@@ -45,12 +47,36 @@ router.post('/signup', async (req, res) => {
             return res.status(400).json({ error: "Account already created with this email" })
         }
 
+        let userCoords = {latitude: null,longitude: null}
+
+        /*****Forward geocoding of provided address - the following code has been implemented and modified based on the
+        example implementation from api documentation: https://opencagedata.com/tutorials/geocode-in-nodejs ***********/
+        await opencage
+        .geocode({ q: address })
+        .then((data) => {
+            if (data.status.code === 200 && data.results.length > 0) {
+                const place = data.results[0];
+                userCoords.latitude = place.geometry.lat;
+                userCoords.longitude = place.geometry.lng;
+            } else {
+                console.log('Status', data.status.message);
+                console.log('total_results', data.total_results);
+            }
+        })
+        .catch((error) => {
+            console.log('Error', error.message);
+            if (error.status.code === 402) {
+                console.log('Request limit reached');
+            }
+        });
+        /************************************* end of code from third-party api documentation *********************************/
+
         // Hash the password before storing it
         const hashedPassword = await bcrypt.hash(password, saltRounds)
 
         // Create a new user in the database
         //for mock data, have all users start out with location at meta's headquarters
-        const queryResult = await prisma.$queryRaw`INSERT INTO "User" (address, username, email, password, coord) VALUES(${address}, ${username}, ${email}, ${hashedPassword}, ST_SetSRID(ST_MakePoint(${-122.1500}, ${37.485949}), 4326)::geography) RETURNING id, address, username, email, password, ST_AsText(coord);`;
+        const queryResult = await prisma.$queryRaw`INSERT INTO "User" (address, username, email, password, coord) VALUES(${address}, ${username}, ${email}, ${hashedPassword}, ST_SetSRID(ST_MakePoint(${userCoords.longitude}, ${userCoords.latitude}), 4326)::geography) RETURNING id, address, username, email, password, ST_AsText(coord);`;
 
         const newUser = queryResult.at(0);
         // Store user ID and username in the session, allowing them to remain authenticated as they navigate the website
