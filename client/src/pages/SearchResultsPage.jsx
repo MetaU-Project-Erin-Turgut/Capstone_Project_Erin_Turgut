@@ -7,11 +7,8 @@ import "../styles/SearchResultsPage.css"
 import "../styles/CardListContainer.css"
 
 const SearchResultsPage = () => {
-
-    //create interest to users inverted index. as results come in put into relative interest
-
     let searchIsReset = false; //set to true when search is triggered - NOT when load more is triggered
-    const [userInterestMap, setUserInterestMap] = useState(new Map());
+    const [userInterestMap, setUserInterestMap] = useState(new Map()); //map of user interest selected ids (keys) to the interest object. tallies for each will be loaded on backend
     const [searchQuery, setSearchQuery] = useState("");
     const [searchResults, setSearchResults] = useState([]);
     const [interestIdFilter, setInterestIdFilter] = useState(-1); //interest id used for filtering user resukts by ones that have this selected interest
@@ -101,9 +98,15 @@ const SearchResultsPage = () => {
             try {
                 //get user object results from backend
                 let apiResultData = {}
-
-                const objUserInterests = {
-                    userInterests: Array.from(userInterestMap.keys())
+                let objUserInterests = {}
+                if(searchIsReset) { //if it's a new search and not just load more
+                    objUserInterests = {
+                        userInterests: Array.from(userInterestMap.keys())
+                    }
+                } else {
+                    objUserInterests = {
+                        userInterests: []
+                    }
                 }
                 if (searchQuery === "") {
                     apiResultData = await APIUtils.userSearch(suggestion, pageMarker.current, objUserInterests);
@@ -114,6 +117,7 @@ const SearchResultsPage = () => {
 
                 pageMarker.current = apiResultData.newPageMarker;
 
+                //update userInterest map with tallies from backend
                 if (apiResultData.userInterestMap) {
                     let updatedUserInterestMap = new Map()
                     for (let i = 0; i < apiResultData.userInterestMap.length; i++) {

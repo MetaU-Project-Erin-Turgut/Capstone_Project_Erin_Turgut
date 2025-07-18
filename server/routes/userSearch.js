@@ -26,9 +26,12 @@ router.post('/search/users', isAuthenticated, async (req, res) => {
     const { searchQuery, pageMarker } = req.query;
     const { userInterests } = req.body;
 
+    //Need tallies when initial search query happens (even if query data is already in cache)
     const userInterestMap = new Map();
-    for (userInterestId of userInterests) {
-        userInterestMap.set(userInterestId, 0);
+    if (userInterests.length > 0) {
+        for (userInterestId of userInterests) {
+            userInterestMap.set(userInterestId, 0);
+        }
     }
    
     const pageIndex = parseInt(pageMarker.charAt(2));
@@ -48,11 +51,34 @@ router.post('/search/users', isAuthenticated, async (req, res) => {
 
         //---Step 1: check higher level cache---//
         if (pageMarker === 'HL0' && highLevelResults) { //cache hit
-            res.status(201).json({ results: highLevelResults, newPageMarker: 'LL0' });
+
+            if (userInterests.length > 0) {
+                for (let i = 0; i < lowerLevelResults.length; i++) {
+                    //for all interests for each user, if it is one of the keys in user interest inverted index, add to tally
+                    for (interest of lowerLevelResults[i].interests) {
+                        if (userInterestMap.has(interest)) {
+                            userInterestMap.set(interest, userInterestMap.get(interest) + 1)
+                        }
+                    }
+                }
+            }
+           
+            res.status(201).json({ results: highLevelResults, newPageMarker: 'LL0' , userInterestMap: userInterests.length > 0 ? [...userInterestMap.entries()] : null});
 
         //---Step 2: check lower level cache---//
         } else if (lowerLevelResults) { //cache hit
-            const returnedLowerLevelData = await getLowerLevelData(lowerLevelResults, req.session.userId, searchQuery, pageMarker, pageIndex);
+            if (userInterests.length > 0) {
+                for (let i = 0; i < lowerLevelResults.length; i++) {
+                    //for all interests for each user, if it is one of the keys in user interest inverted index, add to tally
+                    for (interest of lowerLevelResults[i].interests) {
+                        if (userInterestMap.has(interest)) {
+                            userInterestMap.set(interest, userInterestMap.get(interest) + 1)
+                        }
+                    }
+                }
+            }
+
+            const returnedLowerLevelData = await getLowerLevelData(lowerLevelResults, req.session.userId, searchQuery, pageMarker, pageIndex, (userInterests.length > 0 ? userInterestMap : null));
             res.status(201).json(returnedLowerLevelData);
 
         //---Step 3: cache miss, so load from database---//
@@ -96,7 +122,7 @@ router.post('/search/users', isAuthenticated, async (req, res) => {
             //---Step 4: store in lower level cache---//
             serverSideCache.insertGlobalUserCache(searchQuery, userResults);
 
-            const returnedLowerLevelData = await getLowerLevelData(userResults, req.session.userId, searchQuery, pageMarker, pageIndex, userInterestMap);
+            const returnedLowerLevelData = await getLowerLevelData(userResults, req.session.userId, searchQuery, pageMarker, pageIndex, (userInterests.length > 0 ? userInterestMap : null));
             res.status(201).json(returnedLowerLevelData);
 
         }
@@ -110,7 +136,7 @@ router.post('/search/users', isAuthenticated, async (req, res) => {
 /*This function gets next section of data from lower cache if page marker starts with 'L'.
 If starts with 'H', it triggers makeUserSpecificEntry to get filtered data into HL cache and returns that if exists (else, just returns lower level cache first set of items)*/
 const getLowerLevelData = async (lowerLevelResults, userId, searchQuery, pageMarker, pageIndex, userInterestMap) => {
-    const sentUserInterestMap = (userInterestMap == undefined)? null : [...userInterestMap.entries()]
+    const sentUserInterestMap = (userInterestMap == undefined || userInterestMap == null)? null : [...userInterestMap.entries()]
     if (pageMarker.startsWith('L')) {
         if ((lowerLevelResults.length > pageIndex) && (lowerLevelResults.length > pageIndex + NUM_RESULTS_PER_CALL)) { //ensure index increment is still within array size
             return { results: lowerLevelResults.slice(pageIndex, pageIndex + NUM_RESULTS_PER_CALL), newPageMarker: `LL${pageIndex + NUM_RESULTS_PER_CALL}`, userInterestMap: sentUserInterestMap};
