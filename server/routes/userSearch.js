@@ -12,6 +12,7 @@ const serverSideCache = new ServerSideCache();
 
 const NUM_RESULTS_PER_CALL = 5; //TODO: change to higher number after testing
 
+//endpoint for getting typeahead suggestions given the current user in session
 router.get('/search/users/typeahead', isAuthenticated, async (req, res) => {
     const allUserSpecificSearches = serverSideCache.getUserSpecificCacheByUserId(req.session.userId);
     const recentAndLikelyQueries = allUserSpecificSearches.map((searchEntry) => {
@@ -26,15 +27,17 @@ router.post('/search/users', isAuthenticated, async (req, res) => {
     const { searchQuery, pageMarker } = req.query;
     const { userInterests } = req.body;
 
-    //Need tallies when initial search query happens (even if query data is already in cache)
-    const userInterestMap = new Map();
+    //Need tallies for each of userInterests when initial search query happens (even if query data is already in cache)
+    const userInterestMap = new Map(); //use Map for improved checking later on
+
+    //NOTE: if this endpoint was triggered because of a 'load more', no userInterests will be passed indicating tallies don't need to be calculated again
     if (userInterests.length > 0) {
         for (userInterestId of userInterests) {
             userInterestMap.set(userInterestId, 0);
         }
     }
    
-    const pageIndex = parseInt(pageMarker.charAt(2));
+    const pageIndex = parseInt(pageMarker.charAt(2));//index in cache value where user left off
 
     /*note: usernames should be one word, so if the search query had a space, that means the user is searching for a first and last name. If there is a second keyword, search by matching
         first AND last name, else just search for first word match with either username, firstname, or lastname */
@@ -51,31 +54,20 @@ router.post('/search/users', isAuthenticated, async (req, res) => {
 
         //---Step 1: check higher level cache---//
         if (pageMarker === 'HL0' && highLevelResults) { //cache hit
-
+            
+            //NOTE: if this endpoint was triggered because of a 'load more', no userInterests will be passed indicating tallies don't need to be calculated again
             if (userInterests.length > 0) {
-                for (let i = 0; i < lowerLevelResults.length; i++) {
-                    //for all interests for each user, if it is one of the keys in user interest inverted index, add to tally
-                    for (interest of lowerLevelResults[i].interests) {
-                        if (userInterestMap.has(interest)) {
-                            userInterestMap.set(interest, userInterestMap.get(interest) + 1)
-                        }
-                    }
-                }
+                getTallies(lowerLevelResults, userInterestMap);
             }
            
             res.status(201).json({ results: highLevelResults, newPageMarker: 'LL0' , userInterestMap: userInterests.length > 0 ? [...userInterestMap.entries()] : null});
 
         //---Step 2: check lower level cache---//
         } else if (lowerLevelResults) { //cache hit
+
+            //NOTE: if this endpoint was triggered because of a 'load more', no userInterests will be passed indicating tallies don't need to be calculated again
             if (userInterests.length > 0) {
-                for (let i = 0; i < lowerLevelResults.length; i++) {
-                    //for all interests for each user, if it is one of the keys in user interest inverted index, add to tally
-                    for (interest of lowerLevelResults[i].interests) {
-                        if (userInterestMap.has(interest)) {
-                            userInterestMap.set(interest, userInterestMap.get(interest) + 1)
-                        }
-                    }
-                }
+                getTallies(lowerLevelResults, userInterestMap);
             }
 
             const returnedLowerLevelData = await getLowerLevelData(lowerLevelResults, req.session.userId, searchQuery, pageMarker, pageIndex, (userInterests.length > 0 ? userInterestMap : null));
@@ -107,6 +99,7 @@ router.post('/search/users', isAuthenticated, async (req, res) => {
             })
 
             //make sure interests are stored as just an array of interest ids - not an array of objects like {id: 1}. This will make filtering on frontend easier later
+            //this for loop structure also combines the logic needed to get the tallies for user interests
             for (let i = 0; i < userResults.length; i++) {
                 //for all interests for each user, if it is one of the keys in user interest inverted index, add to tally
                 let refactoredInterestList = [];
@@ -132,6 +125,19 @@ router.post('/search/users', isAuthenticated, async (req, res) => {
         res.status(500).json({ error: "Something went wrong while searching for users." })
     }
 })
+
+/*This function goes through all results for a search query in the lower level cache and gets tallies for each of the current user's selected interests of 
+the number of users that have that interest*/
+const getTallies = (lowerLevelResults, userInterestMap) => {
+    for (let i = 0; i < lowerLevelResults.length; i++) {
+        //for all interests for each user, if it is one of the keys in user interest inverted index, add to tally
+        for (interest of lowerLevelResults[i].interests) {
+            if (userInterestMap.has(interest)) {
+                userInterestMap.set(interest, userInterestMap.get(interest) + 1)
+            }
+        }
+    }
+}
 
 /*This function gets next section of data from lower cache if page marker starts with 'L'.
 If starts with 'H', it triggers makeUserSpecificEntry to get filtered data into HL cache and returns that if exists (else, just returns lower level cache first set of items)*/

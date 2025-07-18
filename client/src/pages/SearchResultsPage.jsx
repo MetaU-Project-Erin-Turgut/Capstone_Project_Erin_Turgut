@@ -99,7 +99,7 @@ const SearchResultsPage = () => {
                 //get user object results from backend
                 let apiResultData = {}
                 let objUserInterests = {}
-                if(searchIsReset) { //if it's a new search and not just load more
+                if(searchIsReset) { //if it's a new search and not just load more, then send user's selected interests to the backend.
                     objUserInterests = {
                         userInterests: Array.from(userInterestMap.keys())
                     }
@@ -108,11 +108,13 @@ const SearchResultsPage = () => {
                         userInterests: []
                     }
                 }
+
                 if (searchQuery === "") {
                     apiResultData = await APIUtils.userSearch(suggestion, pageMarker.current, objUserInterests);
                 } else {
                     apiResultData = await APIUtils.userSearch(searchQuery, pageMarker.current, objUserInterests);
                 }
+                
                 setIsLoadMoreHidden(apiResultData.newPageMarker === 'END');
 
                 pageMarker.current = apiResultData.newPageMarker;
