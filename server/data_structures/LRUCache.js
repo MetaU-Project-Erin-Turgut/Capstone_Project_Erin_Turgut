@@ -12,14 +12,14 @@ class LRUCache {
         return this.DLL.getLength() === this.MAX_CACHE_SIZE
     }
 
-    addEntry(newKey, newValue) {
+    addEntry(newKey, newValue, ttl) {
         if(this.checkIsFull()) {
             const removedNode = this.DLL.removeEnd(); //if full remove least recently used node
             this.HashMap.delete(removedNode.key);
         }
 
         const addedNode = this.DLL.insertBeginning(newKey, newValue); //insert at beginning because most recently used
-        this.HashMap.set(addedNode.key, addedNode)
+        this.HashMap.set(addedNode.key, {results: addedNode, ttl: ttl})
     }
 
     getEntry(queriedKey) {
@@ -27,12 +27,18 @@ class LRUCache {
             //if already in cache, also make head of DLL because it is now the most recent query
             //moveBeginning return new node, so replace in map as well
 
-            const currValue = this.HashMap.get(queriedKey)
+            const currResults = this.HashMap.get(queriedKey).results;
+            const currTTL = this.HashMap.get(queriedKey).ttl;
             this.HashMap.delete(queriedKey); //need to delete before setting again so that order of recent queries is not only maintained in DLL but also the Map
-            this.HashMap.set(queriedKey, this.DLL.moveBeginning(currValue))
-            return this.HashMap.get(queriedKey).value;
+            this.HashMap.set(queriedKey, {results: this.DLL.moveBeginning(currResults), ttl: currTTL})
+            return this.HashMap.get(queriedKey);
         }
         return null;
+    }
+
+    deleteBeginning(queriedKey) {
+        this.DLL.deleteBeginning(this.HashMap.get(queriedKey).results)
+        this.HashMap.delete(queriedKey);
     }
 
     //for debugging

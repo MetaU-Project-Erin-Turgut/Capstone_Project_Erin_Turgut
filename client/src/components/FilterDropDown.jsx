@@ -14,7 +14,7 @@ const FilterDropDown = ({ onFilterChange, userInterests }) => {
                 <option value={-1}>None</option>
                 <Suspense fallback={<p>Loading...</p>}>
                     {Array.from(userInterests.entries()).map(([key, value]) => {
-                        return <option key={key} value={value.id}>{value.title} {value.tally}</option>
+                        return <option key={key} value={value.id}>{value.title} ({value.tally})</option>
                     })}
                 </Suspense>
             </select>

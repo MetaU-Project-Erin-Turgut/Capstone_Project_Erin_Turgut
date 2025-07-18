@@ -16,7 +16,7 @@ const NUM_RESULTS_PER_CALL = 5; //TODO: change to higher number after testing
 router.get('/search/users/typeahead', isAuthenticated, async (req, res) => {
     const allUserSpecificSearches = serverSideCache.getUserSpecificCacheByUserId(req.session.userId);
     const recentAndLikelyQueries = allUserSpecificSearches.map((searchEntry) => {
-        return searchEntry.at(0).slice(1);
+        return searchEntry.at(0).slice(1); //get search query from key
     })
     res.status(201).json(recentAndLikelyQueries);
 })
@@ -59,7 +59,6 @@ router.post('/search/users', isAuthenticated, async (req, res) => {
             if (userInterests.length > 0) {
                 getTallies(lowerLevelResults, userInterestMap);
             }
-           
             res.status(201).json({ results: highLevelResults, newPageMarker: 'LL0' , userInterestMap: userInterests.length > 0 ? [...userInterestMap.entries()] : null});
 
         //---Step 2: check lower level cache---//

@@ -46,6 +46,17 @@ class DoublyLinkedList {
         return this.insertBeginning(tempNodeKey, tempNodeValue);
     }
 
+    deleteBeginning() {
+        if (this.length === 1) {
+            this.head = null;
+            this.tail = null;
+        } else {
+            this.head = this.head.prev;
+            this.head.next = null;
+        }
+        this.length--;
+    }
+
     //end(tail) will be considered least recent
     removeEnd() {
         let tempTail = this.tail;
