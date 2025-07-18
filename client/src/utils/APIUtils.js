@@ -206,11 +206,12 @@ export default class APIUtils {
         }
     }
 
-    static userSearch = async (searchQuery, pageMarker) => {
+    static userSearch = async (searchQuery, pageMarker, userInterests) => {
         const response = await fetch(`http://localhost:3000/search/users/?searchQuery=${searchQuery}&pageMarker=${pageMarker}`, {
-            method: "GET",
+            method: "POST",
             headers: { "Content-Type": "application/json" },
             credentials: "include",
+            body: JSON.stringify(userInterests),
         });
 
         const data = await response.json();

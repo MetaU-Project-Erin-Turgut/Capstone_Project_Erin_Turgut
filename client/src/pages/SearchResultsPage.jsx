@@ -7,8 +7,8 @@ import "../styles/SearchResultsPage.css"
 import "../styles/CardListContainer.css"
 
 const SearchResultsPage = () => {
-
     let searchIsReset = false; //set to true when search is triggered - NOT when load more is triggered
+    const [userInterestMap, setUserInterestMap] = useState(new Map()); //map of user interest selected ids (keys) to the interest object. tallies for each will be loaded on backend
     const [searchQuery, setSearchQuery] = useState("");
     const [searchResults, setSearchResults] = useState([]);
     const [interestIdFilter, setInterestIdFilter] = useState(-1); //interest id used for filtering user resukts by ones that have this selected interest
@@ -21,20 +21,20 @@ const SearchResultsPage = () => {
         () => {
             if (searchQuery === "") {
                 return autocompleteSuggestions;
-            } else { 
+            } else {
                 const filteredSuggestions = Array.from(autocompleteSuggestions).filter((suggestion) => {
                     return suggestion.startsWith(searchQuery)
                 })
                 return filteredSuggestions
             }
-            
+
         },
         [autocompleteSuggestions, searchQuery]
     );
     const displayedSearchResults = useMemo(
         () => {
             if (interestIdFilter === -1) return searchResults;
-            const filteredSearchResults = searchResults.filter((user)  => 
+            const filteredSearchResults = searchResults.filter((user) =>
                 user.interests.includes(interestIdFilter)
             )
             return filteredSearchResults;
@@ -44,7 +44,24 @@ const SearchResultsPage = () => {
 
     useEffect(() => {
         fetchAutocompleteSuggestions();
+        fetchUserInterests();
     }, []);
+
+    const fetchUserInterests = async () => {
+        try {
+            const apiResultData = await APIUtils.fetchUserInterests();
+            let tempMap = new Map();
+            if (apiResultData.length >= 1) {
+                for (let i = 0; i < apiResultData.length; i++) {
+                    tempMap.set(apiResultData[i].id, apiResultData[i]);
+                }
+            }
+            setUserInterestMap(tempMap);
+        } catch (error) {
+            console.log("Status ", error.status);
+            console.log("Error: ", error.message);
+        }
+    }
 
     const fetchAutocompleteSuggestions = async () => {
         try {
@@ -77,18 +94,40 @@ const SearchResultsPage = () => {
             } else {
                 setAutocompleteSuggestions(new Set([...prevSetAsArr, searchQuery]))
             }
-                
+
             try {
                 //get user object results from backend
                 let apiResultData = {}
-                if (searchQuery === "") {
-                    apiResultData = await APIUtils.userSearch(suggestion, pageMarker.current);
+                let objUserInterests = {}
+                if(searchIsReset) { //if it's a new search and not just load more, then send user's selected interests to the backend.
+                    objUserInterests = {
+                        userInterests: Array.from(userInterestMap.keys())
+                    }
                 } else {
-                    apiResultData = await APIUtils.userSearch(searchQuery, pageMarker.current);
+                    objUserInterests = {
+                        userInterests: []
+                    }
                 }
-                setIsLoadMoreHidden(apiResultData.newPageMarker === 'END');
+
+                if (searchQuery === "") {
+                    apiResultData = await APIUtils.userSearch(suggestion, pageMarker.current, objUserInterests);
+                } else {
+                    apiResultData = await APIUtils.userSearch(searchQuery, pageMarker.current, objUserInterests);
+                }
                 
+                setIsLoadMoreHidden(apiResultData.newPageMarker === 'END');
+
                 pageMarker.current = apiResultData.newPageMarker;
+
+                //update userInterest map with tallies from backend
+                if (apiResultData.userInterestMap) {
+                    let updatedUserInterestMap = new Map()
+                    for (let i = 0; i < apiResultData.userInterestMap.length; i++) {
+                        updatedUserInterestMap.set(apiResultData.userInterestMap[i][0], {...userInterestMap.get(apiResultData.userInterestMap[i][0]), tally: apiResultData.userInterestMap[i][1]})
+                    }
+                
+                    setUserInterestMap(updatedUserInterestMap);
+                }
 
                 if (apiResultData.results.length === 0) {
                     setNotif("No results found!")
@@ -102,7 +141,7 @@ const SearchResultsPage = () => {
                             return !currentResultsIds.has(newResult.id) //having created a set makes this operation O(1)
                         })
                         setSearchResults([...searchResults, ...filteredNewResults]);
-                    }  
+                    }
                 }
                 searchIsReset = false;
             } catch (error) {
@@ -110,56 +149,56 @@ const SearchResultsPage = () => {
                 console.log("Error: ", error.message);
             }
         }
-        
+
     }
 
-   
+
     return (
         <div id="search-page">
             <NavBar />
             <div className="search-area">
-                <FilterDropDown onFilterChange={(filter) => {setInterestIdFilter(parseInt(filter))}}/>
+                <FilterDropDown onFilterChange={(filter) => { setInterestIdFilter(parseInt(filter)) }} userInterests={userInterestMap}/>
                 <form onSubmit={(event) => {
-                        event.preventDefault();
-                        searchIsReset = true;
-                        pageMarker.current = 'HL0';
-                        handleSearchSubmit();
-                    }}>
-                    <input className="search-input" value={searchQuery} placeholder="Search users..." onFocus={() => setIsDisplayedAutocompleteSuggestions(true)} onBlur={(event) => setIsDisplayedAutocompleteSuggestions(false)} onChange={handleQueryChange}/>
+                    event.preventDefault();
+                    searchIsReset = true;
+                    pageMarker.current = 'HL0';
+                    handleSearchSubmit();
+                }}>
+                    <input className="search-input" value={searchQuery} placeholder="Search users..." onFocus={() => setIsDisplayedAutocompleteSuggestions(true)} onBlur={(event) => setIsDisplayedAutocompleteSuggestions(false)} onChange={handleQueryChange} />
                     <button type="submit" className="search-btn">Search</button>
                 </form>
                 {isDisplayedAutocompleteSuggestions &&
                     <Suspense fallback={<p>Loading...</p>}>
                         {Array.from(displayedAutocompleteSuggestions).slice(0).reverse().slice(0, 5).map((suggestion, index) => { //need to reverse because sets/maps maintain order by insertion and we want order by recency
-                            return <div 
-                                    className="autocomplete-recommendation"
-                                    key={suggestion + index} 
-                                    onMouseDown={() => { //used onMouseDown to activate before onBlur
-                                        setSearchQuery(suggestion);
-                                        pageMarker.current = 'HL0';
-                                        searchIsReset = true;
-                                        handleSearchSubmit(suggestion);
-                                    }}
-                                >
-                                    {suggestion}
-                                </div>
+                            return <div
+                                className="autocomplete-recommendation"
+                                key={suggestion + index}
+                                onMouseDown={() => { //used onMouseDown to activate before onBlur
+                                    setSearchQuery(suggestion);
+                                    pageMarker.current = 'HL0';
+                                    searchIsReset = true;
+                                    handleSearchSubmit(suggestion);
+                                }}
+                            >
+                                {suggestion}
+                            </div>
                         })}
                     </Suspense>
-                } 
+                }
             </div>
-            
+
             <div className="user-results-list">
                 {searchResults.length < 1 ? <p className="notif-para">{notif}</p> :
                     <div className="card-container">
                         <Suspense fallback={<p>Loading...</p>}>
                             {displayedSearchResults.map((userObj) => {
-                                return <UserResultCard 
+                                return <UserResultCard
                                     key={userObj.id}
                                     username={userObj.username}
                                     numMutualGroups={userObj.numMutualGroups}
                                 />
                             })}
-                        </Suspense> 
+                        </Suspense>
                     </div>
                 }
                 {!isLoadMoreHidden && <button className="load-more-btn" onClick={handleSearchSubmit}>Load More</button>}
