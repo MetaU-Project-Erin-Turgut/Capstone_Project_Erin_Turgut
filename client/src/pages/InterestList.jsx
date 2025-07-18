@@ -13,9 +13,14 @@ const InterestList = () => {
     let initialUserInterests = null; //current solution to userInterests state not being set before fetchRootInterests - better solution?
 
     useEffect(() => {
-        fetchUserInterests();
-        fetchRootInterests();
+        fetchOnMountData();
     }, []);
+
+    //method that calls fetching functions needed to get immediate data when user opens the interests page
+    const fetchOnMountData = async () => {
+        await fetchUserInterests();
+        await fetchRootInterests();
+    }
 
     const fetchRootInterests = async () => {
         try {
