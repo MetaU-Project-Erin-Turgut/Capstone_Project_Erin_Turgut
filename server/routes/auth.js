@@ -49,7 +49,7 @@ router.post('/signup', async (req, res) => {
 
         let userCoords = {latitude: null,longitude: null}
 
-        /*****Forward geocoding of provided address - the following code has been implmented and modified based on the
+        /*****Forward geocoding of provided address - the following code has been implemented and modified based on the
         example implementation from api documentation: https://opencagedata.com/tutorials/geocode-in-nodejs ***********/
         await opencage
         .geocode({ q: address })
