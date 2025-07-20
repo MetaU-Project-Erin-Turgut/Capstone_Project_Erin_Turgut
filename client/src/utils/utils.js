@@ -24,5 +24,24 @@ const DEFAULT_FORM_VALUE = {
     email: ""
 }
 
+//enums for all possible card data options
+const CardFields = Object.freeze({
+    TITLE: "title",
+    DESCRIPTION: "desc",
+    STATUS: "status",
+    COMPATIBILITY: "compatibility",
+    DATEANDTIME: "dateAndTime"
+});
 
-export { Tab, Status, DEFAULT_FORM_VALUE };
+//enums for all possible modal data options
+const ModalFields = Object.freeze({
+    TITLE: "title",
+    DESCRIPTION: "desc",
+    INTERESTS: "interests",
+    PEOPLE: "people",
+    ATTENDEES: "attendees",
+    INTEREST: "interest"
+});
+
+
+export { Tab, Status, DEFAULT_FORM_VALUE, CardFields, ModalFields };

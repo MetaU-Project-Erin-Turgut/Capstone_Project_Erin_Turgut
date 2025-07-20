@@ -1,35 +1,30 @@
-import { useState } from 'react';
-import EventDetailsModal from './EventDetailsModal';
-import StatusIcon from './StatusIcon';
+import Card from "./Card";
+import { CardFields, ModalFields } from "../utils/utils"
+import APIUtils from '../utils/APIUtils';
 import "../styles/Card.css";
 
-const Event = ( {eventData, updateEvent}) => {
+const Event = ( {eventData, onUpdateEvent}) => {
+    const { id } = eventData.event;
 
-    const [isEventDetailsModalVisible, setIsEventDetailsModalVisible] = useState(false);
-
-    const { title, description, dateTime } = eventData.event; //due to nature of prisma relational queries, event table data is in nested event property
-
-    const eventDateTime = (new Date(dateTime)).toDateString();
-
-    const openModal = () => {
-        setIsEventDetailsModalVisible(true)
-    }
-    const closeModal = () => {
-        setIsEventDetailsModalVisible(false);
+    const updateEvent = async(statusState) => {
+        //put request to change status of event
+        try {
+            const apiResultData = await APIUtils.updateEventStatus(id, statusState);
+            onUpdateEvent({...eventData, status: apiResultData.status});
+        } catch (error) {
+            console.log("Status ", error.status);
+            console.log("Error: ", error.message);
+        }
     }
     
     return (
-        <>
-        <div className="card" onClick={openModal}>
-            <section className="card-header">
-                <StatusIcon status={eventData.status}/>
-                <h4 className="title">{title}</h4>
-            </section>
-            <p>{description}</p>
-            <p>{eventDateTime}</p> 
-        </div>
-        {isEventDetailsModalVisible && <EventDetailsModal onModalClose={closeModal} eventData={eventData} onStatusChange={(newEventObj) => {updateEvent(newEventObj)}}/>}
-        </>
+        <Card 
+            cardData={eventData.event} 
+            status={eventData.status} 
+            fields={new Set([CardFields.TITLE, CardFields.DESCRIPTION, CardFields.DATEANDTIME, CardFields.STATUS])}
+            modalFields={new Set([ModalFields.TITLE, ModalFields.DESCRIPTION, ModalFields.INTEREST, ModalFields.ATTENDEES])}  
+            onUpdate={updateEvent}
+        />
     )
 }
 

@@ -47,7 +47,7 @@ const GroupsList = () => {
                     <Group 
                         key={value.id}
                         groupData={value}
-                        updateGroup = {(newGroupObj, isGroupErased, groupId) => {
+                        onUpdateGroup = {(newGroupObj, isGroupErased, groupId) => {
                             const updatedGroups = new Map(groups);
                             if (isGroupErased) { //when no members remain, group is erased from DB, so delete from state
                                 updatedGroups.delete(groupId);
