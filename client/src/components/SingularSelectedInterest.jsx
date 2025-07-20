@@ -1,7 +1,7 @@
-import "../styles/SingularSelectedInterest.css";
+import "../styles/Tile.css";
 const SingularSelectedInterest = ({interest}) => {
     return (
-        <div className="selected-interest">
+        <div className="tile">
             <p>{interest}</p>
         </div>
     )
