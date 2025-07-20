@@ -1,6 +1,8 @@
 .card {
     box-shadow: 0px 10px 10px rgb(114, 112, 112);  
     max-height: 400px;
+    min-width: 220px;
+    padding: 8px;
 }
 
 .card-header {

@@ -4,6 +4,7 @@ import { LiaUserCheckSolid as AcceptedIcon} from "react-icons/lia";//icon for "a
 import { LiaUserClockSolid as PendingIcon} from "react-icons/lia";//icon for "pending"
 import { FaRunning as DroppedIcon} from "react-icons/fa"; //icon for "dropped"
 import GroupDetailsModal from './GroupDetailsModal';
+import CompatibilityDisplay from './CompatibilityDisplay';
 import { Status } from "../utils/utils";
 import "../styles/Card.css";
 
@@ -42,12 +43,7 @@ const Group = ( {groupData, updateGroup}) => {
                 <h4 className="title">{title}</h4>
             </section>
             <p>{description}</p>
-            {(groupData.status === Status.PENDING) &&
-                <section className="compatibility-display">
-                    <h5>Compatibility Ratio: </h5>
-                    <p>{Math.round(compatibilityRatio * 100)}%</p>
-                </section>
-            }
+            {(groupData.status === Status.PENDING) && <CompatibilityDisplay compatibilityRatio={compatibilityRatio}/>}
         </div>
         {isGroupDetailsModalVisible && <GroupDetailsModal onModalClose={closeModal} groupData={groupData} onStatusChange={(newGroupObj, isGroupDeleted, groupId) => {updateGroup(newGroupObj, isGroupDeleted, groupId)}}/>}
         </>

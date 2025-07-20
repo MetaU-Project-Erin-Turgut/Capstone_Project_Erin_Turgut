@@ -1,0 +1,29 @@
+.compatibility-display {
+    display: flex;
+    flex-direction: row;
+    align-items: center;
+    background-color: black;
+    border-radius: 30px;
+    padding: 5px;
+}
+
+.compatibility-meter {
+    width: 70px;
+    height: 70px;
+    background-color: transparent;
+    border-radius: 50%;
+    border: solid grey 1px;
+    background: conic-gradient(var(--meter-color) 0deg, var(--meter-color) var(--meter-angle), transparent var(--meter-angle), transparent 360deg);
+    margin: 0px 18px 0px 10px;
+}
+
+.compatibility-desc{
+    margin: 0px;
+    padding: 0px;
+    color: white;
+    font-size: 20px;
+}
+
+.percentage-num {
+    color: var(--meter-color);
+}
