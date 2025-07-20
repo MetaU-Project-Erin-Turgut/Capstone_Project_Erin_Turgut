@@ -21,6 +21,7 @@ const Event = ( {eventData, onUpdateEvent}) => {
         <Card 
             cardData={eventData.event} 
             status={eventData.status} 
+            isGroup={false}
             fields={new Set([CardFields.TITLE, CardFields.DESCRIPTION, CardFields.DATEANDTIME, CardFields.STATUS])}
             modalFields={new Set([ModalFields.TITLE, ModalFields.DESCRIPTION, ModalFields.INTEREST, ModalFields.ATTENDEES])}  
             onUpdate={updateEvent}

@@ -1,0 +1,5 @@
+.tool-tip {
+    background-color: rgb(185, 182, 182);
+    border-radius: 10px;
+    position: absolute;
+}
