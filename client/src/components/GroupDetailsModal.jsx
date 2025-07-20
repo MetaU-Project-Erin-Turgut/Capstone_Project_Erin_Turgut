@@ -2,6 +2,8 @@ import { Suspense } from 'react';
 import { Status } from "../utils/utils";
 import APIUtils from '../utils/APIUtils';
 import StatusForm from './StatusForm';
+import SingularSelectedInterest from './SingularSelectedInterest';
+import GroupMemberTile from './GroupMemberTile';
 import "../styles/Modal.css";
 
 const GroupDetailsModal = ( {onModalClose, groupData, onStatusChange}) => {
@@ -29,20 +31,30 @@ const GroupDetailsModal = ( {onModalClose, groupData, onStatusChange}) => {
             <div className="modal-popup">       
                 <div className="modal-content">
                     <button className="close-btn" onClick={onModalClose}>X</button>
-                    <h4>{title}</h4>
-                    <p>{description}</p>
-                    <Suspense fallback={<p>Loading Interests...</p>}>
-                        <h5>Interests:</h5>
-                        {interests.map((interest) => (
-                            <p key={interest.interest.id}>{interest.interest.title}</p> 
-                        ))}
-                    </Suspense>
-                    <Suspense fallback={<p>Loading Members...</p>}>
-                        <h5>People:</h5>
-                        {members.map((member) => (
-                            <p key={member.user.id}>{member.user.username} {member.status}</p> 
-                        ))}
-                    </Suspense>
+                    <section className='intro'>
+                        <h1 className='title'>{title}</h1>
+                        <p className='description'>{description}</p>
+                    </section>
+
+                    <h2>Interests:</h2>
+                    <section className='interests'>
+                        <Suspense fallback={<p>Loading Interests...</p>}>
+                            {interests.map((interest) => (
+                                <SingularSelectedInterest key={interest.interest.id} interest={interest.interest.title}/>
+                            ))}
+                        </Suspense>
+                    </section>
+
+                    <h2>People:</h2>
+                    <section className='members'>
+                        <Suspense fallback={<p>Loading Members...</p>}>
+                            {members.map((member) => (
+                                <GroupMemberTile key={member.user.id} username={member.user.username} status={member.status} />
+                            ))}
+                        </Suspense>
+                    </section>
+
+                    <h2>Respond:</h2>
                     {(groupData.status !== Status.DROPPED && groupData.status !== Status.REJECTED)&&<StatusForm onSubmitChange={handleStatusUpdate} currStatus={groupData.status}/>}
                 </div>
             </div>

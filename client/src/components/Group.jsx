@@ -1,10 +1,7 @@
 import { useState } from 'react';
-import { LiaUserTimesSolid as RejectedIcon} from "react-icons/lia";//icon for "rejected/ignored"
-import { LiaUserCheckSolid as AcceptedIcon} from "react-icons/lia";//icon for "accepted"
-import { LiaUserClockSolid as PendingIcon} from "react-icons/lia";//icon for "pending"
-import { FaRunning as DroppedIcon} from "react-icons/fa"; //icon for "dropped"
 import GroupDetailsModal from './GroupDetailsModal';
 import CompatibilityDisplay from './CompatibilityDisplay';
+import StatusIcon from './StatusIcon';
 import { Status } from "../utils/utils";
 import "../styles/Card.css";
 
@@ -13,20 +10,6 @@ const Group = ( {groupData, updateGroup}) => {
     const [isGroupDetailsModalVisible, setIsGroupDetailsModalVisible] = useState(false);
     const compatibilityRatio = groupData.compatibilityRatio;
     const { title, description } = groupData.group; 
-
-    const renderStatus = () => {
-        switch(groupData.status) {
-            case Status.ACCEPTED: 
-                return <AcceptedIcon className="status-icon"/>
-            case Status.PENDING: 
-                return <PendingIcon className="status-icon"/>
-            case Status.REJECTED:
-                return <RejectedIcon className="status-icon"/>
-            case Status.DROPPED:
-                return <DroppedIcon className="status-icon"/>
-
-        }
-    }
 
     const openModal = () => {
         setIsGroupDetailsModalVisible(true)
@@ -39,7 +22,7 @@ const Group = ( {groupData, updateGroup}) => {
         <>
         <div className="card" onClick={openModal}>
             <section className="card-header">
-                {renderStatus()}
+                <StatusIcon status={groupData.status}/>
                 <h4 className="title">{title}</h4>
             </section>
             <p>{description}</p>

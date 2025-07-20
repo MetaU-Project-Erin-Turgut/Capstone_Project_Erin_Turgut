@@ -1,5 +1,6 @@
 import { useState, useRef } from 'react';
 import { Status } from "../utils/utils";
+import "../styles/StatusForm.css";
 
 const StatusForm = ({ onSubmitChange, currStatus }) => {
     const [isSubmitDisabled, setIsSubmitDisabled] = useState(true);
@@ -24,13 +25,13 @@ const StatusForm = ({ onSubmitChange, currStatus }) => {
         <section className="change-status-form">
             {currStatus === Status.PENDING ? 
                 <>
-                    <p>You haven't responded to this invite yet.</p> 
+                    <p className='notif'>You haven't responded to this invite yet.</p> 
                     <button onClick={() => changeSelectedState(Status.ACCEPTED)}>Accept</button> 
                     <button onClick={() => changeSelectedState(Status.REJECTED)}>Ignore</button>
                 </>
                 : 
                 <>
-                    <p>Click "Drop" if you would like to drop this group.</p> 
+                    <p className='notif'>Click "Drop" if you would like to drop this group.</p> 
                     <button onClick={() => changeSelectedState(Status.DROPPED)}>Drop</button>
                 </>
             }
