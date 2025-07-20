@@ -63,7 +63,7 @@
     margin-top: 5px;
 }
 
-.interests, .members {
+.interests, .people {
     display: flex;
     flex-direction: row;
     flex-wrap: wrap;

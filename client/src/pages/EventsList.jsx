@@ -48,7 +48,7 @@ const EventsList = () => {
                     <Event 
                         key={key}
                         eventData={value}
-                        updateEvent= {(newEventObj) => {
+                        onUpdateEvent= {(newEventObj) => {
                             const updatedEvents = new Map(events);
                             updatedEvents.set(newEventObj.eventId, newEventObj);
                             setEvents(updatedEvents);

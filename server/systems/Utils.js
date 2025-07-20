@@ -1,7 +1,7 @@
 const { PrismaClient } = require('../generated/prisma');
 const prisma = new PrismaClient()
 
-const LOCATION_SEARCH_RADIUS = 100; //in meters
+const LOCATION_SEARCH_RADIUS = 5000; //in meters
 
 //enums for user's status for an event or group
 const Status = Object.freeze({
