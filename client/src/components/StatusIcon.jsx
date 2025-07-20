@@ -9,7 +9,7 @@ const StatusIcon = ({ status }) => {
 
     switch (status) {
         case Status.ACCEPTED:
-            return <AcceptedIcon className="status-icon"/>
+            return <AcceptedIcon className="status-icon" />
         case Status.PENDING:
             return <PendingIcon className="status-icon" />
         case Status.REJECTED:

@@ -1,0 +1,12 @@
+.tool-tip {
+    min-width: 150px;
+    font-size: 15px;
+    font-weight: normal;
+    padding: 5px;
+    background-color: rgb(185, 182, 182);
+    border-radius: 10px;
+    border:dotted black 2px;
+    position: absolute;
+    left: var(--distance-from-icon);
+    top: -80px;
+}
