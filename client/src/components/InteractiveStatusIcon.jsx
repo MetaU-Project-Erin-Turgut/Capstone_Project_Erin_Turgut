@@ -2,10 +2,12 @@ import { useState } from 'react';
 import { Status } from "../utils/utils";
 import StatusIcon from "./StatusIcon";
 import ToolTip from "./ToolTip";
+import "../styles/InteractiveStatusIcon.css"
 
 const InteractiveStatusIcon = ({ status, isGroup, isWithinModal, username }) => {
     const [isHoveredOver, setIsHoveredOver] = useState(false);
     const [message, setMessage] = useState("");
+
     const onHover = () => {
         const inviteType = isGroup? "group" : "event";
 
@@ -27,7 +29,11 @@ const InteractiveStatusIcon = ({ status, isGroup, isWithinModal, username }) => 
         if (isWithinModal) { //means it pertains to other users
             setMessage(`${username} has${statusMessage}${inviteType}`);
         } else { //that means it's on a group or event card so it pertains to the user
-            setMessage(`You have${statusMessage}${inviteType}. Click on the ${inviteType} and scroll down to change your status!`);
+            if (status === Status.DROPPED) {
+                setMessage(`You have${statusMessage}${inviteType}.`) //for now, we will make it so that user cannot rejoin group/event when droped 
+            } else {
+                setMessage(`You have${statusMessage}${inviteType}. Click on the ${inviteType} and scroll down to change your status!`);
+            }
         }
 
         setIsHoveredOver(true)
@@ -37,10 +43,11 @@ const InteractiveStatusIcon = ({ status, isGroup, isWithinModal, username }) => 
         setIsHoveredOver(false)
     }
     
+    //set a small delay for on hover and on hover away. also, depending on whether the notification is within a modal or not, modify the distance between the icon and the tooltip
     return (
-        <div onMouseEnter={onHover} onMouseLeave={onNoHover}>
+        <div className="interactive-status-container" onMouseEnter={() => {setTimeout(onHover, 300)}} onMouseLeave={() => {setTimeout(onNoHover, 200)}}>
             <StatusIcon status={status}/>
-            {isHoveredOver && <ToolTip message={message}/>}
+            {isHoveredOver && <ToolTip message={message} distanceFromIcon={isWithinModal? 20 : 130}/>}
         </div>
     )
 }

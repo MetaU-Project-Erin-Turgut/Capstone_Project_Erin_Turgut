@@ -27,7 +27,7 @@ const Card = ({fields, cardData, compatibilityRatio, status, onUpdate, modalFiel
             {fields.has(CardFields.DATEANDTIME) && <p>{(new Date(cardData.dateTime)).toDateString()}</p>}
             {(fields.has(CardFields.COMPATIBILITY) && status === Status.PENDING) && <CompatibilityDisplay compatibilityRatio={compatibilityRatio}/>}
         </div>
-        {isModalVisible && <Modal onModalClose={closeModal} status={status} cardData={cardData} fields={modalFields} onStatusUpdate={onUpdate}/>}
+        {isModalVisible && <Modal onModalClose={closeModal} isGroup={isGroup} status={status} cardData={cardData} fields={modalFields} onStatusUpdate={onUpdate}/>}
     </>)
 }
 

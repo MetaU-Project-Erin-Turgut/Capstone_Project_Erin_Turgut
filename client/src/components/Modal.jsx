@@ -2,11 +2,11 @@ import { Suspense } from 'react';
 import { ModalFields, Status } from "../utils/utils";
 import StatusForm from './StatusForm';
 import SingularSelectedInterest from './SingularSelectedInterest';
-import GroupMemberTile from './GroupMemberTile';
+import MemberTile from './MemberTile';
 import "../styles/Modal.css";
 
 //general Modal component used by Group.jsx and Event.jsx
-const Modal = ({ onModalClose, cardData, onStatusUpdate, fields, status }) => {
+const Modal = ({ onModalClose, cardData, onStatusUpdate, fields, status, isGroup }) => {
 
     return (<div className="modal-overlay">
         <div className="modal-popup">
@@ -43,7 +43,7 @@ const Modal = ({ onModalClose, cardData, onStatusUpdate, fields, status }) => {
                         <section className='people'>
                             <Suspense fallback={<p>Loading Members...</p>}>
                                 {cardData.members.map((member) => (
-                                    <GroupMemberTile key={member.user.id} username={member.user.username} status={member.status} />
+                                    <MemberTile key={member.user.id} username={member.user.username} status={member.status} isGroup={isGroup} />
                                 ))}
                             </Suspense>
                         </section>
@@ -56,7 +56,7 @@ const Modal = ({ onModalClose, cardData, onStatusUpdate, fields, status }) => {
                         <section className='people'>
                             <Suspense fallback={<p>Loading Attendees...</p>}>
                                 {cardData.attendees.map((attendee) => (
-                                    <p key={attendee.user.id}>{attendee.user.username} {attendee.status} </p> 
+                                    <MemberTile key={attendee.user.id} username={attendee.user.username} status={attendee.status} isGroup={isGroup} />
                                 ))}
                             </Suspense>
                         </section>

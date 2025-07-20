@@ -1,7 +1,7 @@
 import "../styles/ToolTip.css";
 
-const ToolTip = ({ message }) => {
-    return <div className="tool-tip">
+const ToolTip = ({ message, distanceFromIcon }) => {
+    return <div className="tool-tip" style={{"--distance-from-icon": distanceFromIcon + "px"}}>
         <p>{message}</p>
     </div>
 }
