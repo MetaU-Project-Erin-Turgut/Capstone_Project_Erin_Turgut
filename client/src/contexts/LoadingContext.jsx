@@ -13,4 +13,4 @@ export const LoadingProvider = ({ children }) => {
 
 }
 
-export const useLoader = () => useContext(LoadingContext);
+export const useLoader = () => useContext(LoadingContext);//export as function so that useContext doesn't have to be imported in every component that needs it
