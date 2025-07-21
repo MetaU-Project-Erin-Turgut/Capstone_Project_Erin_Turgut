@@ -6,6 +6,7 @@ import LoginPage from "./pages/LoginPage";
 import MainPage from "./pages/MainPage";
 import ProfilePage from "./pages/ProfilePage";
 import SearchResultsPage from './pages/SearchResultsPage.jsx';
+import LoadingPage from './pages/LoadingPage.jsx';
 import { welcomeRoute, signUpRoute, loginRoute, mainPageRoute, profileRoute, searchResultsRoute } from "./utils/NavigationConsts.js";
 import './App.css'
 
@@ -16,16 +17,19 @@ function App() {
   const ProtectedSearchResultsPage = WithAuth(SearchResultsPage);
 
   return (
-    <HashRouter>
-      <Routes>
-        <Route path={welcomeRoute} element={<WelcomePage />}/>
-        <Route path={signUpRoute} element={<SignUpPage />}/>
-        <Route path={loginRoute} element={<LoginPage />}/>
-        <Route path={mainPageRoute} element={<ProtectedMainPage />}/>
-        <Route path={profileRoute} element={<ProtectedProfilePage />}/>
-        <Route path={searchResultsRoute} element={<ProtectedSearchResultsPage />}/>
-      </Routes>
-    </HashRouter>
+    <>
+      <LoadingPage />
+      <HashRouter>
+        <Routes>
+          <Route path={welcomeRoute} element={<WelcomePage />}/>
+          <Route path={signUpRoute} element={<SignUpPage />}/>
+          <Route path={loginRoute} element={<LoginPage />}/>
+          <Route path={mainPageRoute} element={<ProtectedMainPage />}/>
+          <Route path={profileRoute} element={<ProtectedProfilePage />}/>
+          <Route path={searchResultsRoute} element={<ProtectedSearchResultsPage />}/>
+        </Routes>
+      </HashRouter>
+    </>
   )
 }
 
