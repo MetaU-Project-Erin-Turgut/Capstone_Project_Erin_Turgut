@@ -1,7 +1,7 @@
 const { PrismaClient } = require('../generated/prisma');
 const prisma = new PrismaClient()
 
-const { Status, filterGroupsByLocation } = require('./Utils');
+const { Status, filterGroupsByLocation, createEvent_User } = require('./Utils');
 
 
 const scheduleEventsForGroups = async () => {
@@ -25,7 +25,7 @@ const scheduleEventsForGroups = async () => {
                 await createGroup_Event(group.id, retrievedEvent.id);
                 //update user_event tables for each user in the group
                 for (member of group.members) {
-                    await createEvent_User(member.user, retrievedEvent.id);
+                    await createEvent_User(member.user.id, retrievedEvent.id);
                 }
 
             } else {
@@ -42,16 +42,6 @@ const createGroup_Event = async (groupId, eventId) => {
         data: {
             group: { connect: { id: groupId } },
             event: { connect: { id: eventId } }
-        }
-    })
-}
-
-const createEvent_User = async (user, eventId) => {
-    return await prisma.event_User.create({ 
-        data: {
-            user: { connect: { id: user.id } },
-            event: { connect: { id: eventId } },
-            status: Status.PENDING 
         }
     })
 }

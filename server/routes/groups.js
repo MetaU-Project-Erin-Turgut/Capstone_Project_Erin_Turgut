@@ -6,7 +6,7 @@ const prisma = new PrismaClient();
 
 const { isAuthenticated } = require('../middleware/CheckAutheticated')
 const { findGroups } = require('../systems/GroupFindAlgo');
-const { updateGroupCentralLocation, updateGroupInterests, recalculateGroupCentralLocation, recalculateGroupInterests } = require('../systems/GroupUpdateMethods')
+const { updateGroupCentralLocation, updateGroupInterests, recalculateGroupCentralLocation, recalculateGroupInterests, sendExistingEventsToUser } = require('../systems/GroupUpdateMethods')
 const { Status, filterMembersByStatus, getUserCoordinates } = require('../systems/Utils');
 
 const FULL_GROUP_SIZE = 15;
@@ -176,7 +176,7 @@ router.put(`/user/groups/:groupId/${Status.ACCEPTED}`, isAuthenticated, async (r
             data: {
                 status: Status.ACCEPTED
             },
-            include: { group: { include: { interests: { include: { interest: true } }, members: { where: { NOT: { userId: req.session.userId } }, include: { user: true } } } } }
+            include: { group: { include: { interests: { include: { interest: true } }, members: { where: { NOT: { userId: req.session.userId } }, include: { user: true } }, events: true} } }
         })
 
         //if group is now full, remove it as a "Pending" option from users' lists who have not accepted the group
@@ -194,6 +194,13 @@ router.put(`/user/groups/:groupId/${Status.ACCEPTED}`, isAuthenticated, async (r
                 }
             });
         }
+
+        const eventIds = updatedGroupUser.group.events.map((eventGroup) => {
+            return eventGroup.eventId;
+        })
+
+        //make sure new accepted member also receives existing event invites
+        await sendExistingEventsToUser(eventIds, req.session.userId);
 
 
         res.status(200).json(updatedGroupUser);
