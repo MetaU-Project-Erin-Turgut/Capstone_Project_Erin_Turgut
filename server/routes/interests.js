@@ -112,20 +112,33 @@ router.post('/user/interests', isAuthenticated, async (req, res) => {
         //for each of the user's pending groups, calculate the jaccard similarity to user's interests
         for (let i = 0; i < existingGroups.length; i++) {
             const compatibilityRatio = calcJaccardSimilarity(existingGroups[i], expandedUserInterests.length)
-            //update new ratio in database
-            await prisma.group_User.update({
-                where: {
-                    userId_groupId: {
-                        groupId: existingGroups[i].id,
-                        userId: req.session.userId
-                    }
-                },
-                data: {
-                    compatibilityRatio: {
-                        set: compatibilityRatio.toFixed(2),
+
+            if (compatibilityRatio > 0) {
+                //update new ratio in database
+                await prisma.group_User.update({
+                    where: {
+                        userId_groupId: {
+                            groupId: existingGroups[i].id,
+                            userId: req.session.userId
+                        }
                     },
-                },
-            })
+                    data: {
+                        compatibilityRatio: {
+                            set: compatibilityRatio.toFixed(2),
+                        },
+                    },
+                })
+            } else {//if new compatibility ratio is 0, don't show to user anymore. i.e. delete the relation
+                await prisma.group_User.delete({
+                    where: {
+                        userId_groupId: {
+                            groupId: existingGroups[i].id,
+                            userId: req.session.userId
+                        }
+                    }
+                })
+            }
+            
         }
 
         res.status(200).json(updatedUser);
