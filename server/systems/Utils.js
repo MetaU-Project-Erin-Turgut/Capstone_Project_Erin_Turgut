@@ -72,6 +72,34 @@ const getUnionOfSets = (groupInterests, userInterests) => {
     return groupInterestsSet.union(new Set(interestIds));
 }
 
+const adjustCandidateGroups = (groupCandidates, interestIds) => {
+    //for each group, need total for all interests and their weightings - used later in jaccard similarity calculation (will filter interests below so need to get this info now)
+    for (let i = 0; i < groupCandidates.length; i++) {
+        let allInterestsWeighted = 0;
+        for(let j = 0; j < groupCandidates[i].interests.length; j++) {
+            allInterestsWeighted += groupCandidates[i].interests[j].interest.level;
+        }
+        groupCandidates[i] = {...groupCandidates[i], totalWeight: allInterestsWeighted} //add as attribute to group object
+    }
+    
+    //additionally filter group interest list only by user's interests
+    for (group of groupCandidates) {
+        group.interests = group.interests.filter((interest) => {
+            return interestIds.includes(interest.interest.id);
+        });
+    }
+}
+
+const calcJaccardSimilarity = (group, numUserInterests) => {
+    let numerator = 0; //cardinality of intersection between group interest set and user interest set
+    for (groupInterest of group.interests) {
+        numerator += groupInterest.interest.level; //add up matching interests and their weightings
+    }
+    const denominator = (numUserInterests + group.totalWeight) - numerator; //cardinality of union between group interest set and user interest set
+
+    return numerator/denominator;
+}
+
 const filterMembersByStatus = (members, status) => {
     return members.filter((member) => {
         return member.status === status;
@@ -120,4 +148,4 @@ const createEvent_User = async (userId, eventId) => {
 }
 
 
-module.exports = { Status, getUserCoordinates, getExpandedInterests, getUnionOfSets, filterMembersByStatus, filterGroupsByLocation, getOtherGroupMembers, createEvent_User };
+module.exports = { Status, getUserCoordinates, getExpandedInterests, getUnionOfSets, filterMembersByStatus, filterGroupsByLocation, getOtherGroupMembers, createEvent_User, adjustCandidateGroups, calcJaccardSimilarity };

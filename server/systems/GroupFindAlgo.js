@@ -1,7 +1,7 @@
 const { PrismaClient } = require('../generated/prisma');
 const prisma = new PrismaClient()
 
-const { getExpandedInterests, getUserCoordinates, filterGroupsByLocation } = require('./Utils');
+const { getExpandedInterests, getUserCoordinates, filterGroupsByLocation, calcJaccardSimilarity, adjustCandidateGroups } = require('./Utils');
 
 const findGroups = async (userData) => {
 
@@ -29,16 +29,6 @@ const findGroups = async (userData) => {
     return candidateGroups;        
 }
 
-const calcJaccardSimilarity = (group, numUserInterests) => {
-    let numerator = 0; //cardinality of intersection between group interest set and user interest set
-    for (groupInterest of group.interests) {
-        numerator += groupInterest.interest.level; //add up matching interests and their weightings
-    }
-    const denominator = (numUserInterests + group.totalWeight) - numerator; //cardinality of union between group interest set and user interest set
-
-    return numerator/denominator;
-}
-
 const getCandidateGroups =  async (allGroupsNearby, allUserInterests) => {
 
     const groupIds = allGroupsNearby.map((group) => {
@@ -64,21 +54,7 @@ const getCandidateGroups =  async (allGroupsNearby, allUserInterests) => {
         } 
     });
 
-    //for each group, need total for all interests and their weightings - used later in jaccard similarity calculation (will filter interests below so need to get this info now)
-    for (let i = 0; i < groupCandidates.length; i++) {
-        let allInterestsWeighted = 0;
-        for(let j = 0; j < groupCandidates[i].interests.length; j++) {
-            allInterestsWeighted += groupCandidates[i].interests[j].interest.level;
-        }
-        groupCandidates[i] = {...groupCandidates[i], totalWeight: allInterestsWeighted} //add as attribute to group object
-    }
-    
-    //additionally filter group interest list only by user's interests
-    for (group of groupCandidates) {
-        group.interests = group.interests.filter((interest) => {
-            return interestIds.includes(interest.interest.id);
-        });
-    }
+    adjustCandidateGroups(groupCandidates, interestIds);
 
     return groupCandidates;
     
