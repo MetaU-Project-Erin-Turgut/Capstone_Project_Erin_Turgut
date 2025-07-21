@@ -1,4 +1,4 @@
-import { createContext, useState } from "react";
+import { createContext, useState, useContext } from "react";
 import LoadingPage from "../pages/LoadingPage";
 
 export const LoadingContext = createContext();
@@ -12,3 +12,5 @@ export const LoadingProvider = ({ children }) => {
      </LoadingContext.Provider>
 
 }
+
+export const useLoader = () => useContext(LoadingContext);

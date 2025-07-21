@@ -1,12 +1,15 @@
 import { useState, useEffect, useMemo } from 'react';
 import { Suspense } from 'react';
 import { Status } from "../utils/utils";
+import { useLoader } from '../contexts/LoadingContext';
 import Event from "../components/Event";
 import FilterOptions from "../components/FilterOptions";
 import APIUtils from '../utils/APIUtils';
 import "../styles/CardListContainer.css"
 
 const EventsList = () => {
+
+    const { setIsLoading } = useLoader(); //used to control loading screen during api call
 
     const [events, setEvents] = useState(new Map());
     const [statusFilter, setStatusFilter] = useState(Status.NONE);
@@ -26,6 +29,7 @@ const EventsList = () => {
     }, []);
 
     const fetchEvents = async () => {
+        setIsLoading(true);
         try {
             const apiResultData = await APIUtils.fetchEvents();
             const mappedEvents = new Map(
@@ -36,6 +40,7 @@ const EventsList = () => {
             console.log("Status ", error.status);
             console.log("Error: ", error.message);
         }
+        setIsLoading(false);
     }
 
     return (

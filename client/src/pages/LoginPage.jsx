@@ -1,6 +1,7 @@
 import { useState } from 'react';
 import { useNavigate } from  "react-router";
 import { useUser } from "../contexts/UserContext";
+import { useLoader } from '../contexts/LoadingContext';
 import Header from "../components/Header";
 import { mainPageRoute } from '../utils/NavigationConsts';
 import { DEFAULT_FORM_VALUE } from "../utils/utils";
@@ -10,6 +11,8 @@ import "../styles/SignUpPage.css"
 
 const LoginPage = () => {
     const { setUser } = useUser();
+
+    const { setIsLoading } = useLoader(); //used to control loading screen during api call
 
     const [formData, setFormData] = useState({ email: DEFAULT_FORM_VALUE.email, password: DEFAULT_FORM_VALUE.password});
     
@@ -30,6 +33,7 @@ const LoginPage = () => {
     }
 
     const loginUser = async () => {
+        setIsLoading(true);
         try {
             const apiResultData = await APIUtils.handleLogin(formData);
             setUser(apiResultData); // Store user session in context
@@ -38,6 +42,7 @@ const LoginPage = () => {
             console.log("Status ", error.status);
             console.log("Error: ", error.message);
         }
+        setIsLoading(false);
     }
 
     return (
