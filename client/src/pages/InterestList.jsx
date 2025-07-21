@@ -1,10 +1,13 @@
 import { useState, useEffect, Suspense } from 'react';
+import { useLoader } from '../contexts/LoadingContext';
 import InterestLevelColumn from "../components/InterestLevelColumn";
 import APIUtils from "../utils/APIUtils";
 import SelectedInterests from '../components/SelectedInterests';
 import "../styles/InterestList.css";
 
 const InterestList = () => {
+
+    const { setIsLoading } = useLoader(); //used to control loading screen during api call
 
     //2D array with level by array index and all interests at that level value as an array at that index
     const [interestsByLevel, setInterestsByLevel] = useState([]); 
@@ -18,8 +21,10 @@ const InterestList = () => {
 
     //method that calls fetching functions needed to get immediate data when user opens the interests page
     const fetchOnMountData = async () => {
+        setIsLoading(true);
         await fetchUserInterests();
         await fetchRootInterests();
+        setIsLoading(false);
     }
 
     const fetchRootInterests = async () => {
@@ -59,6 +64,7 @@ const InterestList = () => {
     }
 
     const addNewColumn = async (interestId, clickedInterestLevel) => {
+        setIsLoading(true);
         try {
             const apiResultData = await APIUtils.fetchImmediateChildren(interestId);
             for (let i = 0; i < apiResultData.length; i++) {
@@ -80,10 +86,12 @@ const InterestList = () => {
             console.log("Status ", error.status);
             console.log("Error: ", error.message);
         }
+        setIsLoading(false);
     }
 
     //this will update the selected interests in the database
     const submitSelectedInterests = async () => {
+        setIsLoading(true);
         const updatedInterests = {
             chosenInterests: Array.from(userInterests.entries()).map(([key, value]) => {
                 return {id: key}
@@ -98,6 +106,7 @@ const InterestList = () => {
             console.log("Status ", error.status);
             console.log("Error: ", error.message);
         }
+        setIsLoading(false);
         
     }
 

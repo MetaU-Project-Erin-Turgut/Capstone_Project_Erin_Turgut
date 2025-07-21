@@ -2,6 +2,7 @@ import { useNavigate } from  "react-router";
 import { FaUserCircle } from "react-icons/fa";
 import { useUser } from "../contexts/UserContext";
 import { mainPageRoute, profileRoute, searchResultsRoute } from "../utils/NavigationConsts";
+import { useLoader } from "../contexts/LoadingContext";
 /* userSearchIcon retrieved from: https://pngtree.com/so/search-user
  and background cleared using https://www.remove.bg/ */
 import userSearchIcon from "../assets/search-user-icon.png";
@@ -12,9 +13,12 @@ const NavBar = ({}) => {
 
     const { setUser } = useUser(); 
 
+    const { setIsLoading } = useLoader(); //used to control loading screen during api call
+
     const navigate = useNavigate();
 
     const handleLogout = async () => {
+        setIsLoading(true);
         try {
             await APIUtils.handleLogout();
             setUser(null); // remove session from react context
@@ -23,6 +27,7 @@ const NavBar = ({}) => {
             console.log("Status ", error.status);
             console.log("Error: ", error.message);
         }
+        setIsLoading(false);
     }
 
     return (

@@ -4,6 +4,7 @@ import '../styles/InterestTile.css';
 const InterestTile = ({ interest, onTileClick, isSelectedInitially, onUpdateInterests }) => {
 
     const [isSelected, setIsSelected] = useState(isSelectedInitially);
+    
     const handleCheckChange = (event) => {
         event.stopPropagation();
         onUpdateInterests(!isSelected, interest.id, interest.title)

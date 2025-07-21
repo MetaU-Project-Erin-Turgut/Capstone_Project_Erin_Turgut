@@ -8,7 +8,8 @@ import "../styles/Modal.css";
 //general Modal component used by Group.jsx and Event.jsx
 const Modal = ({ onModalClose, cardData, onStatusUpdate, fields, status, isGroup }) => {
 
-    return (<div className="modal-overlay">
+    return (
+    <div className="overlay">
         <div className="modal-popup">
             <div className="modal-content">
                 <button className="close-btn" onClick={onModalClose}>X</button>

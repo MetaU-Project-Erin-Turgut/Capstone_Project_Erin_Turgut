@@ -1,0 +1,29 @@
+.loading-icons {
+    display: flex;
+    justify-content: center;
+    align-items: center;
+}
+
+@keyframes person {
+    0%   {top:-200px;}
+    50%  {top:0px;}
+    75% {transform: rotate(360deg);}
+    100% {
+        transform: rotate(360deg);
+        top:-200px;
+    }
+
+}
+
+.person {
+    color: #FF46A2;
+    font-size: 90px;
+    position: relative;
+    animation-name: person;
+    animation-iteration-count: infinite;
+    animation-duration: 2s;
+}
+
+.loading-message {
+    color: #FF46A2;
+}

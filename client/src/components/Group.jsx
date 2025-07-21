@@ -1,5 +1,6 @@
 import Card from "./Card";
 import { CardFields, ModalFields, Status } from "../utils/utils";
+import { useLoader } from "../contexts/LoadingContext";
 import APIUtils from '../utils/APIUtils';
 import "../styles/Card.css";
 
@@ -7,8 +8,11 @@ import "../styles/Card.css";
 const Group = ( {groupData, onUpdateGroup}) => {
     const { id } = groupData.group;
 
+    const { setIsLoading } = useLoader(); //used to control loading screen during api call
+
     const updateGroup = async (statusState) => {
         //put request to change status of group
+        setIsLoading(true);
         try {
             const apiResultData = await APIUtils.updateGroupStatus(id, statusState);
             if (statusState === Status.DROPPED) {
@@ -20,6 +24,7 @@ const Group = ( {groupData, onUpdateGroup}) => {
             console.log("Status ", error.status);
             console.log("Error: ", error.message);
         }
+        setIsLoading(false);
     }
     
     return <Card 
