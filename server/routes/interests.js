@@ -1,11 +1,11 @@
 const express = require('express')
 const router = express.Router()
 
-const { PrismaClient } = require('../generated/prisma');
+const { PrismaClient, Status } = require('../generated/prisma');
 const prisma = new PrismaClient()
 
-
 const { isAuthenticated } = require('../middleware/CheckAutheticated')
+const { getExpandedInterests, calcJaccardSimilarity, adjustCandidateGroups } = require('../systems/Utils');
 
 //get all first level interests
 router.get('/interests', isAuthenticated, async (req, res) => {
@@ -87,9 +87,46 @@ router.post('/user/interests', isAuthenticated, async (req, res) => {
                 },
             },
             include: {
-                interests: true
+                interests: true,
+                groups: {where: {status: Status.PENDING}, select: {group: {select: {interests: { select: {interest: { select: {level: true, id: true}}}}, id: true}}}}
             }
         })
+
+        //now that user interests are updated, any previous compatibility ratio for the user's pending groups
+        //will be inaccurate. Need to recalculate these:
+
+        //First, need to expand the user's interests:
+        const expandedUserInterests = await getExpandedInterests(updatedUser.interests, false);
+
+        const interestIds = expandedUserInterests.map((interest) => {
+            return interest.id;
+        })
+
+        //Need to make sure the array of groups is just the interests and id:
+        const existingGroups = updatedUser.groups.map((group) => {
+            return {interests: group.group.interests, id: group.group.id};
+        })
+
+        adjustCandidateGroups(existingGroups, interestIds);
+
+        //for each of the user's pending groups, calculate the jaccard similarity to user's interests
+        for (let i = 0; i < existingGroups.length; i++) {
+            const compatibilityRatio = calcJaccardSimilarity(existingGroups[i], expandedUserInterests.length)
+            //update new ratio in database
+            await prisma.group_User.update({
+                where: {
+                    userId_groupId: {
+                        groupId: existingGroups[i].id,
+                        userId: req.session.userId
+                    }
+                },
+                data: {
+                    compatibilityRatio: {
+                        set: compatibilityRatio.toFixed(2),
+                    },
+                },
+            })
+        }
 
         res.status(200).json(updatedUser);
 
