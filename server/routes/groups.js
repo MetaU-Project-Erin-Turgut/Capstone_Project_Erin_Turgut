@@ -195,11 +195,11 @@ router.put(`/user/groups/:groupId/${Status.ACCEPTED}`, isAuthenticated, async (r
             });
         }
 
+        //make sure new accepted member also receives existing event invites
         const eventIds = updatedGroupUser.group.events.map((eventGroup) => {
             return eventGroup.eventId;
         })
 
-        //make sure new accepted member also receives existing event invites
         await sendExistingEventsToUser(eventIds, req.session.userId);
 
 

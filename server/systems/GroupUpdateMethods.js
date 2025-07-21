@@ -57,14 +57,4 @@ const sendExistingEventsToUser = async (eventIds, userId) => {
     }
 }
 
-const removeEventInvitesFromUser = async () => {
-    //pass events from group
-    /**
-     * Event_user needs additional field that states groups this invite is due to
-     * Event_user fields are still unique, but when you delete a relation, only delete from the group id set and if it's empty then delete the event_user relation. 
-     */
-
-}
-
-
 module.exports = { updateGroupCentralLocation, updateGroupInterests, recalculateGroupCentralLocation, recalculateGroupInterests, sendExistingEventsToUser };
