@@ -1,7 +1,7 @@
 const { PrismaClient } = require('../generated/prisma');
 const prisma = new PrismaClient()
 
-const { getUnionOfSets } = require('./Utils');
+const { getUnionOfSets, createEvent_User } = require('./Utils');
 
 const updateGroupCentralLocation = (groupCoord, userCoord) => {
    //Given the fact that the accepted group's location and user's location are close by, the midpoint formula is good enough for midpoint calculation:
@@ -51,5 +51,10 @@ const recalculateGroupInterests = async (members, groupInterests) => {
     return newGroupInterests;
 }
 
+const sendExistingEventsToUser = async (eventIds, userId) => {
+    for (eventId of eventIds) {
+        await createEvent_User(userId, eventId)
+    }
+}
 
-module.exports = { updateGroupCentralLocation, updateGroupInterests, recalculateGroupCentralLocation, recalculateGroupInterests };
+module.exports = { updateGroupCentralLocation, updateGroupInterests, recalculateGroupCentralLocation, recalculateGroupInterests, sendExistingEventsToUser };

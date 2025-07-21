@@ -98,7 +98,7 @@ router.patch('/user/events/:eventId/status', isAuthenticated, async (req, res) =
 })
 
 //start event search for groups
-router.get('/events/search', isAuthenticated, async (req, res) => {
+router.get('/events/search', async (req, res) => {
    try {
        const allEvents = await scheduleEventsForGroups();
        res.status(200).json(allEvents);

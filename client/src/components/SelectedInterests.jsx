@@ -18,7 +18,7 @@ const SelectedInterests = ({ initialInterests, onSubmitInterests }) => {
                         <button className="submit-changes-btn" onClick={onSubmitInterests}>Submit changes</button>
                     </>
                     :
-                    <p>"You haven't selected any interests yet! Select some to get group recommendations."</p>
+                    <p>You haven't selected any interests yet! Select some to get group recommendations.</p>
                 }
                 
             </div>

@@ -109,6 +109,15 @@ const getOtherGroupMembers = async (userId) => {
     return groupMates;
 }
 
+const createEvent_User = async (userId, eventId) => {
+    return await prisma.event_User.create({ 
+        data: {
+            user: { connect: { id: userId } },
+            event: { connect: { id: eventId } },
+            status: Status.PENDING 
+        }
+    })
+}
 
 
-module.exports = { Status, getUserCoordinates, getExpandedInterests, getUnionOfSets, filterMembersByStatus, filterGroupsByLocation, getOtherGroupMembers };
+module.exports = { Status, getUserCoordinates, getExpandedInterests, getUnionOfSets, filterMembersByStatus, filterGroupsByLocation, getOtherGroupMembers, createEvent_User };
