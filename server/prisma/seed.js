@@ -27,6 +27,7 @@ const events = [
     {title: 'Tennis game', description: 'Tennis game in mpk', dateTime: new Date('2025-07-25T12:00:00Z'), latitude: 37.4855, longitude: -122.1500, interest: {"id": 10}},
     {title: 'Indie Rock Concert', description: 'Indie Rock concert in mpk', dateTime: new Date('2025-12-25T12:00:00Z'), latitude: 37.4855, longitude: -122.1500, interest: {"id": 7}},
     {title: 'ACDC concert', description: 'ACDC concert in mpk', dateTime: new Date('2025-11-25T12:00:00Z'), latitude: 37.4855, longitude: -122.1500, interest: {"id": 9}},
+    {title: 'karaoke night', description: 'karaoke night out', dateTime: new Date('2025-11-25T12:00:00Z'), latitude: 37.4855, longitude: -122.1500, interest: {"id": 4}},
     {title: 'Baking competition', description: 'Baking competition in mpk', dateTime: new Date('2025-10-25T12:00:00Z'), latitude: 37.4855, longitude: -122.1500, interest: {"id": 11}},
     {title: 'Music festival', description: 'Music festival in Tokyo', dateTime: new Date('2025-09-25T12:00:00Z'), latitude: 35.6895, longitude: 139.6917, interest: {"id": 0}},
 
