@@ -1,7 +1,6 @@
 import { useState, useEffect, useMemo } from 'react';
 import { Suspense } from 'react';
 import { Status } from "../utils/utils";
-import { useLoader } from '../contexts/LoadingContext';
 import Group from "../components/Group";
 import FilterOptions from "../components/FilterOptions";
 import APIUtils from '../utils/APIUtils';
@@ -9,7 +8,6 @@ import "../styles/CardListContainer.css"
 
 const GroupsList = () => {
 
-    const { setIsLoading } = useLoader(); //used to control loading screen during api call
 
     const [groups, setGroups] = useState(new Map());
     const [statusFilter, setStatusFilter] = useState(Status.NONE);
@@ -29,7 +27,6 @@ const GroupsList = () => {
     }, []);
 
     const fetchGroups = async () => {
-        setIsLoading(true);
         try {
             const apiResultData = await APIUtils.fetchGroups();
             const mappedGroups = new Map(
@@ -40,7 +37,6 @@ const GroupsList = () => {
             console.log("Status ", error.status);
             console.log("Error: ", error.message);
         }
-        setIsLoading(false);
     }
 
     return (
