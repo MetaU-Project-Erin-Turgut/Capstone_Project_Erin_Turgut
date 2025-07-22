@@ -24,7 +24,7 @@ const groups = [
 
 const events = [
     {title: 'Passed event', description: 'Passed event', dateTime: new Date('2025-05-25T12:00:00Z'), latitude: 37.4855, longitude: -122.1500, interest: {"id": 10}},
-    {title: 'Tennis game', description: 'Tennis game in mpk', dateTime: new Date('2025-07-25T12:00:00Z'), latitude: 37.4855, longitude: -122.1500, interest: {"id": 10}},
+    {title: 'Tennis game', description: 'Tennis game in mpk', dateTime: new Date('2025-07-22T12:00:00Z'), latitude: 37.4855, longitude: -122.1500, interest: {"id": 10}},
     {title: 'Indie Rock Concert', description: 'Indie Rock concert in mpk', dateTime: new Date('2025-12-25T12:00:00Z'), latitude: 37.4855, longitude: -122.1500, interest: {"id": 7}},
     {title: 'ACDC concert', description: 'ACDC concert in mpk', dateTime: new Date('2025-11-25T12:00:00Z'), latitude: 37.4855, longitude: -122.1500, interest: {"id": 9}},
     {title: 'karaoke night', description: 'karaoke night out', dateTime: new Date('2025-11-25T12:00:00Z'), latitude: 37.4855, longitude: -122.1500, interest: {"id": 4}},
