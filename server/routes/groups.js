@@ -34,17 +34,21 @@ router.get('/user/groups/new', isAuthenticated, async (req, res) => {
     try {
         const updatedUser = await prisma.user.findUnique({
             where: { id: req.session.userId },
-            select: { id: true, interests: true }
+            select: { id: true, username: true, interests: true }
         });
         //Call GroupFindAlgo, will return all suggested groups sorted by compatibility
         let suggestedGroups = await findGroups(updatedUser); //NOTE: the interests attribute part of the returned objects won't be entirely accurate - not needed for now though
-
+        
+        let isNewGroup = false;
         //if no matching groups were found, create new group with just the user
         if (suggestedGroups.length === 0) {
+            isNewGroup = true;
 
             const userCoords = await getUserCoordinates(req.session.userId);
 
-            const newGroupRecordId = await prisma.$queryRaw`INSERT INTO "Group" (title, description, "isFull", coord) VALUES('temp title', 'temp description', false, ST_SetSRID(ST_MakePoint(${userCoords.longitude}, ${userCoords.latitude}), 4326)::geography) RETURNING id`;
+            const newTitle = updatedUser.username + "'s group";
+            const newDesc = updatedUser.username + "'s newly created group";
+            const newGroupRecordId = await prisma.$queryRaw`INSERT INTO "Group" (title, description, "isFull", coord) VALUES(${newTitle}, ${newDesc}, false, ST_SetSRID(ST_MakePoint(${userCoords.longitude}, ${userCoords.latitude}), 4326)::geography) RETURNING id`;
 
             //include interests for the newly created group
             const newGroup = await prisma.group.update({
@@ -84,7 +88,7 @@ router.get('/user/groups/new', isAuthenticated, async (req, res) => {
                     data: {
                         group: { connect: { id: group.id } },
                         user: { connect: { id: req.session.userId } },
-                        status: Status.PENDING,
+                        status: isNewGroup ? Status.ACCEPTED : Status.PENDING, //if there were no groups and a new group was created for the user, they should automatically be accepted/part of the group
                         compatibilityRatio: group.compatibilityRatio
                     }
                 })
