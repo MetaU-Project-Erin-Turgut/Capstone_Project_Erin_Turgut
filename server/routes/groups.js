@@ -7,7 +7,7 @@ const prisma = new PrismaClient();
 const { isAuthenticated } = require('../middleware/CheckAutheticated')
 const { findGroups } = require('../systems/GroupFindAlgo');
 const { updateGroupCentralLocation, updateGroupInterests, recalculateGroupCentralLocation, recalculateGroupInterests, sendExistingEventsToUser } = require('../systems/GroupUpdateMethods')
-const { Status, filterMembersByStatus, getUserCoordinates } = require('../systems/Utils');
+const { Status, filterMembersByStatus, getUserCoordinates, adjustPendingUserCompatibilities } = require('../systems/Utils');
 
 const FULL_GROUP_SIZE = 15;
 
@@ -61,10 +61,10 @@ router.get('/user/groups/new', isAuthenticated, async (req, res) => {
                 include: {
                     interests: { include: { interest: true } }, members: { where: { NOT: { userId: req.session.userId } }, include: { user: true } }
                 }
-                
+
             })
 
-            suggestedGroups.push({...newGroup, compatibilityRatio: 1});
+            suggestedGroups.push({ ...newGroup, compatibilityRatio: 1 });
         }
         //update the user_group table with these invites
         for (group of suggestedGroups) {
@@ -176,8 +176,10 @@ router.put(`/user/groups/:groupId/${Status.ACCEPTED}`, isAuthenticated, async (r
             data: {
                 status: Status.ACCEPTED
             },
-            include: { group: { include: { interests: { include: { interest: true } }, members: { where: { NOT: { userId: req.session.userId } }, include: { user: true } }, events: true} } }
+            include: { group: { include: { interests: { include: { interest: true } }, members: { where: { NOT: { userId: req.session.userId } }, include: { user: true } }, events: true } } }
         })
+
+        const originalUpdatedGroupUser = updatedGroupUser; //this will be modified later, so keep the updated version to return to user at the end
 
         //if group is now full, remove it as a "Pending" option from users' lists who have not accepted the group
         if (newIsFullStatus) {
@@ -202,8 +204,11 @@ router.put(`/user/groups/:groupId/${Status.ACCEPTED}`, isAuthenticated, async (r
 
         await sendExistingEventsToUser(eventIds, req.session.userId);
 
+        //Now that group data has been updated, need to update the compatibility ratios for all the pending users for that group:
+        await adjustPendingUserCompatibilities(groupId, updatedGroupUser.group)
 
-        res.status(200).json(updatedGroupUser);
+
+        res.status(200).json(originalUpdatedGroupUser);
 
 
     } catch (error) {
@@ -213,7 +218,7 @@ router.put(`/user/groups/:groupId/${Status.ACCEPTED}`, isAuthenticated, async (r
 })
 
 //ignore group invite - status: "REJECTED"
-router.patch(`/user/groups/:groupId/${Status.REJECTED}`, isAuthenticated, async (req, res) => {
+router.put(`/user/groups/:groupId/${Status.REJECTED}`, isAuthenticated, async (req, res) => {
     const groupId = parseInt(req.params.groupId);
 
     try {
@@ -230,7 +235,7 @@ router.patch(`/user/groups/:groupId/${Status.REJECTED}`, isAuthenticated, async 
             res.status(404).json({ error: 'This user - group relationship does not exist' });
         }
 
-        const updatedGroup = await prisma.group_User.update({
+        const updatedGroupUser = await prisma.group_User.update({
             where: {
                 userId_groupId: {
                     groupId: groupId,
@@ -239,10 +244,11 @@ router.patch(`/user/groups/:groupId/${Status.REJECTED}`, isAuthenticated, async 
             },
             data: {
                 status: Status.REJECTED
-            }
+            },
+            include: { group: { include: { interests: { include: { interest: true } }, members: { where: { NOT: { userId: req.session.userId } }, include: { user: true } }, events: true } } }
         })
 
-        res.status(200).json(updatedGroup);
+        res.status(200).json(updatedGroupUser);
 
     } catch (error) {
         console.error("Error rejecting group invite:", error)
@@ -263,7 +269,7 @@ router.put(`/user/groups/:groupId/${Status.DROPPED}`, isAuthenticated, async (re
                 }
             },
             include: {
-                group: { include: { interests: { select: { interest: true } }, members: { where: { NOT: { userId: req.session.userId } }, include: {user: { include: { interests: true } }} } }},
+                group: { include: { interests: { select: { interest: true } }, members: { where: { NOT: { userId: req.session.userId } }, include: { user: { include: { interests: true } } } } } },
                 user: { include: { interests: true } }
             }
         });
@@ -271,12 +277,14 @@ router.put(`/user/groups/:groupId/${Status.DROPPED}`, isAuthenticated, async (re
         if (!group_user) {
             res.status(404).json({ error: 'This user - group relationship does not exist' });
         }
-        
+
         //filter to only users that actually accepted the group
         const acceptedMembers = filterMembersByStatus(group_user.group.members, Status.ACCEPTED);
 
         let updatedGroupUser = null; //what will be returned in res.json - need to keep outside of if/else
- 
+
+        let originalUpdatedGroupUser = null;
+
         //if group is now empty with removal of this user, remove the group
         if (acceptedMembers.length === 0) { //remember, user is already excluded for list from db query - so should check against 0
             //delete all group_user many to many relations
@@ -310,7 +318,7 @@ router.put(`/user/groups/:groupId/${Status.DROPPED}`, isAuthenticated, async (re
             const newGroupCoords = await recalculateGroupCentralLocation(memberCoords);
 
             //remove user's interests from overall group interests
-            
+
             const newGroupInterests = await recalculateGroupInterests(acceptedMembers, group_user.group.interests);
 
             //update group in database (update coordinates, update interests list)
@@ -346,8 +354,13 @@ router.put(`/user/groups/:groupId/${Status.DROPPED}`, isAuthenticated, async (re
                 include: { group: { include: { interests: { include: { interest: true } }, members: { where: { NOT: { userId: req.session.userId } }, include: { user: true } } } } }
             })
 
+            originalUpdatedGroupUser = updatedGroupUser; //this will be modified later, so keep the updated version to return to user at the end
+
+            //Now that group data has been updated, need to update the compatibility ratios for all the pending users for that group:
+            await adjustPendingUserCompatibilities(groupId, updatedGroupUser.group)
+
         }
-        res.status(200).json(updatedGroupUser? {...updatedGroupUser, isGroupDeleted: false}: {isGroupDeleted: true});
+        res.status(200).json(originalUpdatedGroupUser ? { ...originalUpdatedGroupUser, isGroupDeleted: false } : { isGroupDeleted: true });
 
     } catch (error) {
         console.error("Error dropping group:", error)

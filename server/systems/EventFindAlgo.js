@@ -86,6 +86,27 @@ const getAllEvents = async () => {
     const currDate = new Date();
 
     //clear out events from database that have passed
+
+    await prisma.event_User.deleteMany({
+        where: {
+            event: {
+                dateTime: {
+                    lt: currDate
+                }
+            }
+        }
+    })
+
+    await prisma.group_Event.deleteMany({
+        where: {
+            event: {
+                dateTime: {
+                    lt: currDate
+                }
+            }
+        }
+    })
+
     await prisma.event.deleteMany({
         where: {
             dateTime : {

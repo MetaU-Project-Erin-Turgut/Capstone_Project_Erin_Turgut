@@ -51,7 +51,7 @@ const GroupsList = () => {
             <Suspense fallback={<p>Loading...</p>}>
                 {Array.from(displayedGroups.entries()).map(([key, value]) => (
                     <Group 
-                        key={value.id}
+                        key={key}
                         groupData={value}
                         onUpdateGroup = {(newGroupObj, isGroupErased, groupId) => {
                             const updatedGroups = new Map(groups);
