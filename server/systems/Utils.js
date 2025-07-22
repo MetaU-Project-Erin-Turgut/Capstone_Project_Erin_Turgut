@@ -138,13 +138,36 @@ const getOtherGroupMembers = async (userId) => {
 }
 
 const createEvent_User = async (userId, eventId) => {
-    return await prisma.event_User.create({ 
+    const eventUser = await prisma.event_User.findUnique({ 
+        where: {
+            userId_eventId: {
+                eventId: eventId,
+                userId: userId
+            }
+        }
+    })
+    if (!eventUser) {
+        return await prisma.event_User.create({ 
+            data: {
+                user: { connect: { id: userId } },
+                event: { connect: { id: eventId } },
+                status: Status.PENDING 
+            }
+        })
+    }
+    return await prisma.event_User.update({ 
+        where: {
+            userId_eventId: {
+                eventId: eventId,
+                userId: userId
+            }
+        },
         data: {
-            user: { connect: { id: userId } },
-            event: { connect: { id: eventId } },
             status: Status.PENDING 
         }
     })
+    
+    
 }
 
 
