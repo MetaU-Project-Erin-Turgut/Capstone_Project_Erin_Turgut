@@ -17,7 +17,7 @@ const getUserCoordinates = async (userId) => {
     SELECT ST_X(coord::geometry), ST_Y(coord::geometry)
     FROM "User" 
     WHERE id = ${userId}`;
-    
+
     return {
         longitude: userCoord.at(0).st_x,
         latitude: userCoord.at(0).st_y,
@@ -27,7 +27,7 @@ const getUserCoordinates = async (userId) => {
 const getExpandedInterests = async (originalInterests, isGroup) => {
     let expandedInterestSet = [];
 
-    for (const interest of originalInterests) { 
+    for (const interest of originalInterests) {
         let currInterest = interest;
         if (isGroup) currInterest = interest.interest;
 
@@ -37,12 +37,12 @@ const getExpandedInterests = async (originalInterests, isGroup) => {
         }
         //query for interest ancestry path for each original interest
         const path = await prisma.interest.findUnique({
-            where: {id: currInterest.id},
+            where: { id: currInterest.id },
             select: {
                 path: true
             }
         })
-        
+
         //use path field to avoid recursive calls to get entire hierarchy 
         const pathParsed = path.path.split('.').map((id) => {
             return parseInt(id);
@@ -52,7 +52,7 @@ const getExpandedInterests = async (originalInterests, isGroup) => {
 
         //get the actual interest objects of these ancestor ids
         const ancestorInterests = await prisma.interest.findMany({
-            where: {id: { in: pathParsed}}
+            where: { id: { in: pathParsed } }
         })
 
         expandedInterestSet = [currInterest, ...expandedInterestSet, ...ancestorInterests]; //expand user's interest set to now include ancestor interests
@@ -76,12 +76,12 @@ const adjustCandidateGroups = (groupCandidates, interestIds) => {
     //for each group, need total for all interests and their weightings - used later in jaccard similarity calculation (will filter interests below so need to get this info now)
     for (let i = 0; i < groupCandidates.length; i++) {
         let allInterestsWeighted = 0;
-        for(let j = 0; j < groupCandidates[i].interests.length; j++) {
+        for (let j = 0; j < groupCandidates[i].interests.length; j++) {
             allInterestsWeighted += groupCandidates[i].interests[j].interest.level;
         }
-        groupCandidates[i] = {...groupCandidates[i], totalWeight: allInterestsWeighted} //add as attribute to group object
+        groupCandidates[i] = { ...groupCandidates[i], totalWeight: allInterestsWeighted } //add as attribute to group object
     }
-    
+
     //additionally filter group interest list only by user's interests
     for (group of groupCandidates) {
         group.interests = group.interests.filter((interest) => {
@@ -97,7 +97,7 @@ const calcJaccardSimilarity = (group, numUserInterests) => {
     }
     const denominator = (numUserInterests + group.totalWeight) - numerator; //cardinality of union between group interest set and user interest set
 
-    return numerator/denominator;
+    return numerator / denominator;
 }
 
 const filterMembersByStatus = (members, status) => {
@@ -111,7 +111,7 @@ const filterGroupsByLocation = async (eventCoordinates, forEventSearch) => {
 
     if (forEventSearch) { //do not need to exclude full groups for event search
         return await prisma.$queryRaw`SELECT id, title FROM "Group" WHERE ST_DWithin(coord, ST_SetSRID(ST_MakePoint(${eventCoordinates.longitude}, ${eventCoordinates.latitude}), 4326)::geography, ${LOCATION_SEARCH_RADIUS})`;
-    } 
+    }
 
     //if it is for group search for users to join, we do need to exclude full groups
     return await prisma.$queryRaw`SELECT id, title FROM "Group" WHERE ST_DWithin(coord, ST_SetSRID(ST_MakePoint(${eventCoordinates.longitude}, ${eventCoordinates.latitude}), 4326)::geography, ${LOCATION_SEARCH_RADIUS}) AND "isFull"= FALSE`;
@@ -120,8 +120,8 @@ const filterGroupsByLocation = async (eventCoordinates, forEventSearch) => {
 
 const getOtherGroupMembers = async (userId) => {
     const groups = await prisma.group_User.findMany({
-        where: {userId: userId, status: Status.ACCEPTED},
-        select: { group: { include: { members: { where: { NOT: { userId: userId } }, include: {user: true}} } } },
+        where: { userId: userId, status: Status.ACCEPTED },
+        select: { group: { include: { members: { where: { NOT: { userId: userId } }, include: { user: true } } } } },
     })
 
     let groupMates = new Map(); //key is user id and value is number of times they were found in one of the current user's groups
@@ -133,12 +133,12 @@ const getOtherGroupMembers = async (userId) => {
             groupMates.set(member.user.id, groupMates.has(member.user.id) ? groupMates.get(member.user.id) + 1 : 1)
         }
     }
-    
+
     return groupMates;
 }
 
 const createEvent_User = async (userId, eventId) => {
-    const eventUser = await prisma.event_User.findUnique({ 
+    const eventUser = await prisma.event_User.findUnique({
         where: {
             userId_eventId: {
                 eventId: eventId,
@@ -147,15 +147,15 @@ const createEvent_User = async (userId, eventId) => {
         }
     })
     if (!eventUser) {
-        return await prisma.event_User.create({ 
+        return await prisma.event_User.create({
             data: {
                 user: { connect: { id: userId } },
                 event: { connect: { id: eventId } },
-                status: Status.PENDING 
+                status: Status.PENDING
             }
         })
     }
-    return await prisma.event_User.update({ 
+    return await prisma.event_User.update({
         where: {
             userId_eventId: {
                 eventId: eventId,
@@ -163,12 +163,73 @@ const createEvent_User = async (userId, eventId) => {
             }
         },
         data: {
-            status: Status.PENDING 
+            status: Status.PENDING
         }
     })
-    
-    
+
+
+}
+
+const adjustPendingUserCompatibilities = async (groupId, updatedGroup) => {
+    //Now that group data has been updated, need to update the compatibility ratios for all the pending users for that group:
+    const pendingUsersFetched = await prisma.group_User.findMany({
+        where: {
+            groupId: groupId,
+            status: Status.PENDING
+        },
+        select: { user: { include: { interests: true } } }
+    })
+
+    //Need to make sure the array of users is just the interests and id:
+    const pendingUsers = pendingUsersFetched.map((user) => {
+        return { interests: user.user.interests, id: user.user.id };
+    })
+
+
+    for (let i = 0; i < pendingUsers.length; i++) {
+        //First, need to expand the user's interests:
+        const expandedUserInterests = await getExpandedInterests(pendingUsers[i].interests, false);
+
+        const interestIds = expandedUserInterests.map((interest) => {
+            return interest.id;
+        })
+
+        const groupAsArr = [];
+        groupAsArr.push(updatedGroup)
+
+        adjustCandidateGroups(groupAsArr, interestIds);
+
+        updatedGroup = groupAsArr.at(0);
+
+        const compatibilityRatio = calcJaccardSimilarity(updatedGroup, expandedUserInterests.length)
+
+        if (compatibilityRatio > 0) {
+            //update new ratio in database
+            await prisma.group_User.update({
+                where: {
+                    userId_groupId: {
+                        groupId: groupId,
+                        userId: pendingUsers[i].id
+                    }
+                },
+                data: {
+                    compatibilityRatio: {
+                        set: compatibilityRatio.toFixed(2),
+                    },
+                },
+            })
+        } else {//if new compatibility ratio is 0, don't show to user anymore. i.e. delete the relation
+            await prisma.group_User.delete({
+                where: {
+                    userId_groupId: {
+                        groupId: groupId,
+                        userId: pendingUsers[i].id
+                    }
+                }
+            })
+        }
+    }
 }
 
 
-module.exports = { Status, getUserCoordinates, getExpandedInterests, getUnionOfSets, filterMembersByStatus, filterGroupsByLocation, getOtherGroupMembers, createEvent_User, adjustCandidateGroups, calcJaccardSimilarity };
+module.exports = { Status, getUserCoordinates, getExpandedInterests, getUnionOfSets, filterMembersByStatus, filterGroupsByLocation, getOtherGroupMembers, createEvent_User, adjustCandidateGroups, calcJaccardSimilarity, adjustPendingUserCompatibilities};

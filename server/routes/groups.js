@@ -7,7 +7,7 @@ const prisma = new PrismaClient();
 const { isAuthenticated } = require('../middleware/CheckAutheticated')
 const { findGroups } = require('../systems/GroupFindAlgo');
 const { updateGroupCentralLocation, updateGroupInterests, recalculateGroupCentralLocation, recalculateGroupInterests, sendExistingEventsToUser } = require('../systems/GroupUpdateMethods')
-const { Status, filterMembersByStatus, getUserCoordinates, calcJaccardSimilarity, getExpandedInterests, adjustCandidateGroups } = require('../systems/Utils');
+const { Status, filterMembersByStatus, getUserCoordinates, adjustPendingUserCompatibilities } = require('../systems/Utils');
 
 const FULL_GROUP_SIZE = 15;
 
@@ -204,65 +204,8 @@ router.put(`/user/groups/:groupId/${Status.ACCEPTED}`, isAuthenticated, async (r
 
         await sendExistingEventsToUser(eventIds, req.session.userId);
 
-
         //Now that group data has been updated, need to update the compatibility ratios for all the pending users for that group:
-        const pendingUsersFetched = await prisma.group_User.findMany({
-            where: {
-                groupId: groupId,
-                status: Status.PENDING
-            },
-            select: { user: { include: { interests: true } } }
-        })
-
-        //Need to make sure the array of users is just the interests and id:
-        const pendingUsers = pendingUsersFetched.map((user) => {
-            return { interests: user.user.interests, id: user.user.id };
-        })
-
-
-        for (let i = 0; i < pendingUsers.length; i++) {
-            //First, need to expand the user's interests:
-            const expandedUserInterests = await getExpandedInterests(pendingUsers[i].interests, false);
-
-            const interestIds = expandedUserInterests.map((interest) => {
-                return interest.id;
-            })
-
-            const groupAsArr = [];
-            groupAsArr.push(updatedGroupUser.group)
-
-            adjustCandidateGroups(groupAsArr, interestIds);
-
-            updatedGroupUser.group = groupAsArr.at(0);
-
-            const compatibilityRatio = calcJaccardSimilarity(updatedGroupUser.group, expandedUserInterests.length)
-
-            if (compatibilityRatio > 0) {
-                //update new ratio in database
-                await prisma.group_User.update({
-                    where: {
-                        userId_groupId: {
-                            groupId: groupId,
-                            userId: pendingUsers[i].id
-                        }
-                    },
-                    data: {
-                        compatibilityRatio: {
-                            set: compatibilityRatio.toFixed(2),
-                        },
-                    },
-                })
-            } else {//if new compatibility ratio is 0, don't show to user anymore. i.e. delete the relation
-                await prisma.group_User.delete({
-                    where: {
-                        userId_groupId: {
-                            groupId: groupId,
-                            userId: pendingUsers[i].id
-                        }
-                    }
-                })
-            }
-        }
+        await adjustPendingUserCompatibilities(groupId, updatedGroupUser.group)
 
 
         res.status(200).json(originalUpdatedGroupUser);
@@ -414,63 +357,7 @@ router.put(`/user/groups/:groupId/${Status.DROPPED}`, isAuthenticated, async (re
             originalUpdatedGroupUser = updatedGroupUser; //this will be modified later, so keep the updated version to return to user at the end
 
             //Now that group data has been updated, need to update the compatibility ratios for all the pending users for that group:
-            const pendingUsersFetched = await prisma.group_User.findMany({
-                where: {
-                    groupId: groupId,
-                    status: Status.PENDING
-                },
-                select: { user: { include: { interests: true } } }
-            })
-
-            //Need to make sure the array of users is just the interests and id:
-            const pendingUsers = pendingUsersFetched.map((user) => {
-                return { interests: user.user.interests, id: user.user.id };
-            })
-
-
-            for (let i = 0; i < pendingUsers.length; i++) {
-                //First, need to expand the user's interests:
-                const expandedUserInterests = await getExpandedInterests(pendingUsers[i].interests, false);
-
-                const interestIds = expandedUserInterests.map((interest) => {
-                    return interest.id;
-                })
-
-                const groupAsArr = [];
-                groupAsArr.push(updatedGroupUser.group)
-
-                adjustCandidateGroups(groupAsArr, interestIds);
-
-                updatedGroupUser.group = groupAsArr.at(0);
-
-                const compatibilityRatio = calcJaccardSimilarity(updatedGroupUser.group, expandedUserInterests.length)
-
-                if (compatibilityRatio > 0) {
-                    //update new ratio in database
-                    await prisma.group_User.update({
-                        where: {
-                            userId_groupId: {
-                                groupId: groupId,
-                                userId: pendingUsers[i].id
-                            }
-                        },
-                        data: {
-                            compatibilityRatio: {
-                                set: compatibilityRatio.toFixed(2),
-                            },
-                        },
-                    })
-                } else {//if new compatibility ratio is 0, don't show to user anymore. i.e. delete the relation
-                    await prisma.group_User.delete({
-                        where: {
-                            userId_groupId: {
-                                groupId: groupId,
-                                userId: pendingUsers[i].id
-                            }
-                        }
-                    })
-                }
-            }
+            await adjustPendingUserCompatibilities(groupId, updatedGroupUser.group)
 
         }
         res.status(200).json(originalUpdatedGroupUser ? { ...originalUpdatedGroupUser, isGroupDeleted: false } : { isGroupDeleted: true });
