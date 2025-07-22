@@ -45,7 +45,7 @@ const InteractiveStatusIcon = ({ status, isGroup, isWithinModal, username }) => 
     
     //set a small delay for on hover and on hover away. also, depending on whether the notification is within a modal or not, modify the distance between the icon and the tooltip
     return (
-        <div className="interactive-status-container" onMouseEnter={() => {setTimeout(onHover, 300)}} onMouseLeave={() => {setTimeout(onNoHover, 200)}}>
+        <div className="interactive-status-container" onMouseOver={onHover} onMouseLeave={onNoHover}>
             <StatusIcon status={status}/>
             {isHoveredOver && <ToolTip message={message} distanceFromIcon={isWithinModal? 20 : 130}/>}
         </div>

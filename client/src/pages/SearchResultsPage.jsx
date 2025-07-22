@@ -1,5 +1,4 @@
 import { useState, Suspense, useMemo, useEffect, useRef } from "react";
-import { useLoader } from "../contexts/LoadingContext";
 import NavBar from "../components/NavBar"
 import UserResultCard from "../components/UserResultCard";
 import FilterDropDown from "../components/FilterDropDown";
@@ -9,8 +8,6 @@ import "../styles/CardListContainer.css"
 
 const SearchResultsPage = () => {
 
-    const { setIsLoading } = useLoader(); //used to control loading screen during api call
-
     let searchIsReset = false; //set to true when search is triggered - NOT when load more is triggered
     const [userInterestMap, setUserInterestMap] = useState(new Map()); //map of user interest selected ids (keys) to the interest object. tallies for each will be loaded on backend
     const [searchQuery, setSearchQuery] = useState("");
@@ -19,7 +16,7 @@ const SearchResultsPage = () => {
     const [notif, setNotif] = useState("User results will show up here..."); //TODO: make notification better appearance and closer to search bar
     const [isDisplayedAutocompleteSuggestions, setIsDisplayedAutocompleteSuggestions] = useState(false);
     const [autocompleteSuggestions, setAutocompleteSuggestions] = useState(new Set());
-    const [isLoadMoreHidden, setIsLoadMoreHidden] = useState(false);
+    const [isLoadMoreHidden, setIsLoadMoreHidden] = useState(true);
     const pageMarker = useRef('HL0'); //'HL' means higher level cache. 'LL' means lower level cache. the number at the end of the pageMarker is the index
     const displayedAutocompleteSuggestions = useMemo(
         () => {
@@ -47,15 +44,10 @@ const SearchResultsPage = () => {
     )
 
     useEffect(() => {
-        fetchOnMountData();
+        fetchAutocompleteSuggestions();
+        fetchUserInterests();
     }, []);
 
-    const fetchOnMountData = async () => {
-        setIsLoading(true);
-        await fetchAutocompleteSuggestions();
-        await fetchUserInterests();
-        setIsLoading(false);
-    }
 
     const fetchUserInterests = async () => {
         try {
@@ -90,9 +82,9 @@ const SearchResultsPage = () => {
     }
 
     const handleSearchSubmit = async (suggestion) => {
-        setIsLoading(true);
         if (searchQuery === "" && suggestion === undefined) { //suggestion is defined if a search query occurred by clicking on an autocomplete suggestion
             setNotif("You haven't searched for anything!")
+            setSearchResults([]); //need to reset search results because search query was empty
         } else {
             //new search happened, so add it to top of typeahead suggestions
             addNewAutocompleteSuggestion(suggestion);
@@ -110,7 +102,6 @@ const SearchResultsPage = () => {
                 console.log("Error: ", error.message);
             }
         }
-        setIsLoading(false);
     }
 
     //---The below 4 functions are helper methods for handleSearchSubmit---//
@@ -190,23 +181,26 @@ const SearchResultsPage = () => {
                     <input className="search-input" value={searchQuery} placeholder="Search users..." onFocus={() => setIsDisplayedAutocompleteSuggestions(true)} onBlur={(event) => setIsDisplayedAutocompleteSuggestions(false)} onChange={handleQueryChange} />
                     <button type="submit" className="search-btn">Search</button>
                 </form>
+                <div className="break"></div>
                 {isDisplayedAutocompleteSuggestions &&
-                    <Suspense fallback={<p>Loading...</p>}>
-                        {Array.from(displayedAutocompleteSuggestions).slice(0).reverse().slice(0, 5).map((suggestion, index) => { //need to reverse because sets/maps maintain order by insertion and we want order by recency
-                            return <div
-                                className="autocomplete-recommendation"
-                                key={suggestion + index}
-                                onMouseDown={() => { //used onMouseDown to activate before onBlur
-                                    setSearchQuery(suggestion);
-                                    pageMarker.current = 'HL0';
-                                    searchIsReset = true;
-                                    handleSearchSubmit(suggestion);
-                                }}
-                            >
-                                {suggestion}
-                            </div>
-                        })}
-                    </Suspense>
+                    <div className="autocomplete-rec-section"> 
+                        <Suspense fallback={<p>Loading...</p>}>
+                            {Array.from(displayedAutocompleteSuggestions).slice(0).reverse().slice(0, 5).map((suggestion, index) => { //need to reverse because sets/maps maintain order by insertion and we want order by recency
+                                return <div
+                                    className="autocomplete-recommendation"
+                                    key={suggestion + index}
+                                    onMouseDown={() => { //used onMouseDown to activate before onBlur
+                                        setSearchQuery(suggestion);
+                                        pageMarker.current = 'HL0';
+                                        searchIsReset = true;
+                                        handleSearchSubmit(suggestion);
+                                    }}
+                                >
+                                    {suggestion}
+                                </div>
+                            })}
+                        </Suspense>
+                    </div>
                 }
             </div>
 

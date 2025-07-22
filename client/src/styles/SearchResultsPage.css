@@ -1,11 +1,17 @@
-.search-page {
-    position: relative;
+.break {
+    /* learned how to style a break for flex container from this resource: https://tobiasahlin.com/blog/flexbox-break-to-new-row/ */
+    flex-basis: 100%;
+    width: 0;
+    /*end of code from prev stated resource*/
 }
 
 .search-area {
-    justify-self: center;
-    width: 30vw;
-    position: absolute;
+    display: flex;
+    flex-direction: row;
+    flex-wrap: wrap;
+    align-items: center;
+    justify-content: center;
+    width: 100vw;
     z-index: 10;
 }
 
@@ -23,6 +29,12 @@
     border-radius: 20px;
 }
 
+.autocomplete-rec-section {
+    display: flex;
+    flex-direction: column;
+    min-width: 300px;
+}
+
 .autocomplete-recommendation {
     padding: 5px;
     background-color: rgb(209, 207, 207);
@@ -31,14 +43,4 @@
     border-width: 2px;
     border-radius: 20px;
     max-width: 300px;
-}
-
-.user-results-list {
-    top: 200px;
-    position: absolute;
-}
-
-.notif-para, .load-more-btn {
-    position: relative;
-    left: 45vw
 }
