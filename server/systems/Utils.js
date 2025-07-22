@@ -12,6 +12,16 @@ const Status = Object.freeze({
     DROPPED: "DROPPED"
 });
 
+//enums for event type
+const EventType = Object.freeze({
+    JUSTMEET: 0,
+    ENTERTAINMENT: 1,
+    EATING: 2,
+    ACTIVE: 3
+});
+
+
+
 const getUserCoordinates = async (userId) => {
     const userCoord = await prisma.$queryRaw`
     SELECT ST_X(coord::geometry), ST_Y(coord::geometry)
@@ -232,4 +242,4 @@ const adjustPendingUserCompatibilities = async (groupId, updatedGroup) => {
 }
 
 
-module.exports = { Status, getUserCoordinates, getExpandedInterests, getUnionOfSets, filterMembersByStatus, filterGroupsByLocation, getOtherGroupMembers, createEvent_User, adjustCandidateGroups, calcJaccardSimilarity, adjustPendingUserCompatibilities};
+module.exports = { Status, EventType, getUserCoordinates, getExpandedInterests, getUnionOfSets, filterMembersByStatus, filterGroupsByLocation, getOtherGroupMembers, createEvent_User, adjustCandidateGroups, calcJaccardSimilarity, adjustPendingUserCompatibilities};
