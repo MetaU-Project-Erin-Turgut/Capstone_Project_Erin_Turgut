@@ -17,7 +17,8 @@ const EventType = Object.freeze({
     JUSTMEET: 0,
     ENTERTAINMENT: 1,
     EATING: 2,
-    ACTIVE: 3
+    ACTIVE: 3,
+    NUMTYPES: 4 //specifies number of different event types
 });
 
 

@@ -6,7 +6,7 @@ const prisma = new PrismaClient()
 
 const { isAuthenticated } = require('../middleware/CheckAutheticated');
 const { scheduleEventsForGroups } = require('../systems/EventFindAlgo');
-const { Status } = require('../systems/Utils');
+const { Status, EventType } = require('../systems/Utils');
 
 //get user's events 
 router.get('/user/events/', isAuthenticated, async (req, res) => {
@@ -70,13 +70,35 @@ router.patch('/user/events/:eventId/status', isAuthenticated, async (req, res) =
                         userId: req.session.userId,
                         eventId: eventId
                     }
-                }
+                },
+                include: {user: {select: {eventTypeTallies: true}}, event: {select: {eventType: true}}}
         });
 
         if (!event_user) {
             res.status(404).json({error: 'This user - event relationship does not exist'});
         }
 
+        //Determine how to change tally by how the user's status for the event changed:
+        const changeBy = updatedStatus === Status.ACCEPTED ? 1 : -1
+
+        //Based on this event type, change tally in user's eventTypeTallies array at corresponding index.
+        let newEventTypeTallies = []
+        if (event_user.user.eventTypeTallies.length === 0) {
+            newEventTypeTallies = new Array(EventType.NUMTYPES).fill(0);
+        } else {
+            newEventTypeTallies = [...event_user.user.eventTypeTallies];
+        }
+        newEventTypeTallies[event_user.event.eventType] = newEventTypeTallies[event_user.event.eventType] + changeBy;
+
+        //update user's eventTypeTallies array
+        const updatedUser = await prisma.user.update({
+            where: {id: req.session.userId},
+            data: {
+                eventTypeTallies: newEventTypeTallies
+            }
+        })
+
+        //update event_user relationship status
         const updatedEvent = await prisma.event_User.update({
             where: {
                 userId_eventId: {
