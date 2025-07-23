@@ -205,7 +205,9 @@ const adjustGroupEventTypeTotals = (user, group, isDrop) => {
     if (group.eventTypeTotals.length === 0) {
         newGroupEventTypeTotals = new Array(EventType.NUMTYPES).fill(0);
     } else {
-        newGroupEventTypeTotals = [...group.eventTypeTotals]
+        for (eventTypeTotal of group.eventTypeTotals) {
+            newGroupEventTypeTotals.push(Number(eventTypeTotal)); //prisma formats Decimals as string, need to convert to number
+        }
     }
 
     //Need to combine user's event type array orderings (sortableArr version) with existing group array. 

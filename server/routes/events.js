@@ -6,7 +6,7 @@ const prisma = new PrismaClient()
 
 const { isAuthenticated } = require('../middleware/CheckAutheticated');
 const { scheduleEventsForGroups } = require('../systems/EventFindAlgo');
-const { Status, EventType } = require('../systems/Utils');
+const { Status, EventType, adjustGroupEventTypeTotals } = require('../systems/Utils');
 
 //get user's events 
 router.get('/user/events/', isAuthenticated, async (req, res) => {
@@ -88,9 +88,38 @@ router.patch('/user/events/:eventId/status', isAuthenticated, async (req, res) =
         } else {
             newEventTypeTallies = [...event_user.user.eventTypeTallies];
         }
+
+        const originalEventTypeTallies = [...newEventTypeTallies];
+
+
+        //calculate updated user eventTypeTallies
         newEventTypeTallies[event_user.event.eventType] = newEventTypeTallies[event_user.event.eventType] + changeBy;
 
-        //update user's eventTypeTallies array
+
+        /*User's event type preference may have changed, so for every group the user is a part of (ACCEPTED), 
+        drop the user's original eventTypeTallies array and add the new version*/
+        const groups = await prisma.group_User.findMany({
+                where: {
+                    userId: req.session.userId,
+                    status: Status.ACCEPTED
+                },
+                include: {group: true}
+        });
+
+        for (let i = 0; i < groups.length; i++) {
+            const groupRemovedUserEventTypes = adjustGroupEventTypeTotals({eventTypeTallies: originalEventTypeTallies}, groups[i].group, true);
+            const groupUpdatedUserEventTypes = adjustGroupEventTypeTotals({eventTypeTallies: newEventTypeTallies}, {eventTypeTotals: groupRemovedUserEventTypes}, false)
+
+            await prisma.group.update({
+                where: {id: groups[i].group.id},
+                data: {
+                    eventTypeTotals: groupUpdatedUserEventTypes
+                }
+            })
+        
+        }
+
+        //update user's eventTypeTallies array in db
         const updatedUser = await prisma.user.update({
             where: {id: req.session.userId},
             data: {
@@ -98,7 +127,7 @@ router.patch('/user/events/:eventId/status', isAuthenticated, async (req, res) =
             }
         })
 
-        //update event_user relationship status
+        //update event_user relationship status in db
         const updatedEvent = await prisma.event_User.update({
             where: {
                 userId_eventId: {
