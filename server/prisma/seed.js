@@ -62,6 +62,7 @@ async function main() {
                         return { interest: { connect: interest } }
                     })
                 },
+                eventTypeTotals: new Array(EventType.NUMTYPES).fill(0)
             },
         })
 

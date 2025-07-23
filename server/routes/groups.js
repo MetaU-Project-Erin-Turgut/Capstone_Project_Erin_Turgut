@@ -61,6 +61,7 @@ router.get('/user/groups/new', isAuthenticated, async (req, res) => {
                             return { interest: { connect: interest } }
                         })
                     },
+                    eventTypeTotals: new Array(EventType.NUMTYPES).fill(0)
                 },
                 include: {
                     interests: { include: { interest: true } }, members: { where: { NOT: { userId: req.session.userId } }, include: { user: true } }

@@ -8,6 +8,8 @@ const rateLimit = require("express-rate-limit");
 
 const opencage = require('opencage-api-client'); //public api
 
+const { EventType } = require('../systems/Utils');
+
 const loginLimiter = rateLimit({
     windowMs: 15 * 60 * 1000, // 15 minutes
     max: 5, // Limit each IP to 5 login attempts per windowMs
@@ -76,7 +78,7 @@ router.post('/signup', async (req, res) => {
 
         // Create a new user in the database
         //for mock data, have all users start out with location at meta's headquarters
-        const queryResult = await prisma.$queryRaw`INSERT INTO "User" (address, username, email, password, coord) VALUES(${address}, ${username}, ${email}, ${hashedPassword}, ST_SetSRID(ST_MakePoint(${userCoords.longitude}, ${userCoords.latitude}), 4326)::geography) RETURNING id, address, username, email, password, ST_AsText(coord);`;
+        const queryResult = await prisma.$queryRaw`INSERT INTO "User" (address, username, email, password, "eventTypeTallies", coord) VALUES(${address}, ${username}, ${email}, ${hashedPassword}, ${new Array(EventType.NUMTYPES).fill(0)}, ST_SetSRID(ST_MakePoint(${userCoords.longitude}, ${userCoords.latitude}), 4326)::geography) RETURNING id, address, username, email, password, ST_AsText(coord);`;
 
         const newUser = queryResult.at(0);
         // Store user ID and username in the session, allowing them to remain authenticated as they navigate the website
