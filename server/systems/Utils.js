@@ -181,6 +181,36 @@ const createEvent_User = async (userId, eventId) => {
 
 }
 
+const adjustGroupEventTypeTotals = (user, group, isDrop) => {
+
+    //order user's event type preferences based on tallies:
+
+    const sortableArr = user.eventTypeTallies.map((eventTypeTally, index) => {
+        return { tally: eventTypeTally, eventType: index }
+    })
+
+    sortableArr.sort((a, b) => b.tally - a.tally);
+
+    let newGroupEventTypeTotals = []
+
+    //get copy of group's eventTypeTotals array
+    if (group.eventTypeTotals.length === 0) {
+        newGroupEventTypeTotals = new Array(EventType.NUMTYPES).fill(0);
+    } else {
+        newGroupEventTypeTotals = [...group.eventTypeTotals]
+    }
+
+    //Need to combine user's event type array orderings (sortableArr version) with existing group array. 
+    let currLevel = EventType.NUMTYPES; //addition will occur based on how high an event type is ranked for current user. Highest = number of event types and lowest = 1
+    //start with user's highest ranked event type and add/subtract the corresponding ranking to the event type index in group array
+    for (let i = 0; i < sortableArr.length; i++) {
+        newGroupEventTypeTotals[sortableArr[i].eventType] = newGroupEventTypeTotals[sortableArr[i].eventType] + (isDrop ? -(currLevel) : currLevel); 
+        currLevel--;
+    }
+
+    return newGroupEventTypeTotals;
+}
+
 const adjustPendingUserCompatibilities = async (groupId, updatedGroup) => {
     //Now that group data has been updated, need to update the compatibility ratios for all the pending users for that group:
     const pendingUsersFetched = await prisma.group_User.findMany({
@@ -243,4 +273,4 @@ const adjustPendingUserCompatibilities = async (groupId, updatedGroup) => {
 }
 
 
-module.exports = { Status, EventType, getUserCoordinates, getExpandedInterests, getUnionOfSets, filterMembersByStatus, filterGroupsByLocation, getOtherGroupMembers, createEvent_User, adjustCandidateGroups, calcJaccardSimilarity, adjustPendingUserCompatibilities};
+module.exports = { Status, EventType, getUserCoordinates, getExpandedInterests, getUnionOfSets, filterMembersByStatus, filterGroupsByLocation, getOtherGroupMembers, createEvent_User, adjustCandidateGroups, calcJaccardSimilarity, adjustPendingUserCompatibilities, adjustGroupEventTypeTotals };
