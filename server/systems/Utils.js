@@ -12,6 +12,17 @@ const Status = Object.freeze({
     DROPPED: "DROPPED"
 });
 
+//enums for event type
+const EventType = Object.freeze({
+    JUSTMEET: 0,
+    ENTERTAINMENT: 1,
+    EATING: 2,
+    ACTIVE: 3,
+    NUMTYPES: 4 //specifies number of different event types
+});
+
+
+
 const getUserCoordinates = async (userId) => {
     const userCoord = await prisma.$queryRaw`
     SELECT ST_X(coord::geometry), ST_Y(coord::geometry)
@@ -170,6 +181,66 @@ const createEvent_User = async (userId, eventId) => {
 
 }
 
+//borda count implementation
+const adjustGroupEventTypeTotals = (user, group, isDrop) => {
+    //order user's event type preferences based on tallies:
+
+    let talliesMap = new Map()//key is tally number and values are count of number of event type (indices) in user eventTypeTallies with that tally. - this is necessary for duplicate handling later in this function
+
+    const sortableArr = user.eventTypeTallies.map((eventTypeTally, index) => {
+        if (talliesMap.has(eventTypeTally)) {
+            talliesMap.set(eventTypeTally, talliesMap.get(eventTypeTally) + 1)
+        } else {
+            talliesMap.set(eventTypeTally, 1)
+        }
+       
+        return { tally: eventTypeTally, eventType: index }
+    })
+
+    sortableArr.sort((a, b) => b.tally - a.tally);
+
+    let newGroupEventTypeTotals = []
+
+    //get copy of group's eventTypeTotals array
+    if (group.eventTypeTotals.length === 0) {
+        newGroupEventTypeTotals = new Array(EventType.NUMTYPES).fill(0);
+    } else {
+        for (eventTypeTotal of group.eventTypeTotals) {
+            newGroupEventTypeTotals.push(Number(eventTypeTotal)); //prisma formats Decimals as string, need to convert to number
+        }
+    }
+
+    //Need to combine user's event type array orderings (sortableArr version) with existing group array. 
+    let currLevel = EventType.NUMTYPES; //addition will occur based on how high an event type is ranked for current user. Highest = number of event types and lowest = 1
+    //start with user's highest ranked event type and add/subtract the corresponding ranking to the event type index in group array
+
+    //NOTE: the below for loop and the ones within it cannot be any larger than the number of event types, so there isn't a complexity concern here
+    for (let i = 0; i < sortableArr.length; i++) {
+        if (talliesMap.get(sortableArr[i].tally) > 1) { 
+            //duplicate encountered, the next following talliesMap.get(sortableArr[i].tally) number of items should be the same duplicates
+            let newCurrLevel = currLevel;
+
+            //for duplicates, add all the currLevel values they would be if they weren't duplicates and divide by how many duplicates there are
+            const numDuplicates = talliesMap.get(sortableArr[i].tally);
+            for (let j = 1; j < numDuplicates; j++) {
+                newCurrLevel += (currLevel - j)
+            }
+            newCurrLevel /= numDuplicates;
+
+            for(let j = 0; j < numDuplicates; j++) {
+                newGroupEventTypeTotals[sortableArr[i + j].eventType] = newGroupEventTypeTotals[sortableArr[i + j].eventType] + (isDrop ? -(newCurrLevel) : newCurrLevel); 
+            }
+            i += (numDuplicates - 1);
+            currLevel -= numDuplicates;
+            continue;
+        }
+        newGroupEventTypeTotals[sortableArr[i].eventType] = newGroupEventTypeTotals[sortableArr[i].eventType] + (isDrop ? -(currLevel) : currLevel); 
+        currLevel--;
+    }
+
+    return newGroupEventTypeTotals;
+}
+
 const adjustPendingUserCompatibilities = async (groupId, updatedGroup) => {
     //Now that group data has been updated, need to update the compatibility ratios for all the pending users for that group:
     const pendingUsersFetched = await prisma.group_User.findMany({
@@ -232,4 +303,4 @@ const adjustPendingUserCompatibilities = async (groupId, updatedGroup) => {
 }
 
 
-module.exports = { Status, getUserCoordinates, getExpandedInterests, getUnionOfSets, filterMembersByStatus, filterGroupsByLocation, getOtherGroupMembers, createEvent_User, adjustCandidateGroups, calcJaccardSimilarity, adjustPendingUserCompatibilities};
+module.exports = { Status, EventType, getUserCoordinates, getExpandedInterests, getUnionOfSets, filterMembersByStatus, filterGroupsByLocation, getOtherGroupMembers, createEvent_User, adjustCandidateGroups, calcJaccardSimilarity, adjustPendingUserCompatibilities, adjustGroupEventTypeTotals };

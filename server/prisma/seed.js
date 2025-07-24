@@ -1,4 +1,5 @@
 const { PrismaClient } = require('../generated/prisma');
+const { EventType } = require('../systems/Utils');
 const prisma = new PrismaClient()
 
 const interests = [
@@ -23,13 +24,13 @@ const groups = [
 ];
 
 const events = [
-    {title: 'Passed event', description: 'Passed event', dateTime: new Date('2025-05-25T12:00:00Z'), latitude: 37.4855, longitude: -122.1500, interest: {"id": 10}},
-    {title: 'Tennis game', description: 'Tennis game in mpk', dateTime: new Date('2025-07-22T12:00:00Z'), latitude: 37.4855, longitude: -122.1500, interest: {"id": 10}},
-    {title: 'Indie Rock Concert', description: 'Indie Rock concert in mpk', dateTime: new Date('2025-12-25T12:00:00Z'), latitude: 37.4855, longitude: -122.1500, interest: {"id": 7}},
-    {title: 'ACDC concert', description: 'ACDC concert in mpk', dateTime: new Date('2025-11-25T12:00:00Z'), latitude: 37.4855, longitude: -122.1500, interest: {"id": 9}},
-    {title: 'karaoke night', description: 'karaoke night out', dateTime: new Date('2025-11-25T12:00:00Z'), latitude: 37.4855, longitude: -122.1500, interest: {"id": 4}},
-    {title: 'Baking competition', description: 'Baking competition in mpk', dateTime: new Date('2025-10-25T12:00:00Z'), latitude: 37.4855, longitude: -122.1500, interest: {"id": 11}},
-    {title: 'Music festival', description: 'Music festival in Tokyo', dateTime: new Date('2025-09-25T12:00:00Z'), latitude: 35.6895, longitude: 139.6917, interest: {"id": 0}},
+    {title: 'Passed event', description: 'Passed event', dateTime: new Date('2025-05-25T12:00:00Z'), latitude: 37.4855, longitude: -122.1500, interest: {"id": 10}, eventType: EventType.EATING},
+    {title: 'Tennis game', description: 'Tennis game in mpk', dateTime: new Date('2025-07-22T12:00:00Z'), latitude: 37.4855, longitude: -122.1500, interest: {"id": 10}, eventType: EventType.ACTIVE},
+    {title: 'Indie Rock Concert', description: 'Indie Rock concert in mpk', dateTime: new Date('2025-12-25T12:00:00Z'), latitude: 37.4855, longitude: -122.1500, interest: {"id": 7}, eventType: EventType.ENTERTAINMENT},
+    {title: 'ACDC concert', description: 'ACDC concert in mpk', dateTime: new Date('2025-11-25T12:00:00Z'), latitude: 37.4855, longitude: -122.1500, interest: {"id": 9}, eventType: EventType.ENTERTAINMENT},
+    {title: 'karaoke night', description: 'karaoke night out', dateTime: new Date('2025-11-25T12:00:00Z'), latitude: 37.4855, longitude: -122.1500, interest: {"id": 4}, eventType: EventType.ENTERTAINMENT},
+    {title: 'Baking competition', description: 'Baking competition in mpk', dateTime: new Date('2025-10-25T12:00:00Z'), latitude: 37.4855, longitude: -122.1500, interest: {"id": 11}, eventType: EventType.ACTIVE},
+    {title: 'Music festival', description: 'Music festival in Tokyo', dateTime: new Date('2025-09-25T12:00:00Z'), latitude: 35.6895, longitude: 139.6917, interest: {"id": 0}, eventType: EventType.ENTERTAINMENT},
 
 ]
 async function main() {
@@ -61,6 +62,7 @@ async function main() {
                         return { interest: { connect: interest } }
                     })
                 },
+                eventTypeTotals: new Array(EventType.NUMTYPES).fill(0)
             },
         })
 
@@ -68,7 +70,7 @@ async function main() {
     }
 
      for (const event of events) {
-        const eventRecordId = await prisma.$queryRaw`INSERT INTO "Event" ("title", "description", "dateTime", "coord") VALUES(${event.title}, ${event.description}, ${event.dateTime}, ST_SetSRID(ST_MakePoint(${event.longitude}, ${event.latitude}), 4326)::geography) RETURNING id`;
+        const eventRecordId = await prisma.$queryRaw`INSERT INTO "Event" ("title", "description", "dateTime", "eventType", "coord") VALUES(${event.title}, ${event.description}, ${event.dateTime}, ${event.eventType}, ST_SetSRID(ST_MakePoint(${event.longitude}, ${event.latitude}), 4326)::geography) RETURNING id`;
 
         //for seeding, include interests - would not be done this way in finished product:
         await prisma.event.update({

@@ -7,7 +7,7 @@ const prisma = new PrismaClient();
 const { isAuthenticated } = require('../middleware/CheckAutheticated')
 const { findGroups } = require('../systems/GroupFindAlgo');
 const { updateGroupCentralLocation, updateGroupInterests, recalculateGroupCentralLocation, recalculateGroupInterests, sendExistingEventsToUser } = require('../systems/GroupUpdateMethods')
-const { Status, filterMembersByStatus, getUserCoordinates, adjustPendingUserCompatibilities } = require('../systems/Utils');
+const { Status, filterMembersByStatus, getUserCoordinates, adjustPendingUserCompatibilities, EventType, adjustGroupEventTypeTotals } = require('../systems/Utils');
 
 const FULL_GROUP_SIZE = 15;
 
@@ -61,6 +61,7 @@ router.get('/user/groups/new', isAuthenticated, async (req, res) => {
                             return { interest: { connect: interest } }
                         })
                     },
+                    eventTypeTotals: new Array(EventType.NUMTYPES).fill(0)
                 },
                 include: {
                     interests: { include: { interest: true } }, members: { where: { NOT: { userId: req.session.userId } }, include: { user: true } }
@@ -147,6 +148,7 @@ router.put(`/user/groups/:groupId/${Status.ACCEPTED}`, isAuthenticated, async (r
         if (acceptedMembers.length + 1 >= FULL_GROUP_SIZE) {
             newIsFullStatus = true;
         }
+        const newGroupEventTypeTotals = adjustGroupEventTypeTotals(group_user.user, group_user.group, false); //pass false because user is not dropping the group
 
         //update group in database (update if is now full, update coordinates, update interests list)
         const updatedGroup = await prisma.group.update({
@@ -158,7 +160,8 @@ router.put(`/user/groups/:groupId/${Status.ACCEPTED}`, isAuthenticated, async (r
                         return { interest: { connect: { id: interest } } }
                     })
                 },
-                isFull: newIsFullStatus
+                isFull: newIsFullStatus,
+                eventTypeTotals: newGroupEventTypeTotals
             },
         })
 
@@ -325,6 +328,9 @@ router.put(`/user/groups/:groupId/${Status.DROPPED}`, isAuthenticated, async (re
 
             const newGroupInterests = await recalculateGroupInterests(acceptedMembers, group_user.group.interests);
 
+            //we also need to adjust the group eventTypeTotals array with this new user deletion:
+            const newGroupEventTypeTotals = adjustGroupEventTypeTotals(group_user.user, group_user.group, true); //pass true because user is dropping the group
+
             //update group in database (update coordinates, update interests list)
             const updatedGroup = await prisma.group.update({
                 where: { id: groupId },
@@ -334,7 +340,8 @@ router.put(`/user/groups/:groupId/${Status.DROPPED}`, isAuthenticated, async (re
                         create: newGroupInterests.map((interest) => {
                             return { interest: { connect: { id: interest.id } } }
                         })
-                    }
+                    },
+                    eventTypeTotals: newGroupEventTypeTotals
                 },
             })
 

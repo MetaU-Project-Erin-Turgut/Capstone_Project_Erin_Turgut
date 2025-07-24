@@ -9,15 +9,16 @@ datasource db {
 }
 
 model User {
-  id           Int           @id @default(autoincrement())
-  username     String        @unique
-  email        String        @unique
-  password     String
-  address      String
-  events       Event_User[]
-  groups       Group_User[]
-  userProfile  User_Profile?
-  interests    Interest[]
+  id               Int           @id @default(autoincrement())
+  username         String        @unique
+  email            String        @unique
+  password         String
+  address          String
+  eventTypeTallies Int[]
+  events           Event_User[]
+  groups           Group_User[]
+  userProfile      User_Profile?
+  interests        Interest[]
 }
 
 model User_Profile {
@@ -33,6 +34,7 @@ model Event {
   title       String
   description String
   dateTime    DateTime
+  eventType   Int
   interestId  Int?
   interest    Interest?     @relation(fields: [interestId], references: [id])
   attendees   Event_User[]
@@ -40,13 +42,14 @@ model Event {
 }
 
 model Group {
-  id          Int           @id @default(autoincrement())
-  title       String
-  description String
-  isFull      Boolean       @default(false)
-  events      Group_Event[]
-  members     Group_User[]
-  interests   Group_Interest[]
+  id              Int           @id @default(autoincrement())
+  title           String
+  description     String
+  isFull          Boolean       @default(false)
+  eventTypeTotals Decimal[]
+  events          Group_Event[]
+  members         Group_User[]
+  interests       Group_Interest[]
 }
 
 model Interest {
@@ -76,8 +79,8 @@ model Event_User {
 model Group_User {
   userId              Int
   groupId             Int
-  status              Status @default(PENDING)
-  compatibilityRatio  Decimal @default("0.00")
+  status              Status     @default(PENDING)
+  compatibilityRatio  Decimal    @default("0.00")
   group               Group      @relation(fields: [groupId], references: [id])
   user                User       @relation(fields: [userId], references: [id])
 
