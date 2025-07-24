@@ -28,7 +28,7 @@ const Group = ( {groupData, onUpdateGroup}) => {
         status={groupData.status} 
         isGroup={true}
         fields={new Set([CardFields.TITLE, CardFields.DESCRIPTION, CardFields.COMPATIBILITY, CardFields.STATUS])} 
-        modalFields={new Set([ModalFields.TITLE, ModalFields.DESCRIPTION, ModalFields.INTERESTS, ModalFields.PEOPLE])} 
+        modalFields={new Set([ModalFields.TITLE, ModalFields.DESCRIPTION, ModalFields.INTERESTS, ModalFields.PEOPLE, ModalFields.EVENT_PREFERENCES])} 
         onUpdate={updateGroup}
     />
 }

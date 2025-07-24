@@ -8,7 +8,6 @@ import "../styles/CardListContainer.css"
 
 const GroupsList = () => {
 
-
     const [groups, setGroups] = useState(new Map());
     const [statusFilter, setStatusFilter] = useState(Status.NONE);
     const displayedGroups = useMemo(

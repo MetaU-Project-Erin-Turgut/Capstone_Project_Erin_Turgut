@@ -40,8 +40,12 @@ const ModalFields = Object.freeze({
     INTERESTS: "interests",
     PEOPLE: "people",
     ATTENDEES: "attendees",
-    INTEREST: "interest"
+    INTEREST: "interest",
+    EVENT_PREFERENCES: "eventTypePreferences"
 });
 
+//array used to map index to event type string
+const EventTypeArr = ["Just Meet", "Entertainment", "Eating", "Active"]
 
-export { Tab, Status, DEFAULT_FORM_VALUE, CardFields, ModalFields };
+
+export { Tab, Status, DEFAULT_FORM_VALUE, CardFields, ModalFields, EventTypeArr };
