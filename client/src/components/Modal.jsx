@@ -3,6 +3,7 @@ import { ModalFields, Status } from "../utils/utils";
 import StatusForm from './StatusForm';
 import SingularSelectedInterest from './SingularSelectedInterest';
 import MemberTile from './MemberTile';
+import EventTypePreferenceDisplay from './EventTypePreferenceDisplay';
 import "../styles/Modal.css";
 
 //general Modal component used by Group.jsx and Event.jsx
@@ -28,6 +29,13 @@ const Modal = ({ onModalClose, cardData, onStatusUpdate, fields, status, isGroup
                                 ))}
                             </Suspense>
                         </section>
+                    </>
+                }
+
+                {fields.has(ModalFields.EVENT_PREFERENCES) &&
+                    <>
+                        <h2>Member Event Type Preferences:</h2>
+                        <EventTypePreferenceDisplay eventTypeTotals={cardData.eventTypeTotals}/>
                     </>
                 }
 

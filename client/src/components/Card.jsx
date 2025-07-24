@@ -6,7 +6,7 @@ import InteractiveStatusIcon from './InteractiveStatusIcon';
 import "../styles/Card.css"
 
 //general Card component used by Group.jsx and Event.jsx
-const Card = ({fields, cardData, compatibilityRatio, status, onUpdate, modalFields, isGroup}) => {
+const Card = ({fields, cardData, compatibilityRatio, status, onUpdate, modalFields, isGroup, isTopEventType}) => {
 
     const [isModalVisible, setIsModalVisible] = useState(false);
 
@@ -19,6 +19,7 @@ const Card = ({fields, cardData, compatibilityRatio, status, onUpdate, modalFiel
 
     return (<>
         <div className="card" onClick={openModal}>
+            {(!isGroup && status !== Status.ACCEPTED && isTopEventType) && <p>We think you'll like this event!</p>}
             <section className="card-header">
                 {fields.has(CardFields.STATUS) && <InteractiveStatusIcon isGroup={isGroup} isWithinModal={false} status={status}/>}
                 {fields.has(CardFields.TITLE) && <h4 className="title">{cardData.title}</h4>}

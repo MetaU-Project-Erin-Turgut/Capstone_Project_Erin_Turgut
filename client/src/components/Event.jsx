@@ -3,7 +3,8 @@ import { CardFields, ModalFields } from "../utils/utils"
 import APIUtils from '../utils/APIUtils';
 import "../styles/Card.css";
 
-const Event = ( {eventData, onUpdateEvent}) => {
+const Event = ( {eventData, onUpdateEvent, isTopEventType}) => {
+
     const { id } = eventData.event;
 
     const updateEvent = async(statusState) => {
@@ -22,6 +23,7 @@ const Event = ( {eventData, onUpdateEvent}) => {
             cardData={eventData.event} 
             status={eventData.status} 
             isGroup={false}
+            isTopEventType={isTopEventType}
             fields={new Set([CardFields.TITLE, CardFields.DESCRIPTION, CardFields.DATEANDTIME, CardFields.STATUS])}
             modalFields={new Set([ModalFields.TITLE, ModalFields.DESCRIPTION, ModalFields.INTEREST, ModalFields.ATTENDEES])}  
             onUpdate={updateEvent}

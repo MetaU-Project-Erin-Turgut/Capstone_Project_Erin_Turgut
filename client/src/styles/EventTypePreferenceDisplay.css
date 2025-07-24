@@ -1,0 +1,19 @@
+.event-type-display {
+    display: flex;
+    align-items: center;
+}
+
+.event-type-pie-chart {
+    width: 100px;
+    height: 100px;
+    background-color: transparent;
+    border-radius: 50%;
+    border: solid grey 1px;
+    background: conic-gradient(var(--calculated-conic-gradient));
+    margin: 0px 18px 0px 10px;
+} 
+
+.event-type-key {
+    color: var(--text-color);
+    font-size: 20px;
+}
