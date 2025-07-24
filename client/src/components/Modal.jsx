@@ -1,23 +1,13 @@
-import { useMemo, Suspense } from 'react';
-import { ModalFields, Status, EventTypeArr } from "../utils/utils";
+import { Suspense } from 'react';
+import { ModalFields, Status } from "../utils/utils";
 import StatusForm from './StatusForm';
 import SingularSelectedInterest from './SingularSelectedInterest';
 import MemberTile from './MemberTile';
+import EventTypePreferenceDisplay from './EventTypePreferenceDisplay';
 import "../styles/Modal.css";
 
 //general Modal component used by Group.jsx and Event.jsx
 const Modal = ({ onModalClose, cardData, onStatusUpdate, fields, status, isGroup }) => {
-
-    const sortedEventTypeTotals = useMemo(
-        () => {
-            const sortableArr = cardData.eventTypeTotals.map((eventTypeTotal, index) => {
-                return { total: eventTypeTotal, eventType: index }
-            })
-            sortableArr.sort((a, b) => b.total - a.total);
-            return sortableArr;
-        },
-        []
-    );
 
     return (
     <div className="overlay">
@@ -45,13 +35,7 @@ const Modal = ({ onModalClose, cardData, onStatusUpdate, fields, status, isGroup
                 {fields.has(ModalFields.EVENT_PREFERENCES) &&
                     <>
                         <h2>Member event preferences:</h2>
-                        <section className='interests'>
-                            <Suspense fallback={<p>Loading event type preferences...</p>}>
-                                {sortedEventTypeTotals.map((eventTypeObj) => (
-                                    <p key={eventTypeObj.index + eventTypeObj.total}>{EventTypeArr.at(eventTypeObj.eventType)}</p>
-                                ))}
-                            </Suspense>
-                        </section>
+                        <EventTypePreferenceDisplay eventTypeTotals={cardData.eventTypeTotals}/>
                     </>
                 }
 
