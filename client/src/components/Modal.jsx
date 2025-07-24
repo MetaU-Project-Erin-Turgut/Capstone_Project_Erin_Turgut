@@ -34,7 +34,7 @@ const Modal = ({ onModalClose, cardData, onStatusUpdate, fields, status, isGroup
 
                 {fields.has(ModalFields.EVENT_PREFERENCES) &&
                     <>
-                        <h2>Member event preferences:</h2>
+                        <h2>Member Event Type Preferences:</h2>
                         <EventTypePreferenceDisplay eventTypeTotals={cardData.eventTypeTotals}/>
                     </>
                 }

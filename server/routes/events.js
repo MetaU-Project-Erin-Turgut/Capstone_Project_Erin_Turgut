@@ -58,6 +58,22 @@ router.get('/user/events/', isAuthenticated, async (req, res) => {
     }
 })
 
+//get user eventTypeTallies
+router.get('/user/tallies', isAuthenticated, async (req, res) => {
+    try {
+        const eventTypeTallies = await prisma.user.findUnique({
+            where: {
+                id: req.session.userId, 
+            },
+            select: {eventTypeTallies: true}
+        })
+        res.status(201).json(eventTypeTallies);
+    } catch (error) {
+        console.error("Error fetching user event type tallies:", error)
+        res.status(500).json({ error: "Something went wrong while fetching user event type tallies." })
+    }
+})
+
 //update user's status for an event
 router.patch('/user/events/:eventId/status', isAuthenticated, async (req, res) => {
     const eventId = parseInt(req.params.eventId);

@@ -3,7 +3,6 @@ import { CardFields, ModalFields, Status } from "../utils/utils";
 import APIUtils from '../utils/APIUtils';
 import "../styles/Card.css";
 
-
 const Group = ( {groupData, onUpdateGroup}) => {
     const { id } = groupData.group;
 

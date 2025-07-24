@@ -53,6 +53,22 @@ export default class APIUtils {
 
     }
 
+    static fetchUserEventTypeTallies = async () => {
+        const response = await fetch("http://localhost:3000/user/tallies", {
+            method: "GET",
+            headers: { "Content-Type": "application/json" },
+            credentials: "include",
+        });
+
+        const data = await response.json();
+
+        if (response.ok) {
+            return data;
+        } else {
+            throw {status: response.status, message: data.error};
+        }
+    }
+
     static fetchEvents = async () => {
         const response = await fetch("http://localhost:3000/user/events/", {
             method: "GET",

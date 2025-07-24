@@ -6,9 +6,7 @@ import FilterOptions from "../components/FilterOptions";
 import APIUtils from '../utils/APIUtils';
 import "../styles/CardListContainer.css"
 
-const EventsList = () => {
-
-
+const EventsList = ({ userTopEventType }) => {
     const [events, setEvents] = useState(new Map());
     const [statusFilter, setStatusFilter] = useState(Status.NONE);
     const displayedEvents = useMemo(
@@ -49,6 +47,7 @@ const EventsList = () => {
                     <Event 
                         key={key}
                         eventData={value}
+                        isTopEventType={(value.event.eventType == userTopEventType)}
                         onUpdateEvent= {(newEventObj) => {
                             const updatedEvents = new Map(events);
                             updatedEvents.set(newEventObj.eventId, newEventObj);
