@@ -3,6 +3,7 @@
     max-height: 400px;
     min-width: 220px;
     padding: 8px;
+    border-radius: 30px;
 }
 
 .card-header {

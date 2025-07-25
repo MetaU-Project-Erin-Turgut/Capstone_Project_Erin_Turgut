@@ -1,0 +1,99 @@
+.filter-component {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: -3px;
+}
+
+.filter-slider {
+    border: solid black 2px;
+    box-shadow: 0px 5px 10px rgb(114, 112, 112); 
+    z-index: 5;
+    padding: 15px;
+    border-radius: 30px;
+    font-weight: 700;
+    font-size: 20px;
+    display: inline-block;
+    width: 250px;
+    transition: width .5s;
+    overflow: hidden;
+}
+
+.filter-slider:hover{
+    width: 400px;
+    cursor: pointer;
+}
+
+.filter-option-container {
+    border-radius: 30px;
+    color: black;
+    display: flex;
+    min-height: 30px;
+    min-width: 300px;
+    overflow: scroll;
+    scroll-snap-type: x mandatory;
+    overscroll-behavior-x: contain;
+    margin-bottom: 3px;
+}
+
+/* Learned how to hide scroll bar with this code from: https://www.w3schools.com/howto/howto_css_hide_scrollbars.asp */
+.filter-option-container::-webkit-scrollbar {
+  display: none;
+}
+/*end of copied code*/
+
+
+.filter-option {
+    padding: 5px;
+    border-radius: 30px;
+    font-weight: 700;
+    justify-content: center;
+    font-size: 20px;
+    max-height: 30px;
+    min-width: 400px;
+    scroll-snap-align: center;
+}
+
+.dot-container {
+    display: flex;
+    flex-direction: row;
+    justify-content: center;
+}
+.dot {
+    border-radius: 50%;
+    width: 8px;
+    height: 8px;
+    background-color: rgb(2, 81, 81);
+    margin-right: 5px;
+}
+
+.selected {
+    background-color: rgb(4, 213, 213);
+    animation-name: expand;
+    animation-duration: .5s;
+}
+
+@keyframes expand {
+    0% {width: 9px; height: 9px;}
+    25% {width: 12px; height: 12px;}
+    50% {width: 15px; height: 15px;}
+    75% {width: 12px; height: 12px;}
+    100% {width: 8px; height: 8px;}
+
+}
+
+.curr-filter-display {
+    border: solid black 2px;
+    padding: 8px;
+    border-bottom-left-radius: 30px;
+    border-bottom-right-radius: 30px;
+    font-weight: 700;
+    font-size: 20px;
+    display: inline-block;
+    width: 125px;
+    max-height: 14px;
+}
+
+.curr-filter-text {
+    font-size: 16px;
+}

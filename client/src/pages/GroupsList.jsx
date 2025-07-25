@@ -2,7 +2,7 @@ import { useState, useEffect, useMemo } from 'react';
 import { Suspense } from 'react';
 import { Status } from "../utils/utils";
 import Group from "../components/Group";
-import FilterOptions from "../components/FilterOptions";
+import FilterSlider from "../components/FilterSlider";
 import APIUtils from '../utils/APIUtils';
 import "../styles/CardListContainer.css"
 
@@ -40,7 +40,7 @@ const GroupsList = () => {
     return (
         <>
         <h2>Groups</h2>
-        <FilterOptions onFilterChange={(status) => {setStatusFilter(status)}}/>
+        <FilterSlider onFilterChange={(status) => {setStatusFilter(status)}}/>
         <div className="card-container">
             <Suspense fallback={<p>Loading...</p>}>
                 {Array.from(displayedGroups.entries()).map(([key, value]) => (
