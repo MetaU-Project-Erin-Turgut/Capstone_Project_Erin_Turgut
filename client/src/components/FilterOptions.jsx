@@ -32,8 +32,8 @@ const FilterOptions = ( {onFilterChange}) => {
             </>
             }
         </div>
-       <div className={isFilterActive ? "hidden" : "curr-filter-display"}>
-            <div className="curr-filter-text">{currSelectedFilter}</div>
+       <div className="curr-filter-display">
+            <div className="curr-filter-text">{!isFilterActive ? currSelectedFilter : "Click to select"}</div>
         </div>
     </div>
     )
