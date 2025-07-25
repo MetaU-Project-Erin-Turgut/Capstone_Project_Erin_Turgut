@@ -147,6 +147,7 @@ const SearchResultsPage = () => {
 
         if (apiResultData.results.length === 0) {
             setNotif("No results found!")
+            setSearchResults([]); //need to reset search results because no result was found for new query
         } else {
             if (searchIsReset) {
                 setSearchResults(apiResultData.results);

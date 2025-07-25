@@ -47,7 +47,7 @@ const createGroup_Event = async (groupId, eventId) => {
 }
 
 const sendInvitesToUsers = () => {
-    // TODO: will implement public api for sending invites soon, for now just return 200 to mock 200 ok status
+    // TODO: possible stretch goal: implement public api for sending invites, for now just return 200 to mock 200 ok status
     return (200);
 }
 

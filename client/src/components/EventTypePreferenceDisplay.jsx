@@ -1,10 +1,10 @@
 import { Suspense } from 'react';
-import { EventTypeArr } from "../utils/utils";
+import { EventTypeArr, EventTypePreferenceColors } from "../utils/utils";
 import "../styles/EventTypePreferenceDisplay.css";
 
 const EventTypePreferenceDisplay = ({ eventTypeTotals }) => {
 
-    const colors = ['red', 'green', 'blue', '#9929EA']; // TODO: should make dynamic
+    const colors = Object.values(EventTypePreferenceColors);
 
     let cumulativeTotals = 0;
     for (let i = 0; i < eventTypeTotals.length; i++) {

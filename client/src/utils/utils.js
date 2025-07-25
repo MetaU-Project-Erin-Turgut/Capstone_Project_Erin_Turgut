@@ -47,5 +47,13 @@ const ModalFields = Object.freeze({
 //array used to map index to event type string
 const EventTypeArr = ["Just Meet", "Entertainment", "Eating", "Active"]
 
+//for use in modal event type distribution pie charts
+const EventTypePreferenceColors = Object.freeze({
+    JUSTMEET: 'red',
+    ENTERTAINMENT: 'green',
+    EATING: 'blue',
+    ACTIVE: '#9929EA',
+});
 
-export { Tab, Status, DEFAULT_FORM_VALUE, CardFields, ModalFields, EventTypeArr };
+
+export { Tab, Status, DEFAULT_FORM_VALUE, CardFields, ModalFields, EventTypeArr, EventTypePreferenceColors };
