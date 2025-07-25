@@ -21,12 +21,12 @@ const FilterSlider = ( {onFilterChange}) => {
             <>
                 <div className="filter-option-container">
                     {Object.values(Status).map((status, index) => (
-                        <div className="filter-option" key={status} value={status} onMouseOver={() => {setCurrHoveredFilter(index)}} onClick={() => {handleFilterClick(status)}}>{status}</div>
+                        <div key={status + index} className="filter-option" value={status} onMouseOver={() => {setCurrHoveredFilter(index)}} onClick={() => {handleFilterClick(status)}}>{status}</div>
                     ))}
                 </div>
                 <div className="dot-container">
                     {Object.values(Status).map((status, index) => (
-                        <div className={index === currHoveredFilter ? 'selected dot' : 'dot'} />
+                        <div key={status + index} className={index === currHoveredFilter ? 'selected dot' : 'dot'} />
                     ))}
                 </div>
             </>
