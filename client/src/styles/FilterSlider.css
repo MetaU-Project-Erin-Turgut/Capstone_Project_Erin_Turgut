@@ -1,7 +1,6 @@
 .filter-component {
     display: flex;
     flex-direction: column;
-    justify-self: center;
     align-items: center;
     gap: -3px;
 }
@@ -16,14 +15,12 @@
     font-size: 20px;
     display: inline-block;
     width: 250px;
-    max-height: 43px;
     transition: width .5s;
     overflow: hidden;
 }
 
 .filter-slider:hover{
     width: 400px;
-    height: 43px;
     cursor: pointer;
 }
 
