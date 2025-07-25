@@ -1,8 +1,8 @@
 import { useState } from "react";
 import { Status } from "../utils/utils";
-import "../styles/FilterOptions.css";
+import "../styles/FilterSlider.css";
 
-const FilterOptions = ( {onFilterChange}) => {
+const FilterSlider = ( {onFilterChange}) => {
 
     const [isFilterActive, setIsFilterActive] = useState(false);
     const [currHoveredFilter, setCurrHoveredFilter] = useState(0);
@@ -15,7 +15,7 @@ const FilterOptions = ( {onFilterChange}) => {
 
     return (
     <div className="filter-component">
-        <div className="filter-form" onMouseEnter={() => {setIsFilterActive(true)}} onMouseLeave={() => {setIsFilterActive(false)}}>
+        <div className="filter-slider" onMouseEnter={() => {setIsFilterActive(true)}} onMouseLeave={() => {setIsFilterActive(false)}}>
             {!isFilterActive && <div className="filter-button" onClick={() => {setIsFilterActive(true)}}>Filter</div>}
             {isFilterActive && 
             <>
@@ -39,4 +39,4 @@ const FilterOptions = ( {onFilterChange}) => {
     )
 }
 
-export default FilterOptions;
+export default FilterSlider;

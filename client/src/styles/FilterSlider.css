@@ -6,7 +6,7 @@
     gap: -3px;
 }
 
-.filter-form {
+.filter-slider {
     border: solid black 2px;
     box-shadow: 0px 5px 10px rgb(114, 112, 112); 
     z-index: 5;
@@ -21,7 +21,7 @@
     overflow: hidden;
 }
 
-.filter-form:hover{
+.filter-slider:hover{
     width: 400px;
     height: 43px;
     cursor: pointer;
