@@ -1,16 +1,31 @@
+import { useState } from "react";
 import { Status } from "../utils/utils";
+import "../styles/FilterOptions.css";
 
 const FilterOptions = ( {onFilterChange}) => {
 
-    const handleFilterClick = (event) => {
-        onFilterChange(event.target.value)
+    const [isFilterActive, setIsFilterActive] = useState(false);
+    const [currHoveredFilter, setCurrHoveredFilter] = useState(0);
+
+    const handleFilterClick = (status) => {
+        onFilterChange(status)
     }
 
-    return <div className="filter-form">
-        {
-            Object.values(Status).map((status) => (
-                <button className="filter-btn" key={status} value={status} onClick={handleFilterClick}>{status}</button>
-            ))
+    return <div className="filter-form" onMouseEnter={() => {setIsFilterActive(true)}} onMouseLeave={() => {setIsFilterActive(false)}}>
+        {!isFilterActive && <div className="filter-button" onClick={() => {setIsFilterActive(true)}}>Filter</div>}
+        {isFilterActive && 
+        <>
+            <div className="filter-option-container">
+                {Object.values(Status).map((status, index) => (
+                    <div className="filter-option" key={status} value={status} onMouseOver={() => {setCurrHoveredFilter(index)}} onClick={() => {handleFilterClick(status)}}>{status}</div>
+                ))}
+            </div>
+            <div className="dot-container">
+                {Object.values(Status).map((status, index) => (
+                    <div className={index === currHoveredFilter ? 'selected dot' : 'dot'} />
+                ))}
+            </div>
+        </>
         }
     </div>
 }
