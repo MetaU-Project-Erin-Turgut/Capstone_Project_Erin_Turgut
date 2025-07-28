@@ -1,5 +1,6 @@
 import { useNavigate } from  "react-router";
 import { FaUserCircle } from "react-icons/fa";
+import { GiHamburgerMenu } from "react-icons/gi";
 import { useUser } from "../contexts/UserContext";
 import { mainPageRoute, profileRoute, searchResultsRoute } from "../utils/NavigationConsts";
 import { useLoader } from "../contexts/LoadingContext";
@@ -9,7 +10,7 @@ import userSearchIcon from "../assets/search-user-icon.png";
 import APIUtils from "../utils/APIUtils";
 import "../styles/NavBar.css";
 
-const NavBar = ({}) => {
+const NavBar = ({onMenuClick, isMenuClicked}) => {
 
     const { setUser } = useUser(); 
 
@@ -32,17 +33,22 @@ const NavBar = ({}) => {
 
     return (
         <nav className="navigation">
-            <h1 className="title-text" onClick={() => {
-                navigate(mainPageRoute);
-            }}>Pivot</h1>
-            <img className="search-icon" src={userSearchIcon} onClick={() => {
-                navigate(searchResultsRoute)
-            }}/>
-            <div className="profile-nav-btns">
-                <FaUserCircle size={50} onClick={() => {
-                    navigate(profileRoute);
+            <div className="nav-section">
+                <GiHamburgerMenu className= {isMenuClicked ? "menu-icon clicked" : "menu-icon"} onClick={onMenuClick}/>
+                <h1 className="title-text" onClick={() => {
+                    navigate(mainPageRoute);
+                }}>Pivot</h1>
+            </div>
+            <div className="nav-section">
+                <img className="search-icon" src={userSearchIcon} onClick={() => {
+                    navigate(searchResultsRoute)
                 }}/>
-                <button onClick={handleLogout}>Log Out</button>
+                <div className="profile-nav-btns">
+                    <FaUserCircle size={50} onClick={() => {
+                        navigate(profileRoute);
+                    }}/>
+                    <button onClick={handleLogout}>Log Out</button>
+                </div>
             </div>
         </nav>
     )
