@@ -4,13 +4,14 @@
 
 /* on main page */
 .page-header {
-    box-shadow: 0px 10px 10px rgb(114, 112, 112); 
-    height: 45px;
-    text-align: left;
-    margin-bottom: 30px;
+  border-bottom: 2px solid black;
+  height: 45px;
+  text-align: left;
+  font-size: 18px;
+  margin-bottom: 30px;
+  padding-left: 110px;
 }
 
-.icon{
-    font-size: 40px;
+.icon {
+  font-size: 40px;
 }
-

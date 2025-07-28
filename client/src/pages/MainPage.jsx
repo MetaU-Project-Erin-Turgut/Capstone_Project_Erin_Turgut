@@ -11,6 +11,7 @@ const MainPage = () => {
 
     const [userEventTypeTallies, setUserEventTypeTallies] = useState([]);
     const [selectedTab, setSelectedTab] = useState(Tab.EVENTS);
+    const [isSideBarVisible, setIsSideBarVisible] = useState(false);
 
     const userTopEventType = useMemo(
         () => { 
@@ -57,12 +58,15 @@ const MainPage = () => {
 
     return (
         <div id="main-page">
-            <NavBar/>
+            <NavBar isMenuClicked={isSideBarVisible} onMenuClick={() => {
+                setIsSideBarVisible(!isSideBarVisible)
+            }}/>
+            {isSideBarVisible && <SideBar handleTabSelect={(tabName) => {
+                setSelectedTab(tabName);
+                setIsSideBarVisible(!isSideBarVisible)
+            }}/>}
             <div className="main-content">
-                <SideBar handleTabSelect={(tabName) => {
-                    setSelectedTab(tabName);
-                }}/>
-                <div className="page-header"><h1>{selectedTab}</h1></div>
+                <div className="page-header"><h2>{selectedTab}</h2></div>
                 {/* Populate events or groups depending what tab was clicked on the side */}
                 {newDisplay()}
             </div>

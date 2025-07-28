@@ -1,8 +1,11 @@
 .sidebar{
-    float: left;
+    display: block;
+    background-color: white;
+    z-index: 2;
+    position: fixed;
+    top: 0px;
     box-shadow: 5px 10px 10px rgb(114, 112, 112);  
-    margin-top: 45px;
-    height: 100vh;
+    margin-top: 70px;
 }
 
 .sidebar .side-tab {
