@@ -39,7 +39,6 @@ const EventsList = ({ userTopEventType }) => {
 
     return (
         <>
-        <h2>Events</h2>
         <FilterSlider onFilterChange={(status) => {setStatusFilter(status)}}/>
         <div className="card-container">
             <Suspense fallback={<p>Loading...</p>}>

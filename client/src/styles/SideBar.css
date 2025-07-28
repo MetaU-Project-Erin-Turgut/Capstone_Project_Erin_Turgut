@@ -1,12 +1,18 @@
-.sidebar {
+.sidebar{
     float: left;
-    box-shadow: 0px 10px 10px rgb(114, 112, 112);  
+    box-shadow: 5px 10px 10px rgb(114, 112, 112);  
+    margin-top: 45px;
     height: 100vh;
 }
 
 .sidebar .side-tab {
     text-align: center;
-    padding: 50px;
-    width: 120px;
-    border-bottom: solid rgb(133, 131, 131) 5px;
+    padding: 15px;
+    width: 70px;
+    max-height: fit-content;
+}
+
+.side-tab:hover {
+    background-color: rgb(164, 164, 164);
+    border-radius: 30px;
 }

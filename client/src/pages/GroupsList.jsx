@@ -39,7 +39,6 @@ const GroupsList = () => {
 
     return (
         <>
-        <h2>Groups</h2>
         <FilterSlider onFilterChange={(status) => {setStatusFilter(status)}}/>
         <div className="card-container">
             <Suspense fallback={<p>Loading...</p>}>

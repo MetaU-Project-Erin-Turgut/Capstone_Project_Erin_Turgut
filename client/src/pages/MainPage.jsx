@@ -62,6 +62,7 @@ const MainPage = () => {
                 <SideBar handleTabSelect={(tabName) => {
                     setSelectedTab(tabName);
                 }}/>
+                <div className="page-header"><h1>{selectedTab}</h1></div>
                 {/* Populate events or groups depending what tab was clicked on the side */}
                 {newDisplay()}
             </div>
