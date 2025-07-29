@@ -1,4 +1,5 @@
 import { useState, Suspense, useMemo, useEffect, useRef } from "react";
+import { useNotification } from '../contexts/NotificationContext';
 import NavBar from "../components/NavBar"
 import UserResultCard from "../components/UserResultCard";
 import FilterDropDown from "../components/FilterDropDown";
@@ -8,12 +9,14 @@ import "../styles/CardListContainer.css"
 
 const SearchResultsPage = () => {
 
+    const { setMessage } = useNotification(); //used to control notification pop up and message
+    
     let searchIsReset = false; //set to true when search is triggered - NOT when load more is triggered
     const [userInterestMap, setUserInterestMap] = useState(new Map()); //map of user interest selected ids (keys) to the interest object. tallies for each will be loaded on backend
     const [searchQuery, setSearchQuery] = useState("");
     const [searchResults, setSearchResults] = useState([]);
     const [interestIdFilter, setInterestIdFilter] = useState(-1); //interest id used for filtering user resukts by ones that have this selected interest
-    const [notif, setNotif] = useState("User results will show up here..."); //TODO: make notification better appearance and closer to search bar
+    const [notif, setNotif] = useState("User results will show up here..."); 
     const [isDisplayedAutocompleteSuggestions, setIsDisplayedAutocompleteSuggestions] = useState(false);
     const [autocompleteSuggestions, setAutocompleteSuggestions] = useState(new Set());
     const [isLoadMoreHidden, setIsLoadMoreHidden] = useState(true);
@@ -60,6 +63,7 @@ const SearchResultsPage = () => {
             }
             setUserInterestMap(tempMap);
         } catch (error) {
+            setMessage(error.message)
             console.log("Status ", error.status);
             console.log("Error: ", error.message);
         }
@@ -71,6 +75,7 @@ const SearchResultsPage = () => {
             const apiResultData = await APIUtils.userSearchTypeAhead();
             setAutocompleteSuggestions(new Set(apiResultData));
         } catch (error) {
+            setMessage(error.message)
             console.log("Status ", error.status);
             console.log("Error: ", error.message);
         }
@@ -98,6 +103,7 @@ const SearchResultsPage = () => {
                 searchIsReset = false;
                 
             } catch (error) {
+                setMessage(error.message)
                 console.log("Status ", error.status);
                 console.log("Error: ", error.message);
             }

@@ -2,6 +2,7 @@ import { useState } from "react";
 import { useNavigate } from  "react-router";
 import { useUser } from "../contexts/UserContext";
 import { useLoader } from "../contexts/LoadingContext";
+import { useNotification } from '../contexts/NotificationContext';
 import Header from "../components/Header";
 import { mainPageRoute } from "../utils/NavigationConsts";
 import { DEFAULT_FORM_VALUE } from "../utils/utils";
@@ -12,6 +13,7 @@ const SignUpPage = () => {
     const { setUser } = useUser();
 
     const { setIsLoading } = useLoader(); //used to control loading screen during api call
+    const { setMessage } = useNotification(); //used to control notification pop up and message
 
     const [formData, setFormData] = useState(DEFAULT_FORM_VALUE);
 
@@ -38,6 +40,7 @@ const SignUpPage = () => {
             setUser(apiResultData); // Store user session in context
             navigate(mainPageRoute);
         } catch (error) {
+            setMessage(error.message)
             console.log("Status ", error.status);
             console.log("Error: ", error.message);
         }

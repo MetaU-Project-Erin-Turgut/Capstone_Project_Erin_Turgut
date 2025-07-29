@@ -1,10 +1,13 @@
 import { useState, useEffect, Suspense } from 'react';
+import { useNotification } from '../contexts/NotificationContext';
 import InterestLevelColumn from "../components/InterestLevelColumn";
 import APIUtils from "../utils/APIUtils";
 import SelectedInterests from '../components/SelectedInterests';
 import "../styles/InterestList.css";
 
 const InterestList = () => {
+
+    const { setMessage } = useNotification(); //used to control notification pop up and message
 
     //2D array with level by array index and all interests at that level value as an array at that index
     const [interestsByLevel, setInterestsByLevel] = useState([]); 
@@ -35,9 +38,10 @@ const InterestList = () => {
                 newArr[0] = apiResultData; //make first level interests (stored in first index of array) hold all returned root interests
                 setInterestsByLevel(newArr);
             } else {
-                alert("Could not load interests"); // TODO: will have better visual display for this later
+                setMessage("Could not load interests right now. Try again later.")
             }
         } catch (error) {
+            setMessage(error.message)
             console.log("Status ", error.status);
             console.log("Error: ", error.message);
         }
@@ -53,6 +57,7 @@ const InterestList = () => {
                 setUserInterests(initialUserInterests);
             }
         } catch (error) {
+            setMessage(error.message)
             console.log("Status ", error.status);
             console.log("Error: ", error.message);
         }
@@ -74,9 +79,10 @@ const InterestList = () => {
                 newArr[clickedInterestLevel] = apiResultData;
                 setInterestsByLevel(newArr);
             } else {
-                alert("No more subinterests!"); // TODO: will have better visual display for this later
+                setMessage("No more subinterests!")
             }
         } catch (error) {
+            setMessage(error.message)
             console.log("Status ", error.status);
             console.log("Error: ", error.message);
         }
@@ -93,8 +99,9 @@ const InterestList = () => {
         try {
             await APIUtils.updateUserInterests(updatedInterests);
             await APIUtils.getNewGroupRecs();
-            alert("New group recs! See Groups tab"); // TODO: Will have better visual display for this later
+            setMessage("Check Groups tab for new groups!")
         } catch (error) {
+            setMessage(error.message)
             console.log("Status ", error.status);
             console.log("Error: ", error.message);
         }        
