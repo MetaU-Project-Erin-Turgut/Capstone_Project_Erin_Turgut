@@ -219,10 +219,10 @@ router.put('/user/update', isAuthenticated, async (req, res) => {
             } else {
                 skipUsername = true; //username did not change for the user so we will skip this update in db query
             }
-        }
 
-        //check if address changed on update
-        if(existingUsername.address === address) skipAddress = true;
+            //check if address changed on update
+            if(existingUsername.address === address) skipAddress = true;
+        }
 
         // Check if email is already taken by another user
         const existingUserEmail = await prisma.user.findUnique({

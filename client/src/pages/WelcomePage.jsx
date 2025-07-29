@@ -1,12 +1,13 @@
-import Header from "../components/Header";
-import "../styles/WelcomePage.css"
+import { useNavigate } from  "react-router";
+import { signUpRoute, loginRoute } from "../utils/NavigationConsts";import "../styles/WelcomePage.css"
 
 //This is the page that loads on start up - welcoming user to the app
 const WelcomePage = () => {
 
+    const navigate = useNavigate();
+
     return (
         <>
-            <Header />
             <div className="welcome-div">
                 <div className="welcome-title">
                     <h1 className="title-text">Pivot</h1>
@@ -15,8 +16,13 @@ const WelcomePage = () => {
                     </h2>
                 </div>
 
-                <div className="welcome-images">
-                    <h2>(Placeholder images go here)</h2>
+                <div className="welcome-buttons">
+                    <div className="welcome-btn" onClick={() => {
+                        navigate(signUpRoute);
+                    }}>Sign Up</div>
+                    <div className="welcome-btn" onClick={() => {
+                        navigate(loginRoute);
+                    }}>Login</div> 
                 </div>
             </div>
         </>

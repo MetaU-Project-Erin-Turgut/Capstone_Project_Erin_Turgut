@@ -4,6 +4,8 @@
     justify-content: space-around;
     align-items: center;
     height: 100vh;
+    background-image: url("../assets/welcome-page-photo2.jpg");
+    background-size: cover;
 }
 
 .title-side {

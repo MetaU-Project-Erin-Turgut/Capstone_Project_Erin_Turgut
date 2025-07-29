@@ -21,9 +21,10 @@
 }
 
 .modal-content {
-    background-color: white;
+    background-color: black;
     max-width: 70%;
     border-style: outset;
+    border-radius: 30px;
     border-width: 7px;
     overflow: scroll;
     box-shadow: 10px 10px 10px rgb(114, 112, 112);   

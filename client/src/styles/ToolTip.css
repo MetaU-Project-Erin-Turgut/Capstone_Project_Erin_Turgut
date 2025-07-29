@@ -3,7 +3,8 @@
     font-size: 15px;
     font-weight: normal;
     padding: 5px;
-    background-color: rgb(185, 182, 182);
+    background-color: white;
+    color: black;
     border-radius: 10px;
     border:dotted black 2px;
     position: absolute;

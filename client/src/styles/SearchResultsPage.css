@@ -37,7 +37,8 @@
 
 .autocomplete-recommendation {
     padding: 5px;
-    background-color: rgb(209, 207, 207);
+    background-color: white;
+    color:black;
     margin: 2px 2px 2px 64px;
     text-align: left;
     border-width: 2px;
