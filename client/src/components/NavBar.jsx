@@ -10,7 +10,7 @@ import userSearchIcon from "../assets/search-user-icon.png";
 import APIUtils from "../utils/APIUtils";
 import "../styles/NavBar.css";
 
-const NavBar = ({onMenuClick, isMenuClicked}) => {
+const NavBar = ({onMenuClick, isMenuClicked, isMenuVisible}) => {
 
     const { setUser } = useUser(); 
 
@@ -34,7 +34,7 @@ const NavBar = ({onMenuClick, isMenuClicked}) => {
     return (
         <nav className="navigation">
             <div className="nav-section">
-                <GiHamburgerMenu className= {isMenuClicked ? "menu-icon clicked" : "menu-icon"} onClick={onMenuClick}/>
+                {isMenuVisible && <GiHamburgerMenu className= {isMenuClicked ? "menu-icon clicked" : "menu-icon"} onClick={onMenuClick}/>}
                 <h1 className="title-text" onClick={() => {
                     navigate(mainPageRoute);
                 }}>Pivot</h1>

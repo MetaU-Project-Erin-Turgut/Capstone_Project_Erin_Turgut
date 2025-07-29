@@ -1,0 +1,33 @@
+.profile-info {
+    display: flex;
+    gap: 30vw;
+    align-items: center;
+    text-align: left;
+    padding-left: 40px;
+    font-size: 20px;
+}
+
+.profile-page-img {
+    padding-left: 180px;
+    font-size: 300px;
+}
+
+.input-label {
+    margin: 10px;
+}
+
+.profile-input {
+    padding: 10px;
+    font-size: 20px;
+    border-radius: 30px;
+}
+
+.edit-btn, .save-btn {
+    margin-top: 30px;
+    justify-self: center;
+}
+
+.edit-btn:hover, .save-btn:hover {
+    color: rgb(4, 213, 213)
+}
+
