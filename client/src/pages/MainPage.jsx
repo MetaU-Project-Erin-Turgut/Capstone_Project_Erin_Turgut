@@ -1,4 +1,5 @@
 import { useState, useMemo, useEffect } from 'react';
+import { useNotification } from '../contexts/NotificationContext';
 import NavBar from "../components/NavBar";
 import SideBar from "../components/SideBar";
 import EventsList from './EventsList';
@@ -9,6 +10,8 @@ import { Tab } from "../utils/utils";
 
 const MainPage = () => {
 
+    const { setMessage } = useNotification(); //used to control notification pop up and message
+    
     const [userEventTypeTallies, setUserEventTypeTallies] = useState([]);
     const [selectedTab, setSelectedTab] = useState(Tab.EVENTS);
     const [isSideBarVisible, setIsSideBarVisible] = useState(false);
@@ -38,6 +41,7 @@ const MainPage = () => {
             (apiResultData)
             setUserEventTypeTallies(apiResultData.eventTypeTallies);
         } catch (error) {
+            setMessage(error.message)
             console.log("Status ", error.status);
             console.log("Error: ", error.message);
         }

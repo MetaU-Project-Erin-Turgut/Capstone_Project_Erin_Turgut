@@ -1,4 +1,5 @@
 import { useState, useEffect } from "react";
+import { useNotification } from '../contexts/NotificationContext';
 import APIUtils from "../utils/APIUtils";
 import NavBar from "../components/NavBar"
 import { DEFAULT_FORM_VALUE } from "../utils/utils";
@@ -8,6 +9,8 @@ import { FaRegSave } from "react-icons/fa";
 import "../styles/ProfilePage.css";
 
 const ProfilePage = () => {
+
+    const { setMessage } = useNotification(); //used to control notification pop up and message
 
     const [formData, setFormData] = useState(DEFAULT_FORM_VALUE);
     const [isEdit, setIsEdit] = useState(false);
@@ -27,6 +30,7 @@ const ProfilePage = () => {
                 email: apiResultData.email
             })
         } catch (error) {
+            setMessage(error.message)
             console.log("Status ", error.status);
             console.log("Error: ", error.message);
         }
@@ -55,6 +59,7 @@ const ProfilePage = () => {
             })
             setIsEdit(false)
         } catch (error) {
+            setMessage(error.message)
             console.log("Status ", error.status);
             console.log("Error: ", error.message);
         }

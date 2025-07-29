@@ -1,12 +1,16 @@
 import { useState, useEffect, useMemo } from 'react';
 import { Suspense } from 'react';
 import { Status } from "../utils/utils";
+import { useNotification } from '../contexts/NotificationContext';
 import Group from "../components/Group";
 import FilterSlider from "../components/FilterSlider";
 import APIUtils from '../utils/APIUtils';
 import "../styles/CardListContainer.css"
 
 const GroupsList = () => {
+
+    const { setMessage } = useNotification(); //used to control notification pop up and message
+    
     const [groups, setGroups] = useState(new Map());
     const [statusFilter, setStatusFilter] = useState(Status.NONE);
     const displayedGroups = useMemo(
@@ -32,6 +36,7 @@ const GroupsList = () => {
             );
             setGroups(mappedGroups);
         } catch (error) {
+            setMessage(error.message)
             console.log("Status ", error.status);
             console.log("Error: ", error.message);
         }

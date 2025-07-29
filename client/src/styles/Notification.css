@@ -1,0 +1,23 @@
+.notif-popup {
+    position: fixed;
+    justify-self: center;
+    height: 10vh;
+    min-width: 40vw;
+    border: 1px solid black;
+    box-shadow: 0px 10px 10px rgb(114, 112, 112);  
+    font-size: 20px;
+    background-color: white;
+    padding-top: 50px;
+    z-index: 10;
+    animation-name: drop-down;
+    animation-duration: var(--notif-time);
+}
+
+@keyframes drop-down {
+    /* Learned how to use transform within animation for component movement in and out of page from this
+    source:  https://stackoverflow.com/questions/6805482/css3-transition-animation-on-load*/
+    0% { transform: translateY(-100%);}
+    20% { transform: translateY(0);}
+    90% { transform: translateY(0);}
+    100% { transform: translateY(-100%);}
+}

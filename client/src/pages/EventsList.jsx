@@ -1,12 +1,16 @@
 import { useState, useEffect, useMemo } from 'react';
 import { Suspense } from 'react';
 import { Status } from "../utils/utils";
+import { useNotification } from '../contexts/NotificationContext';
 import Event from "../components/Event";
 import FilterSlider from "../components/FilterSlider";
 import APIUtils from '../utils/APIUtils';
 import "../styles/CardListContainer.css"
 
 const EventsList = ({ userTopEventType }) => {
+
+    const { setMessage } = useNotification(); //used to control notification pop up and message
+    
     const [events, setEvents] = useState(new Map());
     const [statusFilter, setStatusFilter] = useState(Status.NONE);
     const displayedEvents = useMemo(
@@ -32,6 +36,7 @@ const EventsList = ({ userTopEventType }) => {
             );
             setEvents(mappedEvents);
         } catch (error) {
+            setMessage(error.message)
             console.log("Status ", error.status);
             console.log("Error: ", error.message);
         }
