@@ -69,6 +69,22 @@ export default class APIUtils {
         }
     }
 
+    static updateUserInfo = async (formData) => {
+        const response = await fetch("http://localhost:3000/user/update", {
+            method: "PUT",
+            headers: { "Content-Type": "application/json" },
+            body: JSON.stringify(formData),
+            credentials: "include",
+        });
+
+        if (response.ok) {
+            return await this.fetchUserInfo()
+        } else {
+            throw {status: response.status, message: data.error};
+        }
+
+    }
+
     static fetchUserEventTypeTallies = async () => {
         const response = await fetch("http://localhost:3000/user/tallies", {
             method: "GET",

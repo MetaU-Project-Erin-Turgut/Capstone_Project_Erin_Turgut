@@ -41,9 +41,24 @@ const ProfilePage = () => {
         }))
     }
 
-    const handleFormSubmit = () => {
+    const handleFormSubmit = async () => {
         //update user info in database
-        setIsEdit(false)
+
+        try {
+            const apiResultData = await APIUtils.updateUserInfo(formData);
+            setFormData({
+                firstName: apiResultData.userProfile.firstName,
+                lastName: apiResultData.userProfile.lastName,
+                address: apiResultData.address,
+                username: apiResultData.username,
+                email: apiResultData.email
+            })
+            setIsEdit(false)
+        } catch (error) {
+            console.log("Status ", error.status);
+            console.log("Error: ", error.message);
+        }
+        
     }
 
     return (
@@ -55,6 +70,7 @@ const ProfilePage = () => {
                     <FaUserCircle className="profile-page-img"/>
                 </section>
                 <form className="info-section">
+                    {/* combine these? */}
                     <h3 className="input-label">First name:</h3>
                     {!isEdit ? <p>{formData.firstName}</p> :
                     <input className="profile-input"

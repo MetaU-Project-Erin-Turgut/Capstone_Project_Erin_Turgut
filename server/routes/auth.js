@@ -1,6 +1,6 @@
 const express = require('express')
 const bcrypt = require('bcrypt')
-const { PrismaClient } = require('../generated/prisma');
+const { PrismaClient, Prisma } = require('../generated/prisma');
 
 const prisma = new PrismaClient()
 const router = express.Router()
@@ -8,6 +8,7 @@ const rateLimit = require("express-rate-limit");
 
 const opencage = require('opencage-api-client'); //public api
 
+const { isAuthenticated } = require('../middleware/CheckAutheticated');
 const { EventType } = require('../systems/Utils');
 
 const loginLimiter = rateLimit({
@@ -17,6 +18,32 @@ const loginLimiter = rateLimit({
 });
 
 const saltRounds = 10;
+
+
+const addressToCoord = async (address, userCoords) => {
+
+    /*****Forward geocoding of provided address - the following code has been implemented and modified based on the
+    example implementation from api documentation: https://opencagedata.com/tutorials/geocode-in-nodejs ***********/
+    await opencage
+    .geocode({ q: address })
+    .then((data) => {
+        if (data.status.code === 200 && data.results.length > 0) {
+            const place = data.results[0];
+            userCoords.latitude = place.geometry.lat;
+            userCoords.longitude = place.geometry.lng;
+        } else {
+            console.log('Status', data.status.message);
+            console.log('total_results', data.total_results);
+        }
+    })
+    .catch((error) => {
+        console.log('Error', error.message);
+        if (error.status.code === 402) {
+            console.log('Request limit reached');
+        }
+    });
+    /************************************* end of code from third-party api documentation *********************************/
+}
 
 //Signup route
 router.post('/signup', async (req, res) => {
@@ -50,28 +77,7 @@ router.post('/signup', async (req, res) => {
         }
 
         let userCoords = {latitude: null,longitude: null}
-
-        /*****Forward geocoding of provided address - the following code has been implemented and modified based on the
-        example implementation from api documentation: https://opencagedata.com/tutorials/geocode-in-nodejs ***********/
-        await opencage
-        .geocode({ q: address })
-        .then((data) => {
-            if (data.status.code === 200 && data.results.length > 0) {
-                const place = data.results[0];
-                userCoords.latitude = place.geometry.lat;
-                userCoords.longitude = place.geometry.lng;
-            } else {
-                console.log('Status', data.status.message);
-                console.log('total_results', data.total_results);
-            }
-        })
-        .catch((error) => {
-            console.log('Error', error.message);
-            if (error.status.code === 402) {
-                console.log('Request limit reached');
-            }
-        });
-        /************************************* end of code from third-party api documentation *********************************/
+        await addressToCoord(address, userCoords);
 
         // Hash the password before storing it
         const hashedPassword = await bcrypt.hash(password, saltRounds)
@@ -175,7 +181,7 @@ router.post("/logout", (req, res) => {
 });
 
 //endpoint to get current user in session's info
-router.get('/user', async (req, res) => {
+router.get('/user', isAuthenticated, async (req, res) => {
     try {
         const userData = await prisma.user.findUnique({
             where: {id: req.session.userId},
@@ -185,6 +191,84 @@ router.get('/user', async (req, res) => {
     } catch (error) {
         console.error("Error fetching user info:", error)
         res.status(500).json({ error: "Something went wrong while user info." })
+    }
+})
+
+//endpoint for user to update their profile information
+router.put('/user/update', isAuthenticated, async (req, res) => {
+
+    const { address, username, email, firstName, lastName } = req.body;
+
+    try {
+        if (!username || !email || !firstName || !lastName || !address) {
+            return res.status(400).json({ error: "First name, last name, address, username, and email are required." });
+        }
+
+        let skipUsername = false;
+        let skipEmail = false;
+        let skipAddress = false;
+
+        // Check if username is already taken by another user
+        const existingUsername = await prisma.user.findUnique({
+            where: { username },
+        })
+
+        if (existingUsername) {
+            if (existingUsername.id !== req.session.userId) {
+                return res.status(400).json({ error: "Username already exists" })
+            } else {
+                skipUsername = true; //username did not change for the user so we will skip this update in db query
+            }
+        }
+
+        //check if address changed on update
+        if(existingUsername.address === address) skipAddress = true;
+
+        // Check if email is already taken by another user
+        const existingUserEmail = await prisma.user.findUnique({
+            where: { email },
+        })
+
+        if (existingUserEmail) {
+            if (existingUserEmail.id !== req.session.userId) {
+                return res.status(400).json({ error: "Account already created with this email" })
+            } else {
+                skipEmail = true; //email did not change for the user so we will skip this update in db query
+            }
+        }
+
+        //update user table - need to amke sure we avoid updating username and email unnecessarily to avoid uniqueness error
+        const userUpdated = await prisma.user.update({
+            where: {id: req.session.userId},
+            data: {
+                username: skipUsername ? Prisma.skip : username,
+                email: skipEmail ? Prisma.skip : email,
+                address: skipAddress ? Prisma.skip : address,
+            }
+        })
+
+        //update coordinate field - need to make sure third party api is being used to get new coordinates only if address was actually changed
+        if (!skipAddress) {
+            let userCoords = {latitude: null,longitude: null}
+            await addressToCoord(address, userCoords);
+            await prisma.$executeRaw`UPDATE "User" SET coord=ST_SetSRID(ST_MakePoint(${userCoords.longitude}, ${userCoords.latitude}), 4326)::geography WHERE id=${userUpdated.id}`;
+        }
+
+        //update user profile 
+        await prisma.user_Profile.update({
+            where: {userId: req.session.userId},
+            data: {
+                firstName: firstName, 
+                lastName: lastName
+            }
+        })
+
+        res.status(201).json({ message: "Information successfully updated!"}) 
+
+
+    } catch (error) {
+        console.error(error)
+        res.status(500).json({ error: "Something went wrong while updating user information" })
     }
 })
 
