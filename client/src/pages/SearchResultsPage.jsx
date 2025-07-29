@@ -170,7 +170,7 @@ const SearchResultsPage = () => {
 
     return (
         <div id="search-page">
-            <NavBar />
+            <NavBar isMenuVisible={false}/>
             <div className="search-area">
                 <FilterDropDown onFilterChange={(filter) => { setInterestIdFilter(parseInt(filter)) }} userInterests={userInterestMap}/>
                 <form onSubmit={(event) => {

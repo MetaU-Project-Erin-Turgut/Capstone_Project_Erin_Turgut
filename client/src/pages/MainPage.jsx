@@ -58,7 +58,7 @@ const MainPage = () => {
 
     return (
         <div id="main-page">
-            <NavBar isMenuClicked={isSideBarVisible} onMenuClick={() => {
+            <NavBar isMenuClicked={isSideBarVisible} isMenuVisible={true} onMenuClick={() => {
                 setIsSideBarVisible(!isSideBarVisible)
             }}/>
             {isSideBarVisible && <SideBar handleTabSelect={(tabName) => {

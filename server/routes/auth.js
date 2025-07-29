@@ -174,4 +174,18 @@ router.post("/logout", (req, res) => {
     });
 });
 
+//endpoint to get current user in session's info
+router.get('/user', async (req, res) => {
+    try {
+        const userData = await prisma.user.findUnique({
+            where: {id: req.session.userId},
+            include: {userProfile: true}
+        })
+        res.status(201).json(userData)
+    } catch (error) {
+        console.error("Error fetching user info:", error)
+        res.status(500).json({ error: "Something went wrong while user info." })
+    }
+})
+
 module.exports = router
