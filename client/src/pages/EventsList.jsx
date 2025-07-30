@@ -1,11 +1,8 @@
 import { useState, useEffect, useMemo } from 'react';
-import { Suspense } from 'react';
 import { Status } from "../utils/utils";
 import { useNotification } from '../contexts/NotificationContext';
-import Event from "../components/Event";
-import FilterSlider from "../components/FilterSlider";
+import List from '../components/List';
 import APIUtils from '../utils/APIUtils';
-import "../styles/CardListContainer.css"
 
 const EventsList = ({ userTopEventType }) => {
 
@@ -42,27 +39,19 @@ const EventsList = ({ userTopEventType }) => {
         }
     }
 
-    return (
-        <>
-        <FilterSlider onFilterChange={(status) => {setStatusFilter(status)}}/>
-        <div className="card-container">
-            <Suspense fallback={<p>Loading...</p>}>
-                {Array.from(displayedEvents.entries()).map(([key, value]) => (
-                    <Event 
-                        key={key}
-                        eventData={value}
-                        isTopEventType={(value.event.eventType == userTopEventType)}
-                        onUpdateEvent= {(newEventObj) => {
-                            const updatedEvents = new Map(events);
-                            updatedEvents.set(newEventObj.eventId, newEventObj);
-                            setEvents(updatedEvents);
-                        }}
-                    />
-                ))}
-            </Suspense>
-        </div>
-        </>
-    )
+    const updateEvents = (newEventObj) => {
+        const updatedEvents = new Map(events);
+        updatedEvents.set(newEventObj.eventId, newEventObj);
+        setEvents(updatedEvents);
+    }
+
+    return <List 
+        onNewFilter={(status) => {setStatusFilter(status)}}
+        displayedItems={displayedEvents}
+        isGroups={false}
+        userTopEventType={userTopEventType}
+        onUpdateItems={updateEvents}
+    />
 }
 
 export default EventsList;
