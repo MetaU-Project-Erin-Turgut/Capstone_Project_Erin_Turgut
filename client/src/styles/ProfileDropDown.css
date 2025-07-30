@@ -1,0 +1,22 @@
+.profile-dropdown {
+    display: block;
+    background-color: black;
+    z-index: 2;
+    position: fixed;
+    top: 0px;
+    right: 0px;
+    box-shadow: -5px 10px 10px rgb(114, 112, 112);  
+    margin-top: 70px;
+}
+
+.profile-dropdown .profile-dropdown-option {
+    text-align: center;
+    padding: 15px;
+    width: 70px;
+    max-height: fit-content;
+}
+
+.profile-dropdown-option:hover {
+    background-color: rgb(164, 164, 164);
+    border-radius: 30px;
+}
