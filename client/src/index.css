@@ -1,6 +1,8 @@
 .title-text {
-  font-family: "Caprasimo", serif;
-  font-weight: 400;
+  /* code below copied from google fonts embed instructions: https://fonts.google.com/selection/embed*/
+  font-family: "Roboto Flex", sans-serif;
+  font-optical-sizing: auto;
+  font-weight: 300;
   font-style: normal;
 }
 
@@ -8,17 +10,18 @@ body {
   margin: 0;
   background-color: black;
   color: white;
+  font-family: "Roboto Flex", sans-serif;
 }
 
 
 .overlay {
-    display: block;
-    position: fixed;
-    top: 0;
-    left: 0;
-    width:100vw;
-    height:100vh;
-    background: rgba(0, 0, 0, 0.8);
-    z-index: 2;
-    align-content: center;  
+  display: block;
+  position: fixed;
+  top: 0;
+  left: 0;
+  width: 100vw;
+  height: 100vh;
+  background: rgba(0, 0, 0, 0.8);
+  z-index: 2;
+  align-content: center;
 }
