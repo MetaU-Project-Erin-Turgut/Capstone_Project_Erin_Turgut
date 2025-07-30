@@ -1,11 +1,8 @@
 import { useState, useEffect, useMemo } from 'react';
-import { Suspense } from 'react';
 import { Status } from "../utils/utils";
 import { useNotification } from '../contexts/NotificationContext';
-import Group from "../components/Group";
-import FilterSlider from "../components/FilterSlider";
+import List from '../components/List';
 import APIUtils from '../utils/APIUtils';
-import "../styles/CardListContainer.css"
 
 const GroupsList = () => {
 
@@ -42,30 +39,22 @@ const GroupsList = () => {
         }
     }
 
-    return (
-        <>
-        <FilterSlider onFilterChange={(status) => {setStatusFilter(status)}}/>
-        <div className="card-container">
-            <Suspense fallback={<p>Loading...</p>}>
-                {Array.from(displayedGroups.entries()).map(([key, value]) => (
-                    <Group 
-                        key={key}
-                        groupData={value}
-                        onUpdateGroup = {(newGroupObj, isGroupErased, groupId) => {
-                            const updatedGroups = new Map(groups);
-                            if (isGroupErased) { //when no members remain, group is erased from DB, so delete from state
-                                updatedGroups.delete(groupId);
-                            } else {
-                                updatedGroups.set(groupId, newGroupObj);
-                            }
-                            setGroups(updatedGroups);
-                        }}
-                    />
-                ))}
-            </Suspense>
-        </div>
-        </>
-    )
+    const updateGroups = (newGroupObj, isGroupErased, groupId) => {
+        const updatedGroups = new Map(groups);
+        if (isGroupErased) { //when no members remain, group is erased from DB, so delete from state
+            updatedGroups.delete(groupId);
+        } else {
+            updatedGroups.set(groupId, newGroupObj);
+        }
+        setGroups(updatedGroups);
+    }
+
+    return <List 
+        onNewFilter={(status) => {setStatusFilter(status)}}
+        displayedItems={displayedGroups}
+        isGroups={true}
+        onUpdateItems={updateGroups}
+    />
 }
 
 export default GroupsList;

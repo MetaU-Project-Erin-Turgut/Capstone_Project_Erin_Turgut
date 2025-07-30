@@ -4,6 +4,7 @@ import { useUser } from "../contexts/UserContext";
 import { useLoader } from '../contexts/LoadingContext';
 import { useNotification } from '../contexts/NotificationContext';
 import Header from "../components/Header";
+import InputField from '../components/InputField';
 import { mainPageRoute } from '../utils/NavigationConsts';
 import { DEFAULT_FORM_VALUE } from "../utils/utils";
 import APIUtils from '../utils/APIUtils';
@@ -57,22 +58,21 @@ const LoginPage = () => {
 
                 <div className="input-side">
                     <form onSubmit={handleFormSubmit}>
-                        <input 
+                        <InputField
+                            key="email"
                             placeholder="Email"
-                            type="text"
                             name="email"
                             value={formData.email}
                             onChange={handleInputChange}
-                        ></input><br />
-                        <input 
+                        />
+                        <InputField
+                            key="password"
                             placeholder="Password"
-                            type="text"
                             name="password"
                             value={formData.password}
                             onChange={handleInputChange}
-                        ></input> <br /> 
-
-                        <input type="submit" value="Submit"></input>
+                        />
+                        <input className="btn" type="submit" value="Submit"></input>
                     </form>
                 </div>
             </div>

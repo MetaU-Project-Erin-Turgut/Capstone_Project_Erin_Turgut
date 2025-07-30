@@ -186,7 +186,7 @@ const SearchResultsPage = () => {
                     handleSearchSubmit();
                 }}>
                     <input className="search-input" value={searchQuery} placeholder="Search users..." onFocus={() => setIsDisplayedAutocompleteSuggestions(true)} onBlur={(event) => setIsDisplayedAutocompleteSuggestions(false)} onChange={handleQueryChange} />
-                    <button type="submit" className="search-btn">Search</button>
+                    <button type="submit" className="search-btn btn">Search</button>
                 </form>
                 <div className="break"></div>
                 {isDisplayedAutocompleteSuggestions &&

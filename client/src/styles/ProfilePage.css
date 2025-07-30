@@ -16,12 +16,6 @@
     margin: 10px;
 }
 
-.profile-input {
-    padding: 10px;
-    font-size: 20px;
-    border-radius: 30px;
-}
-
 .edit-btn, .save-btn {
     margin-top: 30px;
     justify-self: center;

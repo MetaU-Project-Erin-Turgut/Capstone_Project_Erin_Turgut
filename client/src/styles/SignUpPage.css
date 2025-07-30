@@ -4,6 +4,8 @@
     justify-content: space-around;
     align-items: center;
     height: 100vh;
+    /* Photo on Login and Sign up pages (Credit: Anthony DELANOIX):
+    https://unsplash.com/photos/person-performing-heart-hand-gesture-hzgs56Ze49s */
     background-image: url("../assets/welcome-page-photo2.jpg");
     background-size: cover;
 }
@@ -12,18 +14,7 @@
     text-align: center;
 }
 
-.input-side input {
-    padding: 10px;
-    width: 400px;
-    margin: 10px 0px;
-}
-
 .title-side .title-text {
     font-size: 100px;
     margin: 5px;
-}
-
-input::placeholder {
-    color: black;
-    opacity: 1;
 }
