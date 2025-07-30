@@ -4,8 +4,9 @@ import { useUser } from "../contexts/UserContext";
 import { useLoader } from "../contexts/LoadingContext";
 import { useNotification } from '../contexts/NotificationContext';
 import Header from "../components/Header";
+import InputField from "../components/InputField";
 import { mainPageRoute } from "../utils/NavigationConsts";
-import { DEFAULT_FORM_VALUE } from "../utils/utils";
+import { DEFAULT_FORM_VALUE, FormFieldPlaceholders } from "../utils/utils";
 import APIUtils from "../utils/APIUtils";
 import "../styles/SignUpPage.css"
 
@@ -55,54 +56,22 @@ const SignUpPage = () => {
                 <div className="title-side">
                     <h1 className="title-text">Sign Up</h1>
                 </div>
-
-{/* combine these into a component and use map? */}
                 <div className="input-side">
                     <form onSubmit={handleFormSubmit}>
-                        <input 
-                            placeholder="First Name"
-                            type="text"
-                            name="firstName"
-                            value={formData.firstName}
-                            onChange={handleInputChange}
-                        ></input><br />
-                        <input 
-                            placeholder="Last Name"
-                            type="text"
-                            name="lastName"
-                            value={formData.lastName}
-                            onChange={handleInputChange}
-                        ></input><br />
-                        <input 
-                            placeholder="Address"
-                            type="text"
-                            name="address"
-                            value={formData.address}
-                            onChange={handleInputChange}
-                        ></input><br />
-                        <input 
-                            placeholder="Email"
-                            type="text"
-                            name="email"
-                            value={formData.email}
-                            onChange={handleInputChange}
-                        ></input><br />
-                        <input 
-                            placeholder="Username"
-                            type="text"
-                            name="username"
-                            value={formData.username}
-                            onChange={handleInputChange}
-                        ></input><br />
-                        <input 
-                            placeholder="Password"
-                            type="text"
-                            name="password"
-                            value={formData.password}
-                            onChange={handleInputChange}
-                        ></input> <br /> 
 
-                        <input type="submit" value="Submit"></input>
+                        {Object.keys(formData).map((formField) => {
+                            return (
+                                <InputField
+                                    key={formField}
+                                    placeholder={FormFieldPlaceholders[formField]}
+                                    name={formField}
+                                    value={formData[formField]}
+                                    onChange={handleInputChange}
+                                />
+                            )
+                        })}
+
+                        <input className="btn" type="submit" value="Submit"></input>
                     </form>
                 </div>
             </div>

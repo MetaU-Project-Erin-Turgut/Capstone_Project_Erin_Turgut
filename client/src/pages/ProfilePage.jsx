@@ -2,7 +2,8 @@ import { useState, useEffect } from "react";
 import { useNotification } from '../contexts/NotificationContext';
 import APIUtils from "../utils/APIUtils";
 import NavBar from "../components/NavBar"
-import { DEFAULT_FORM_VALUE } from "../utils/utils";
+import InputField from "../components/InputField";
+import { DEFAULT_FORM_VALUE, FormFieldPlaceholders } from "../utils/utils";
 import { FaUserCircle } from "react-icons/fa";
 import { GrEdit } from "react-icons/gr";
 import { FaRegSave } from "react-icons/fa";
@@ -75,47 +76,22 @@ const ProfilePage = () => {
                     <FaUserCircle className="profile-page-img"/>
                 </section>
                 <form className="info-section">
-                    {/* combine these? */}
-                    <h3 className="input-label">First name:</h3>
-                    {!isEdit ? <p>{formData.firstName}</p> :
-                    <input className="profile-input"
-                            placeholder={formData.firstName}
-                            type="text"
-                            name="firstName"
-                            value={formData.firstName}
-                            onChange={handleInputChange}/>}
-                    <h3 className="input-label">Last name:</h3>
-                    {!isEdit ? <p>{formData.lastName}</p> :
-                    <input className="profile-input"
-                            placeholder={formData.lastName}
-                            type="text"
-                            name="lastName"
-                            value={formData.lastName}
-                            onChange={handleInputChange}/>}
-                    <h3 className="input-label">Username:</h3>
-                    {!isEdit ? <p>{formData.username}</p> :
-                    <input className="profile-input"
-                            placeholder={formData.username}
-                            type="text"
-                            name="username"
-                            value={formData.username}
-                            onChange={handleInputChange}/>}
-                    <h3 className="input-label">Email:</h3>
-                    {!isEdit ? <p>{formData.email}</p> :
-                    <input className="profile-input"
-                            placeholder={formData.email}
-                            type="text"
-                            name="email"
-                            value={formData.email}
-                            onChange={handleInputChange}/>}
-                    <h3 className="input-label">Address:</h3>
-                    {!isEdit ? <p>{formData.address}</p> :
-                    <input className="profile-input"
-                            placeholder={formData.address}
-                            type="text"
-                            name="address"
-                            value={formData.address}
-                            onChange={handleInputChange}/>}
+
+                    {Object.keys(formData).map((formField) => {
+                        return (
+                            <div key={formField}>
+                                <h3 className="input-label">{FormFieldPlaceholders[formField]}:</h3>
+                                {!isEdit ? <p>{formData[formField]}</p> :
+                                <InputField 
+                                    placeholder={formData[formField]}
+                                    name={formField}
+                                    value={formData[formField]}
+                                    onChange={handleInputChange}
+                                />}
+                            </div>
+                        )
+                    })}
+        
                     {isEdit ? <div className="save-btn" onClick={handleFormSubmit}><FaRegSave className="icon"/></div> : 
                     <div className="edit-btn" onClick={() => {setIsEdit(true)}}><GrEdit className="icon"/></div>}
                 </form>

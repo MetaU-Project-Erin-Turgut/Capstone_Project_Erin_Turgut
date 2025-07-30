@@ -24,6 +24,16 @@ const DEFAULT_FORM_VALUE = {
     email: ""
 }
 
+//enum for placeholders depending on form value
+const FormFieldPlaceholders = Object.freeze({
+    firstName: "First Name",
+    lastName: "Last Name",
+    address: "Address",
+    username: "Username",
+    password: "Password",
+    email: "Email"
+});
+
 //enums for all possible card data options
 const CardFields = Object.freeze({
     TITLE: "title",
@@ -56,4 +66,4 @@ const EventTypePreferenceColors = Object.freeze({
 });
 
 
-export { Tab, Status, DEFAULT_FORM_VALUE, CardFields, ModalFields, EventTypeArr, EventTypePreferenceColors };
+export { Tab, Status, DEFAULT_FORM_VALUE, CardFields, ModalFields, EventTypeArr, EventTypePreferenceColors, FormFieldPlaceholders};

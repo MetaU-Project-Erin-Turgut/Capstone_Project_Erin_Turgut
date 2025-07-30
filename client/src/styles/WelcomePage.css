@@ -4,6 +4,8 @@
     gap: 20vw;
     align-items: center;
     height: 100vh;
+    /* Photo Credit: Papaioannou Kostas:
+    https://unsplash.com/photos/silhouette-photo-of-people-tysecUm5HJA */
     background-image: url("../assets/welcome-page-photo1.jpg");
     background-size: cover;
 }
@@ -31,7 +33,7 @@
     box-shadow: 0px 10px 10px rgb(114, 112, 112);  
 }
 
-.welcome-btn:hover {
+.welcome-btn:hover,.header-btn:hover {
     box-shadow: 0px 10px 10px white; 
 }
 

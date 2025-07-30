@@ -15,7 +15,7 @@ const SelectedInterests = ({ initialInterests, onSubmitInterests }) => {
                                 <SingularSelectedInterest key={key} interest={value}/>
                             ))}
                         </Suspense>
-                        <button className="submit-changes-btn" onClick={onSubmitInterests}>Submit changes</button>
+                        <button className="submit-changes-btn btn" onClick={onSubmitInterests}>Submit changes</button>
                     </>
                     :
                     <p>You haven't selected any interests yet! Select some to get group recommendations.</p>
