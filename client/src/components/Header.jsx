@@ -10,13 +10,13 @@ const Header = () => {
             <h1 className="title-text" onClick={() => {
                 navigate(welcomeRoute);
             }}>Pivot</h1>
-            <div className="welcome-buttons">
-                <button onClick={() => {
+            <div className="header-buttons">
+                <div className="header-btn" onClick={() => {
                     navigate(signUpRoute);
-                }}>Sign Up</button>
-                <button onClick={() => {
+                }}>Sign Up</div>
+                <div className="header-btn" onClick={() => {
                     navigate(loginRoute);
-                }}>Login</button> 
+                }}>Login</div> 
             </div>
         </header>
     )

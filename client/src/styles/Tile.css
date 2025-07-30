@@ -3,7 +3,8 @@
     flex-direction: row;
     align-items: center;
     border-radius: 10px;
-    background-color: rgb(185, 182, 182);
+    background-color: white;
+    color: black;
     margin: 2px 4px;
     padding: 0px 7px;
     font-weight: bold;

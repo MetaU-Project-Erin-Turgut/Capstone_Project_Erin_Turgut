@@ -15,3 +15,12 @@
     font-size: 30px;
     margin: 2px;
 }
+
+.event-suggestion {
+    color: rgb(4, 213, 213);
+    border: 2px solid rgb(4, 213, 213);
+    font-size: 20px;
+    padding: 5px;
+    border-radius: 30px;
+    margin-bottom: 8px;
+}

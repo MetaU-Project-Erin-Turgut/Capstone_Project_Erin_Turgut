@@ -69,7 +69,7 @@ const ProfilePage = () => {
     return (
         <div id="profile-page">
             <NavBar isMenuVisible={false}/>
-            <div className="page-header"><h2>Profile Page</h2></div>
+            <div className="page-header"><h2>Your Profile</h2></div>
             <div className="profile-info">
                 <section className="image-side">
                     <FaUserCircle className="profile-page-img"/>

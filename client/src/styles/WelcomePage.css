@@ -1,17 +1,37 @@
 .welcome-div {
     display: flex;
     flex-direction: row;
-    justify-content: space-around;
+    gap: 20vw;
     align-items: center;
     height: 100vh;
+    background-image: url("../assets/welcome-page-photo1.jpg");
+    background-size: cover;
 }
 
 .welcome-title {
     text-align: center;
+    margin-left: 200px;
 }
 
 .welcome-title .title-text {
     font-size: 150px;
     margin: 5px;
+}
+
+.welcome-buttons {
+    display: flex;
+    flex-direction: column;
+    gap: 20px;
+}
+.welcome-btn {
+    padding: 30px;
+    font-size: 25px;
+    border-radius: 70px;
+    min-width: 380px;
+    box-shadow: 0px 10px 10px rgb(114, 112, 112);  
+}
+
+.welcome-btn:hover {
+    box-shadow: 0px 10px 10px white; 
 }
 
