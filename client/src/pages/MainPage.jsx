@@ -1,30 +1,18 @@
 import { useState, useMemo, useEffect } from 'react';
-import { useNavigate } from  "react-router";
-import { useUser } from "../contexts/UserContext";
-import { useLoader } from "../contexts/LoadingContext";
 import { useNotification } from '../contexts/NotificationContext';
-import { profileRoute } from "../utils/NavigationConsts";
 import NavBar from "../components/NavBar";
-import SideBar from "../components/SideBar";
 import EventsList from './EventsList';
 import GroupsList from './GroupsList';
 import InterestList from './InterestList';
-import ProfileDropDown from '../components/ProfileDropDown';
 import APIUtils from '../utils/APIUtils';
 import { Tab } from "../utils/utils";
 
 const MainPage = () => {
 
-    const navigate = useNavigate();
-
     const { setMessage } = useNotification(); //used to control notification pop up and message
-    const { setUser } = useUser(); 
-    const { setIsLoading } = useLoader(); //used to control loading screen during api call
-
+    
     const [userEventTypeTallies, setUserEventTypeTallies] = useState([]);
     const [selectedTab, setSelectedTab] = useState(Tab.EVENTS);
-    const [isSideBarVisible, setIsSideBarVisible] = useState(false);
-    const [isProfileDropDownVisible, setIsProfileDropDownVisible] = useState(false);
 
     const userTopEventType = useMemo(
         () => { 
@@ -70,32 +58,9 @@ const MainPage = () => {
         }
     }
 
-    const handleLogout = async () => {
-        setIsLoading(true);
-        try {
-            await APIUtils.handleLogout();
-            setUser(null); // remove session from react context
-            navigate(mainPageRoute);
-        } catch (error) {
-            console.log("Status ", error.status);
-            console.log("Error: ", error.message);
-        }
-        setIsLoading(false);
-    }
-
     return (
         <div id="main-page">
-            <NavBar isMenuClicked={isSideBarVisible} isMenuVisible={true} onMenuClick={() => {setIsSideBarVisible((prev) => !prev)}} onProfileClick={() => {setIsProfileDropDownVisible((prev) => !prev)}}/>
-            {isSideBarVisible && <SideBar handleTabSelect={(tabName) => {
-                setSelectedTab(tabName);
-                setIsSideBarVisible(!isSideBarVisible)
-            }}/>}
-            {isProfileDropDownVisible && <ProfileDropDown 
-                onProfileNav={() => {navigate(profileRoute); setIsProfileDropDownVisible(false);}}
-                onLogout={() => {handleLogout(); setIsProfileDropDownVisible(false);}}
-            />
-
-            }
+            <NavBar isMenuVisible={true} onSelectTab={(tabName) => setSelectedTab(tabName)} />
             <div className="main-content">
                 <div className="page-header"><h2>{selectedTab}</h2></div>
                 {/* Populate events or groups depending what tab was clicked on the side */}
