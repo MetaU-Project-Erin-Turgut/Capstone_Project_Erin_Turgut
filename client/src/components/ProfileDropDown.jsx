@@ -1,9 +1,9 @@
-import "../styles/ProfileDropDown.css";
+import "../styles/DropDownBar.css";
 
 const ProfileDropDown = ({onProfileNav, onLogout}) => {
-    return (<div className="profile-dropdown">
-        <div className="profile-dropdown-option" onClick={onProfileNav}>My profile</div>
-        <div className="profile-dropdown-option" onClick={onLogout}>Logout</div>
+    return (<div className="dropdown-bar profile-dropdown">
+        <div className="bar-tab" onClick={onProfileNav}>My profile</div>
+        <div className="bar-tab" onClick={onLogout}>Logout</div>
     </div>)
 }
 

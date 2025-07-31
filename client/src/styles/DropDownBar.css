@@ -1,4 +1,4 @@
-.sidebar{
+.dropdown-bar{
     display: block;
     background-color: black;
     z-index: 2;
@@ -8,14 +8,18 @@
     margin-top: 70px;
 }
 
-.sidebar .side-tab {
+.profile-dropdown {
+    right: 0px;
+}
+
+.dropdown-bar .bar-tab {
     text-align: center;
     padding: 15px;
     width: 70px;
     max-height: fit-content;
 }
 
-.side-tab:hover {
+.bar-tab:hover {
     background-color: rgb(164, 164, 164);
     border-radius: 30px;
 }
