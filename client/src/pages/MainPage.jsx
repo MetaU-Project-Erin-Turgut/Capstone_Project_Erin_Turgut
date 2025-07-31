@@ -1,7 +1,6 @@
 import { useState, useMemo, useEffect } from 'react';
 import { useNotification } from '../contexts/NotificationContext';
 import NavBar from "../components/NavBar";
-import SideBar from "../components/SideBar";
 import EventsList from './EventsList';
 import GroupsList from './GroupsList';
 import InterestList from './InterestList';
@@ -14,7 +13,6 @@ const MainPage = () => {
     
     const [userEventTypeTallies, setUserEventTypeTallies] = useState([]);
     const [selectedTab, setSelectedTab] = useState(Tab.EVENTS);
-    const [isSideBarVisible, setIsSideBarVisible] = useState(false);
 
     const userTopEventType = useMemo(
         () => { 
@@ -62,13 +60,7 @@ const MainPage = () => {
 
     return (
         <div id="main-page">
-            <NavBar isMenuClicked={isSideBarVisible} isMenuVisible={true} onMenuClick={() => {
-                setIsSideBarVisible(!isSideBarVisible)
-            }}/>
-            {isSideBarVisible && <SideBar handleTabSelect={(tabName) => {
-                setSelectedTab(tabName);
-                setIsSideBarVisible(!isSideBarVisible)
-            }}/>}
+            <NavBar isMenuVisible={true} onSelectTab={(tabName) => setSelectedTab(tabName)} />
             <div className="main-content">
                 <div className="page-header"><h2>{selectedTab}</h2></div>
                 {/* Populate events or groups depending what tab was clicked on the side */}

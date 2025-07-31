@@ -1,6 +1,6 @@
 .profile-info {
     display: flex;
-    gap: 30vw;
+    justify-content: space-around;
     align-items: center;
     text-align: left;
     padding-left: 40px;
@@ -8,12 +8,11 @@
 }
 
 .profile-page-img {
-    padding-left: 180px;
     font-size: 300px;
 }
 
 .input-label {
-    margin: 10px;
+    font-size: 27px;
 }
 
 .edit-btn, .save-btn {

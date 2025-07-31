@@ -1,7 +1,7 @@
 .welcome-div {
     display: flex;
     flex-direction: row;
-    gap: 20vw;
+    justify-content: space-around;
     align-items: center;
     height: 100vh;
     /* Photo Credit: Papaioannou Kostas:
@@ -12,7 +12,6 @@
 
 .welcome-title {
     text-align: center;
-    margin-left: 200px;
 }
 
 .welcome-title .title-text {
