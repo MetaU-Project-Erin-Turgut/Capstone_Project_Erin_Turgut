@@ -5,7 +5,7 @@ const InputField = ({ placeholder, name, value, onChange}) => {
         <>
             <input className="input-field"
                 placeholder={placeholder}
-                type="text"
+                type={name === "password" ? "password" : "text"}
                 name={name}
                 value={value}
                 onChange={(event) => {onChange(event)}}
