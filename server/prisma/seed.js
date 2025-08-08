@@ -15,23 +15,39 @@ const interests = [
     {id: 9, title: 'ACDC',  parentId: 8, level: 4, path: "0.6.8.9"},
     {id: 10, title: 'Tennis',  parentId: 1, level: 2, path: "1.10"},
     {id: 11, title: 'Baking',  parentId: 2, level: 2, path: "2.11"},
+    {id: 12, title: 'Pickleball',  parentId: 1, level: 2, path: "1.12"},
+    {id: 13, title: 'Ping Pong',  parentId: 1, level: 2, path: "1.13"},
+    {id: 14, title: 'Soccer',  parentId: 1, level: 2, path: "1.14"},
+    {id: 15, title: 'FIFA',  parentId: 14, level: 3, path: "1.14.15"},
+    {id: 16, title: 'Rap',  parentId: 0, level: 2, path: "0.16"},
+    {id: 17, title: 'Rap Battles',  parentId: 16, level: 3, path: "0.16.17"},
+    {id: 18, title: 'Dance', parentId: null, level: 1, path: "18"},
+    {id: 19, title: 'Hip Hop', parentId: 18, level: 2, path: "18.19"},
+    {id: 20, title: 'Salsa', parentId: 18, level: 2, path: "18.20"},
+    {id: 21, title: 'Ballet', parentId: 18, level: 2, path: "18.21"},
+    {id: 22, title: 'Ballroom', parentId: 18, level: 2, path: "18.22"}
 ];
 const groups = [
-    {title: 'Group 1', description: 'group 1 in mpk', isFull: false, latitude: 37.4855, longitude: -122.1500, interests: [{"id": 10}, {"id": 6}, {"id": 11}]},
-    {title: 'Group 2', description: 'group 2 in mpk', isFull: false, latitude: 37.4855, longitude: -122.1500, interests: [{"id": 8}, {"id": 7}, {"id": 1}]},
-    {title: 'Group 3', description: 'group 3 in mpk', isFull: false, latitude: 37.4855, longitude: -122.1500, interests: [{"id": 5}, {"id": 10}]},
-    {title: 'Group Far away', description: 'far away from mpk', isFull: false, latitude: 35.6895, longitude: 139.6917, interests: [{"id": 10}, {"id": 2}, {"id": 7}]},
+    {title: 'Menlo Music', description: 'Music group In MPK area', isFull: false, latitude: 37.4855, longitude: -122.1500, interests: [{"id": 0}]},
+    {title: 'Ping Pong Rookies', description: 'Group in mpk', isFull: false, latitude: 37.4855, longitude: -122.1500, interests: [{"id": 13}]},
+    {title: 'Gordon Ramsay who?', description: 'Best cooks period', isFull: false, latitude: 37.4855, longitude: -122.1500, interests: [{"id": 2}, {"id": 11}]},
+    {title: 'Trebles', description: 'We like to sing', isFull: false, latitude: 37.4855, longitude: -122.1500, interests: [{"id": 3}, {"id": 4}, {"id": 7}]},
+    {title: 'Group Foster City', description: 'Best in the bay area!!!', isFull: false, latitude: 37.4855, longitude: -122.1500, interests: [{"id": 7}, {"id": 13}, {"id": 4}, {"id": 0}, {"id": 14}]},
+    {title: 'Sports in Sunnyvale', description: 'Just Do It', isFull: false, latitude: 37.4855, longitude: -122.1500, interests: [{"id": 14}, {"id": 15}]},
+    {title: 'Best group in Pivot', description: 'Best of the best in Cali', isFull: false, latitude: 37.4855, longitude: -122.1500, interests: [{"id": 20}, {"id": 18}]},
 ];
 
 const events = [
     {title: 'Passed event', description: 'Passed event', dateTime: new Date('2025-05-25T12:00:00Z'), latitude: 37.4855, longitude: -122.1500, interest: {"id": 10}, eventType: EventType.EATING},
-    {title: 'Tennis game', description: 'Tennis game in mpk', dateTime: new Date('2025-07-22T12:00:00Z'), latitude: 37.4855, longitude: -122.1500, interest: {"id": 10}, eventType: EventType.ACTIVE},
-    {title: 'Indie Rock Concert', description: 'Indie Rock concert in mpk', dateTime: new Date('2025-12-25T12:00:00Z'), latitude: 37.4855, longitude: -122.1500, interest: {"id": 7}, eventType: EventType.ENTERTAINMENT},
-    {title: 'ACDC concert', description: 'ACDC concert in mpk', dateTime: new Date('2025-11-25T12:00:00Z'), latitude: 37.4855, longitude: -122.1500, interest: {"id": 9}, eventType: EventType.ENTERTAINMENT},
-    {title: 'karaoke night', description: 'karaoke night out', dateTime: new Date('2025-11-25T12:00:00Z'), latitude: 37.4855, longitude: -122.1500, interest: {"id": 4}, eventType: EventType.ENTERTAINMENT},
+    {title: 'Tennis game', description: 'Tennis game in mpk', dateTime: new Date('2025-08-22T12:00:00Z'), latitude: 37.4855, longitude: -122.1500, interest: {"id": 10}, eventType: EventType.ACTIVE},
+    {title: 'Indie Rock Concert', description: 'Indie Rock concert in Mountain View', dateTime: new Date('2025-12-25T12:00:00Z'), latitude: 37.4855, longitude: -122.1500, interest: {"id": 7}, eventType: EventType.ENTERTAINMENT},
+    {title: 'ACDC concert', description: 'ACDC concert in Sunnyvale', dateTime: new Date('2025-11-25T12:00:00Z'), latitude: 37.4855, longitude: -122.1500, interest: {"id": 9}, eventType: EventType.ENTERTAINMENT},
+    {title: 'Karaoke night', description: 'Karaoke night out bay area', dateTime: new Date('2025-11-25T12:00:00Z'), latitude: 37.4855, longitude: -122.1500, interest: {"id": 4}, eventType: EventType.ENTERTAINMENT},
     {title: 'Baking competition', description: 'Baking competition in mpk', dateTime: new Date('2025-10-25T12:00:00Z'), latitude: 37.4855, longitude: -122.1500, interest: {"id": 11}, eventType: EventType.ACTIVE},
-    {title: 'Music festival', description: 'Music festival in Tokyo', dateTime: new Date('2025-09-25T12:00:00Z'), latitude: 35.6895, longitude: 139.6917, interest: {"id": 0}, eventType: EventType.ENTERTAINMENT},
-
+    {title: 'Soccer Tournament', description: 'Tournament in Foster city. All levels!', dateTime: new Date('2025-08-22T12:00:00Z'), latitude: 37.4855, longitude: -122.1500, interest: {"id": 14}, eventType: EventType.ACTIVE},
+    {title: 'World Cup Watch Party', description: 'At Bob\'s Burgers and Bar', dateTime: new Date('2025-08-14T12:00:00Z'), latitude: 37.4855, longitude: -122.1500, interest: {"id": 15}, eventType: EventType.ENTERTAINMENT},
+    {title: 'Ballroom Dance Lessons', description: 'Trina\'s Studio - $10 entry fee!', dateTime: new Date('2025-09-14T12:00:00Z'), latitude: 37.4855, longitude: -122.1500, interest: {"id": 22}, eventType: EventType.ACTIVE},
+    {title: 'Italian Cheese Tasting', description: 'Eataly - $5 Entry!', dateTime: new Date('2025-08-18T12:00:00Z'), latitude: 37.4855, longitude: -122.1500, interest: {"id": 2}, eventType: EventType.EATING},
 ]
 async function main() {
     console.log(`Start seeding ...`)

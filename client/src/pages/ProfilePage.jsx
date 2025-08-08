@@ -59,6 +59,7 @@ const ProfilePage = () => {
                 email: apiResultData.email
             })
             setIsEdit(false)
+            setMessage("Changes saved!")
         } catch (error) {
             setMessage(error.message)
             console.log("Status ", error.status);

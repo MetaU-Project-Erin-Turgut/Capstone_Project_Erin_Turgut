@@ -19,9 +19,9 @@ const DEFAULT_FORM_VALUE = {
     firstName: "",
     lastName: "",
     address: "",
+    email: "",
     username: "",
-    password: "",
-    email: ""
+    password: ""
 }
 
 //enum for placeholders depending on form value
